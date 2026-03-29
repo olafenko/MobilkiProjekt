@@ -52,3 +52,70 @@ CodeCoverage/
 *.VisualState.xml
 TestResult.xml
 nunit-*.xml
+
+# Visual Studio (IDE-specific)
+.vs/
+/.vs
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+*.vcxproj.user
+*.csproj.user
+*.vbproj.user
+*.fsproj.user
+
+# Visual Studio caches / databases
+*.VC.db
+*.VC.VC.opendb
+ipch/
+*.sdf
+*.opensdf
+*.psess
+*.vsp
+*.vspx
+*.opendb
+
+# VS build / profiler / history artifacts
+.vshistory/
+*.tlog
+
+# JetBrains Rider (often used with .NET)
+.idea/
+*.sln.iml
+
+# React Native
+node_modules/
+
+# Package manager / debug logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+*.log
+
+# Metro / React Native packager
+.metro-cache/
+metro-cache/
+*.pack
+
+
+# React Native generated files
+.react-native/
+*.bundle
+
+# Android
+android/.gradle/
+android/local.properties
+android/**/build/
+android/**/captures/
+android/**/.cxx/
+android/.idea/
+android/*.iml
+
+# iOS
+ios/Pods/
+ios/build/
+ios/DerivedData/
+ios/*.xcuserstate
+ios/**/xcuserdata/
