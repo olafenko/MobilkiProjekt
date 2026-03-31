@@ -9,7 +9,7 @@
         public decimal Price { get; set; }
         public bool IsActive { get; set; }
 
-        public virtual ICollection<Reservation> Reservations { get; set; } = new List<Reservation>();
+        public virtual ICollection<ReservationHotelService> ReservationHotelServices { get; set; } = new List<ReservationHotelService>();
 
     }
 }
