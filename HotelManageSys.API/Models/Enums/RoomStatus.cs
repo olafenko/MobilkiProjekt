@@ -2,7 +2,7 @@
 {
     public enum RoomStatus
     {
-        FREE, OCCUPIED,
+        AVAILABLE, OCCUPIED,
 
     }
 }
