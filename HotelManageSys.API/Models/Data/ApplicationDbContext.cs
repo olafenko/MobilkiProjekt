@@ -109,7 +109,7 @@ namespace HotelManageSys.API.Models.Data
                 rhs.HasOne(rhs => rhs.Reservation)
                     .WithMany(r => r.ReservationHotelServices)
                     .HasForeignKey(rhs => rhs.ReservationId)
-                    .OnDelete(DeleteBehavior.Restrict);
+                    .OnDelete(DeleteBehavior.Cascade);
 
                 rhs.HasOne(rhs => rhs.HotelService)
                    .WithMany(hs => hs.ReservationHotelServices)
