@@ -11,6 +11,7 @@ namespace HotelManageSys.API.Models
         public string? Description { get; set; }
         public RoomStatus Status { get; set; }
         public bool IsActive { get; set; }
+
         public int RoomTypeId { get; set; }
 
         public virtual RoomType RoomType { get; set; } = null!;

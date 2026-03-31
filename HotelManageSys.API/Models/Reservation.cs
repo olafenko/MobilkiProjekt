@@ -24,7 +24,7 @@ namespace HotelManageSys.API.Models
 
         public int WorkerId { get; set; }
 
-        public Worker Worker { get; set; } = null!;
+        public virtual Worker Worker { get; set; } = null!;
 
         public virtual ICollection<HotelService> HotelServices { get; set; } = new List<HotelService>();
 
