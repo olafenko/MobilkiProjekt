@@ -12,8 +12,8 @@ namespace HotelManageSys.API.Models
 
         public decimal Price { get; set; }
 
-        public DateTime PaymentDate { get; set; }
-        public bool IsActive { get; set; }
+        public DateTime PaymentDate { get; set; } = DateTime.Now;
+        public bool IsActive { get; set; } = true;
 
         public int ReservationId { get; set; }
         public virtual Reservation Reservation { get; set; } = null!;

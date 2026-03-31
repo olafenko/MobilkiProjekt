@@ -10,7 +10,7 @@
         public int Quantity { get; set; }
         public string? Notes { get; set; }
 
-        public bool IsActive { get; set; }
+        public bool IsActive { get; set; } = true;
 
         public virtual Reservation Reservation { get; set; } = null!;
         public virtual HotelService HotelService { get; set; } = null!;

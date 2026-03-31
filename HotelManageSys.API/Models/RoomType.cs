@@ -11,7 +11,7 @@
 
         public string? Description { get; set; }
 
-        public bool IsActive { get; set; }
+        public bool IsActive { get; set; } = true;
 
 
         public virtual ICollection<Room> Rooms { get; set; } = new List<Room>();

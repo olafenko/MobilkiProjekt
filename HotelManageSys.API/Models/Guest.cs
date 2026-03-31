@@ -13,7 +13,7 @@
 
         public required string IdentityCardNumber { get; set; }
 
-        public bool IsActive { get; set; }
+        public bool IsActive { get; set; } = true;
 
         public virtual ICollection<Reservation> Reservations { get; set; } = new List<Reservation>();
     }

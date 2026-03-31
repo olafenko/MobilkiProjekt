@@ -10,7 +10,7 @@ namespace HotelManageSys.API.Models
         public int Floor { get; set; }
         public string? Description { get; set; }
         public RoomStatus Status { get; set; }
-        public bool IsActive { get; set; }
+        public bool IsActive { get; set; } = true;
 
         public int RoomTypeId { get; set; }
 
