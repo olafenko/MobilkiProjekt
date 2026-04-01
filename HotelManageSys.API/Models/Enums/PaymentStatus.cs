@@ -3,7 +3,7 @@
     public enum PaymentStatus
     {
 
-        PAID,PENDING,CANCELLED,FAILED
+        PAID, PENDING, CANCELLED, FAILED
 
 
     }
