@@ -1,6 +1,8 @@
-﻿namespace HotelManageSys.API.Features.Rooms.Messages.Queries
+﻿using MediatR;
+
+namespace HotelManageSys.API.Features.Rooms.Messages.Queries
 {
-    public class GetRoomByIdQuery
+    public class GetRoomByIdQuery : IRequest<RoomDTO>
     {
     }
 }
