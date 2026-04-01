@@ -26,7 +26,7 @@ namespace HotelManageSys.API.Models
 
         public virtual Worker Worker { get; set; } = null!;
 
-        public virtual ICollection<ReservationHotelService> ReservationHotelServices { get; set; } = new List<ReservationHotelService>();
+        public virtual ICollection<ReservationAdditionalOffer> ReservationAdditionalOffers { get; set; } = new List<ReservationAdditionalOffer>();
         public virtual ICollection<Payment> Payments { get; set; } = new List<Payment>();
 
 

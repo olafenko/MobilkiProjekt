@@ -11,12 +11,10 @@ namespace HotelManageSys.API
         {
             var builder = WebApplication.CreateBuilder(args);
 
-
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
                options.UseSqlServer(builder.Configuration.GetConnectionString("ApplicationDbContext")));
 
             builder.Services.AddOpenApi();
-
 
             builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
 
@@ -53,7 +51,6 @@ namespace HotelManageSys.API
             app.UseHttpsRedirection();
 
             app.UseAuthorization();
-
 
             app.MapControllers();
 

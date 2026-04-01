@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HotelManageSys.API.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260331174216_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20260401165754_InitalCreate")]
+    partial class InitalCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -38,6 +38,46 @@ namespace HotelManageSys.API.Migrations
                     b.HasIndex("RoomsRoomId");
 
                     b.ToTable("AmenityRoom");
+                });
+
+            modelBuilder.Entity("HotelManageSys.API.Models.AdditionalOffer", b =>
+                {
+                    b.Property<int>("AdditionalOfferId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("AdditionalOfferId"));
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(80)
+                        .HasColumnType("nvarchar(80)");
+
+                    b.Property<decimal>("Price")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.HasKey("AdditionalOfferId");
+
+                    b.ToTable("AdditionalOffers");
+
+                    b.HasData(
+                        new
+                        {
+                            AdditionalOfferId = 1,
+                            IsActive = true,
+                            Name = "Śniadanie",
+                            Price = 40m
+                        },
+                        new
+                        {
+                            AdditionalOfferId = 2,
+                            IsActive = true,
+                            Name = "Parking",
+                            Price = 25m
+                        });
                 });
 
             modelBuilder.Entity("HotelManageSys.API.Models.Amenity", b =>
@@ -133,46 +173,6 @@ namespace HotelManageSys.API.Migrations
                         });
                 });
 
-            modelBuilder.Entity("HotelManageSys.API.Models.HotelService", b =>
-                {
-                    b.Property<int>("HotelServiceId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("HotelServiceId"));
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(80)
-                        .HasColumnType("nvarchar(80)");
-
-                    b.Property<decimal>("Price")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.HasKey("HotelServiceId");
-
-                    b.ToTable("HotelServices");
-
-                    b.HasData(
-                        new
-                        {
-                            HotelServiceId = 1,
-                            IsActive = true,
-                            Name = "Śniadanie",
-                            Price = 40m
-                        },
-                        new
-                        {
-                            HotelServiceId = 2,
-                            IsActive = true,
-                            Name = "Parking",
-                            Price = 25m
-                        });
-                });
-
             modelBuilder.Entity("HotelManageSys.API.Models.Payment", b =>
                 {
                     b.Property<int>("PaymentId")
@@ -260,15 +260,15 @@ namespace HotelManageSys.API.Migrations
                     b.ToTable("Reservations");
                 });
 
-            modelBuilder.Entity("HotelManageSys.API.Models.ReservationHotelService", b =>
+            modelBuilder.Entity("HotelManageSys.API.Models.ReservationAdditionalOffer", b =>
                 {
-                    b.Property<int>("ReservationHotelServiceId")
+                    b.Property<int>("ReservationAdditionalOfferId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ReservationHotelServiceId"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ReservationAdditionalOfferId"));
 
-                    b.Property<int>("HotelServiceId")
+                    b.Property<int>("AdditionalOfferId")
                         .HasColumnType("int");
 
                     b.Property<bool>("IsActive")
@@ -284,13 +284,13 @@ namespace HotelManageSys.API.Migrations
                     b.Property<int>("ReservationId")
                         .HasColumnType("int");
 
-                    b.HasKey("ReservationHotelServiceId");
+                    b.HasKey("ReservationAdditionalOfferId");
 
-                    b.HasIndex("HotelServiceId");
+                    b.HasIndex("AdditionalOfferId");
 
                     b.HasIndex("ReservationId");
 
-                    b.ToTable("ReservationHotelServices");
+                    b.ToTable("ReservationAdditionalOffers");
                 });
 
             modelBuilder.Entity("HotelManageSys.API.Models.Room", b =>
@@ -494,21 +494,21 @@ namespace HotelManageSys.API.Migrations
                     b.Navigation("Worker");
                 });
 
-            modelBuilder.Entity("HotelManageSys.API.Models.ReservationHotelService", b =>
+            modelBuilder.Entity("HotelManageSys.API.Models.ReservationAdditionalOffer", b =>
                 {
-                    b.HasOne("HotelManageSys.API.Models.HotelService", "HotelService")
-                        .WithMany("ReservationHotelServices")
-                        .HasForeignKey("HotelServiceId")
+                    b.HasOne("HotelManageSys.API.Models.AdditionalOffer", "AdditionalOffer")
+                        .WithMany("ReservationAdditionalOffers")
+                        .HasForeignKey("AdditionalOfferId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("HotelManageSys.API.Models.Reservation", "Reservation")
-                        .WithMany("ReservationHotelServices")
+                        .WithMany("ReservationAdditionalOffers")
                         .HasForeignKey("ReservationId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("HotelService");
+                    b.Navigation("AdditionalOffer");
 
                     b.Navigation("Reservation");
                 });
@@ -524,21 +524,21 @@ namespace HotelManageSys.API.Migrations
                     b.Navigation("RoomType");
                 });
 
+            modelBuilder.Entity("HotelManageSys.API.Models.AdditionalOffer", b =>
+                {
+                    b.Navigation("ReservationAdditionalOffers");
+                });
+
             modelBuilder.Entity("HotelManageSys.API.Models.Guest", b =>
                 {
                     b.Navigation("Reservations");
-                });
-
-            modelBuilder.Entity("HotelManageSys.API.Models.HotelService", b =>
-                {
-                    b.Navigation("ReservationHotelServices");
                 });
 
             modelBuilder.Entity("HotelManageSys.API.Models.Reservation", b =>
                 {
                     b.Navigation("Payments");
 
-                    b.Navigation("ReservationHotelServices");
+                    b.Navigation("ReservationAdditionalOffers");
                 });
 
             modelBuilder.Entity("HotelManageSys.API.Models.Room", b =>

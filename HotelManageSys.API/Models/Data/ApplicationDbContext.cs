@@ -14,11 +14,11 @@ namespace HotelManageSys.API.Models.Data
         public DbSet<RoomType> RoomTypes { get; set; }
         public DbSet<Reservation> Reservations { get; set; }
         public DbSet<Amenity> Amenities { get; set; }
-        public DbSet<HotelService> HotelServices { get; set; }
+        public DbSet<AdditionalOffer> AdditionalOffers { get; set; }
         public DbSet<Guest> Guests { get; set; }
         public DbSet<Worker> Workers { get; set; }
         public DbSet<Payment> Payments { get; set; }
-        public DbSet<ReservationHotelService> ReservationHotelServices { get; set; }
+        public DbSet<ReservationAdditionalOffer> ReservationAdditionalOffers { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -89,31 +89,31 @@ namespace HotelManageSys.API.Models.Data
 
             });
 
-            modelBuilder.Entity<HotelService>(hs =>
+            modelBuilder.Entity<AdditionalOffer>(a =>
             {
-                hs.HasKey(hs => hs.HotelServiceId);
-                hs.Property(hs => hs.Name).HasMaxLength(80).IsRequired();
-                hs.Property(hs => hs.Price).HasColumnType("decimal(18,2)").IsRequired();
-                hs.Property(hs => hs.IsActive).IsRequired();
+                a.HasKey(a => a.AdditionalOfferId);
+                a.Property(a => a.Name).HasMaxLength(80).IsRequired();
+                a.Property(a => a.Price).HasColumnType("decimal(18,2)").IsRequired();
+                a.Property(a => a.IsActive).IsRequired();
 
 
             });
 
-            modelBuilder.Entity<ReservationHotelService>(rhs =>
+            modelBuilder.Entity<ReservationAdditionalOffer>(rhs =>
             {
-                rhs.HasKey(rhs => rhs.ReservationHotelServiceId);
+                rhs.HasKey(rhs => rhs.ReservationAdditionalOfferId);
                 rhs.Property(rhs => rhs.Quantity).IsRequired();
                 rhs.Property(rhs => rhs.Notes).HasMaxLength(300);
                 rhs.Property(rhs => rhs.IsActive).IsRequired();
 
                 rhs.HasOne(rhs => rhs.Reservation)
-                    .WithMany(r => r.ReservationHotelServices)
+                    .WithMany(r => r.ReservationAdditionalOffers)
                     .HasForeignKey(rhs => rhs.ReservationId)
                     .OnDelete(DeleteBehavior.Cascade);
 
-                rhs.HasOne(rhs => rhs.HotelService)
-                   .WithMany(hs => hs.ReservationHotelServices)
-                   .HasForeignKey(rhs => rhs.HotelServiceId)
+                rhs.HasOne(rhs => rhs.AdditionalOffer)
+                   .WithMany(a => a.ReservationAdditionalOffers)
+                   .HasForeignKey(rhs => rhs.AdditionalOfferId)
                    .OnDelete(DeleteBehavior.Restrict);
 
 
@@ -189,9 +189,9 @@ namespace HotelManageSys.API.Models.Data
                 new Amenity { AmenityId = 2, Name = "AC", Description = "Klimatyzacja", IsActive = true }
             );
 
-            modelBuilder.Entity<HotelService>().HasData(
-                new HotelService { HotelServiceId = 1, Name = "Śniadanie", Price = 40, IsActive = true },
-                new HotelService { HotelServiceId = 2, Name = "Parking", Price = 25, IsActive = true }
+            modelBuilder.Entity<AdditionalOffer>().HasData(
+                new AdditionalOffer { AdditionalOfferId = 1, Name = "Śniadanie", Price = 40, IsActive = true },
+                new AdditionalOffer { AdditionalOfferId = 2, Name = "Parking", Price = 25, IsActive = true }
             );
 
             modelBuilder.Entity<Worker>().HasData(
