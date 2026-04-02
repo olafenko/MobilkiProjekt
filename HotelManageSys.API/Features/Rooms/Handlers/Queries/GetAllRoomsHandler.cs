@@ -1,5 +1,6 @@
 ﻿using HotelManageSys.API.Features.Rooms.Messages.Queries;
 using HotelManageSys.API.Models.Data;
+using Mapster;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -25,20 +26,9 @@ namespace HotelManageSys.API.Features.Rooms.Handlers.Queries
                 .Include(r => r.Amenities)
                 .Where(r => r.IsActive)
                 .OrderBy(r => r.Number)
-                .Select(r => new RoomDTO
-                {
-                    RoomId = r.RoomId,
-                    Number = r.Number,
-                    Floor = r.Floor,
-                    Description = r.Description,
-                    Status = r.Status.ToString(),
-                    RoomTypeName = r.RoomType != null ? r.RoomType.Name : null,
-                    BasePrice = r.RoomType != null ? r.RoomType.BasePrice : 0,
-                    AmenitiesNames = r.Amenities.Select(a => a.Name).ToList()
+                .ToListAsync(cancellationToken);
 
-                }).ToListAsync(cancellationToken);
-
-            return rooms;
+            return rooms.Adapt<IEnumerable<RoomDTO>>();
 
         }
     }

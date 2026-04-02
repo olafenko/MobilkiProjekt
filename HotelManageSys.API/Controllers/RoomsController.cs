@@ -8,12 +8,12 @@ namespace HotelManageSys.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class RoomController : ControllerBase
+    public class RoomsController : ControllerBase
     {
 
         private readonly IMediator _mediator;
 
-        public RoomController(IMediator mediator)
+        public RoomsController(IMediator mediator)
         {
             _mediator = mediator;
         }
