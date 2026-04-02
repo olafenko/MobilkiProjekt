@@ -1,4 +1,5 @@
-﻿using HotelManageSys.API.Features.Rooms.Messages.Queries;
+﻿using HotelManageSys.API.Features.Rooms.Messages.Commands;
+using HotelManageSys.API.Features.Rooms.Messages.Queries;
 using HotelManageSys.API.Models;
 using Mapster;
 
@@ -13,6 +14,12 @@ namespace HotelManageSys.API.Features.Rooms.Mappings
                 .Map(d => d.BasePrice, src => src.RoomType != null ? src.RoomType.BasePrice : 0)
                 .Map(d => d.AmenitiesNames, src => src.Amenities.Select(a => a.Name).ToList())
                 .Map(d => d.Status, src => src.Status.ToString());
+
+            config.NewConfig<CreateRoomCommand, Room>()
+                .Ignore(d => d.RoomId)
+                .Ignore(d => d.RoomType)
+                .Ignore(d => d.Reservations)
+                .Ignore(d => d.Amenities);
 
         }
     }

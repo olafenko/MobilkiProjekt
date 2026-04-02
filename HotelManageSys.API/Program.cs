@@ -1,5 +1,6 @@
 
 using HotelManageSys.API.Features.Rooms.Providers;
+using HotelManageSys.API.Features.Rooms.Services;
 using HotelManageSys.API.Models.Data;
 using Mapster;
 using Microsoft.EntityFrameworkCore;
@@ -23,6 +24,8 @@ namespace HotelManageSys.API
             TypeAdapterConfig.GlobalSettings.Scan(Assembly.GetExecutingAssembly());
 
             builder.Services.AddScoped<IRoomProvider, RoomProvider>();
+
+            builder.Services.AddScoped<IRoomService, RoomService>();
 
             // Add services to the container.
 

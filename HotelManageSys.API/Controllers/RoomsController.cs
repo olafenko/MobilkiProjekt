@@ -1,4 +1,5 @@
 ﻿
+using HotelManageSys.API.Features.Rooms.Messages.Commands;
 using HotelManageSys.API.Features.Rooms.Messages.Queries;
 using MediatR;
 using Microsoft.AspNetCore.Http;
@@ -18,6 +19,10 @@ namespace HotelManageSys.API.Controllers
             _mediator = mediator;
         }
 
+        /// <summary>
+        /// Return list of all rooms
+        /// </summary>
+        /// <returns></returns>
         [HttpGet]
         [ProducesResponseType(typeof(List<RoomDTO>), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetAllRooms()
@@ -29,6 +34,11 @@ namespace HotelManageSys.API.Controllers
 
         }
 
+        /// <summary>
+        /// Return single room 
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         [HttpGet("{id}")]
         [ProducesResponseType(typeof(RoomDTO), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -43,6 +53,25 @@ namespace HotelManageSys.API.Controllers
 
         }
 
+
+        [HttpPost]
+        [ProducesResponseType(typeof(int), StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> CreateRoom([FromBody] CreateRoomCommand command)
+        {
+
+            var roomId = await _mediator.Send(command);
+
+            return CreatedAtAction(
+                nameof(GetRoomById),
+                new { id = roomId},
+                new { id = roomId, message = "Pokój został utworzony"}
+
+                );
+
+
+
+        }
 
 
 
