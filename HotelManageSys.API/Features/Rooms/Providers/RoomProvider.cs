@@ -26,13 +26,19 @@ namespace HotelManageSys.API.Features.Rooms.Providers
                 .ToListAsync(cancellationToken);
         }
 
-        public async Task<Room?> GetRoomByIdAsync(int roomId, CancellationToken cancellationToken = default)
+        public async Task<Room?> GetRoomByIdAsync(int roomId,bool noTracking = true, CancellationToken cancellationToken = default)
         {
-            return await _dbContext.Rooms
-                .AsNoTracking()
+            IQueryable<Room> query = _dbContext.Rooms
                 .Include(r => r.RoomType)
-                .Include(r => r.Amenities)
-                .FirstOrDefaultAsync(r => r.IsActive && r.RoomId == roomId, cancellationToken);
+                .Include(r => r.Amenities);
+
+            if (noTracking)
+            {
+                query = query.AsNoTracking();
+            }
+
+
+            return await query.FirstOrDefaultAsync(r => r.IsActive && r.RoomId == roomId, cancellationToken);
         }
     }
 }

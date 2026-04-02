@@ -18,7 +18,7 @@ namespace HotelManageSys.API.Features.Rooms.Handlers.Queries
     public async Task<RoomDTO?> Handle(GetRoomByIdQuery request, CancellationToken cancellationToken)
     {
 
-        return (await _roomProvider.GetRoomByIdAsync(request.Id, cancellationToken))?.Adapt<RoomDTO>();
+        return (await _roomProvider.GetRoomByIdAsync(request.Id, true, cancellationToken))?.Adapt<RoomDTO>();
 
     }
 }

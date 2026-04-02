@@ -6,6 +6,7 @@ namespace HotelManageSys.API.Features.Rooms.Services
     {
 
         Task CreateRoom(Room room, CancellationToken cancellationToken = default);
+        Task UpdateRoom(Room room, CancellationToken cancellationToken = default);
 
     }
 }
