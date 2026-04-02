@@ -3,7 +3,7 @@
     public enum PaymentMethod
     {
 
-        MONEY,CARD,TRANSFER
+        MONEY, CARD, TRANSFER
 
     }
 }

@@ -16,7 +16,7 @@ namespace HotelManageSys.API.Models
 
         public virtual RoomType RoomType { get; set; } = null!;
 
-        public virtual ICollection<Reservation>  Reservations { get; set; } = new List<Reservation>();
+        public virtual ICollection<Reservation> Reservations { get; set; } = new List<Reservation>();
         public virtual ICollection<Amenity> Amenities { get; set; } = new List<Amenity>();
 
 

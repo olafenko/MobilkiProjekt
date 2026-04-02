@@ -1,5 +1,8 @@
 
+using HotelManageSys.API.Features.Rooms.Providers;
+using HotelManageSys.API.Features.Rooms.Services;
 using HotelManageSys.API.Models.Data;
+using Mapster;
 using Microsoft.EntityFrameworkCore;
 using System.Reflection;
 
@@ -11,14 +14,18 @@ namespace HotelManageSys.API
         {
             var builder = WebApplication.CreateBuilder(args);
 
-
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
                options.UseSqlServer(builder.Configuration.GetConnectionString("ApplicationDbContext")));
 
             builder.Services.AddOpenApi();
 
-
             builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
+
+            TypeAdapterConfig.GlobalSettings.Scan(Assembly.GetExecutingAssembly());
+
+            builder.Services.AddScoped<IRoomProvider, RoomProvider>();
+
+            builder.Services.AddScoped<IRoomService, RoomService>();
 
             // Add services to the container.
 
@@ -53,7 +60,6 @@ namespace HotelManageSys.API
             app.UseHttpsRedirection();
 
             app.UseAuthorization();
-
 
             app.MapControllers();
 

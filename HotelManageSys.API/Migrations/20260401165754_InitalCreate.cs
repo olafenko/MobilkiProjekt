@@ -8,11 +8,26 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace HotelManageSys.API.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class InitalCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.CreateTable(
+                name: "AdditionalOffers",
+                columns: table => new
+                {
+                    AdditionalOfferId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(80)", maxLength: 80, nullable: false),
+                    Price = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AdditionalOffers", x => x.AdditionalOfferId);
+                });
+
             migrationBuilder.CreateTable(
                 name: "Amenities",
                 columns: table => new
@@ -44,21 +59,6 @@ namespace HotelManageSys.API.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Guests", x => x.GuestId);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "HotelServices",
-                columns: table => new
-                {
-                    HotelServiceId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(80)", maxLength: 80, nullable: false),
-                    Price = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    IsActive = table.Column<bool>(type: "bit", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_HotelServices", x => x.HotelServiceId);
                 });
 
             migrationBuilder.CreateTable(
@@ -207,32 +207,41 @@ namespace HotelManageSys.API.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "ReservationHotelServices",
+                name: "ReservationAdditionalOffers",
                 columns: table => new
                 {
-                    ReservationHotelServiceId = table.Column<int>(type: "int", nullable: false)
+                    ReservationAdditionalOfferId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     ReservationId = table.Column<int>(type: "int", nullable: false),
-                    HotelServiceId = table.Column<int>(type: "int", nullable: false),
+                    AdditionalOfferId = table.Column<int>(type: "int", nullable: false),
                     Quantity = table.Column<int>(type: "int", nullable: false),
                     Notes = table.Column<string>(type: "nvarchar(300)", maxLength: 300, nullable: true),
                     IsActive = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ReservationHotelServices", x => x.ReservationHotelServiceId);
+                    table.PrimaryKey("PK_ReservationAdditionalOffers", x => x.ReservationAdditionalOfferId);
                     table.ForeignKey(
-                        name: "FK_ReservationHotelServices_HotelServices_HotelServiceId",
-                        column: x => x.HotelServiceId,
-                        principalTable: "HotelServices",
-                        principalColumn: "HotelServiceId",
+                        name: "FK_ReservationAdditionalOffers_AdditionalOffers_AdditionalOfferId",
+                        column: x => x.AdditionalOfferId,
+                        principalTable: "AdditionalOffers",
+                        principalColumn: "AdditionalOfferId",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_ReservationHotelServices_Reservations_ReservationId",
+                        name: "FK_ReservationAdditionalOffers_Reservations_ReservationId",
                         column: x => x.ReservationId,
                         principalTable: "Reservations",
                         principalColumn: "ReservationId",
                         onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.InsertData(
+                table: "AdditionalOffers",
+                columns: new[] { "AdditionalOfferId", "IsActive", "Name", "Price" },
+                values: new object[,]
+                {
+                    { 1, true, "Śniadanie", 40m },
+                    { 2, true, "Parking", 25m }
                 });
 
             migrationBuilder.InsertData(
@@ -248,15 +257,6 @@ namespace HotelManageSys.API.Migrations
                 table: "Guests",
                 columns: new[] { "GuestId", "Email", "FirstName", "IdentityCardNumber", "IsActive", "LastName", "PhoneNumber" },
                 values: new object[] { 1, "pudzian@test.pl", "Mariusz", "ID123", true, "Pudzianowski", "123567345" });
-
-            migrationBuilder.InsertData(
-                table: "HotelServices",
-                columns: new[] { "HotelServiceId", "IsActive", "Name", "Price" },
-                values: new object[,]
-                {
-                    { 1, true, "Śniadanie", 40m },
-                    { 2, true, "Parking", 25m }
-                });
 
             migrationBuilder.InsertData(
                 table: "RoomTypes",
@@ -292,13 +292,13 @@ namespace HotelManageSys.API.Migrations
                 column: "ReservationId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ReservationHotelServices_HotelServiceId",
-                table: "ReservationHotelServices",
-                column: "HotelServiceId");
+                name: "IX_ReservationAdditionalOffers_AdditionalOfferId",
+                table: "ReservationAdditionalOffers",
+                column: "AdditionalOfferId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ReservationHotelServices_ReservationId",
-                table: "ReservationHotelServices",
+                name: "IX_ReservationAdditionalOffers_ReservationId",
+                table: "ReservationAdditionalOffers",
                 column: "ReservationId");
 
             migrationBuilder.CreateIndex(
@@ -332,13 +332,13 @@ namespace HotelManageSys.API.Migrations
                 name: "Payments");
 
             migrationBuilder.DropTable(
-                name: "ReservationHotelServices");
+                name: "ReservationAdditionalOffers");
 
             migrationBuilder.DropTable(
                 name: "Amenities");
 
             migrationBuilder.DropTable(
-                name: "HotelServices");
+                name: "AdditionalOffers");
 
             migrationBuilder.DropTable(
                 name: "Reservations");
