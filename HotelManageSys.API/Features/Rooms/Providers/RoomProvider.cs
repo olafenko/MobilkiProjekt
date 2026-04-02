@@ -32,8 +32,7 @@ namespace HotelManageSys.API.Features.Rooms.Providers
                 .AsNoTracking()
                 .Include(r => r.RoomType)
                 .Include(r => r.Amenities)
-                .Where(r => r.IsActive && r.RoomId == roomId)
-                .FirstOrDefaultAsync(cancellationToken);
+                .FirstOrDefaultAsync(r => r.IsActive && r.RoomId == roomId, cancellationToken);
         }
     }
 }
