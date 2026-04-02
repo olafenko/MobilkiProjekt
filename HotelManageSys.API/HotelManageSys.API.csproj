@@ -27,7 +27,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Features\Rooms\Providers\" />
     <Folder Include="Features\Rooms\Validators\Queries\" />
     <Folder Include="Migrations\" />
   </ItemGroup>
