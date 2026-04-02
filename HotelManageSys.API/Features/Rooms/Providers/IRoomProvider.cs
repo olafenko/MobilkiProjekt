@@ -13,7 +13,14 @@ namespace HotelManageSys.API.Features.Rooms.Providers
 
         Task<IEnumerable<Room>> GetAllRoomsAsync(CancellationToken cancellationToken = default);
 
-        Task<Room> GetRoomByIdAsync(int roomId, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="roomId"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        Task<Room?> GetRoomByIdAsync(int roomId, CancellationToken cancellationToken = default);
 
     }
 }

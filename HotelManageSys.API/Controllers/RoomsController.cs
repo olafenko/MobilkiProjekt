@@ -29,6 +29,21 @@ namespace HotelManageSys.API.Controllers
 
         }
 
+        [HttpGet("{id}")]
+        [ProducesResponseType(typeof(RoomDTO), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> GetRoomById(int id)
+        {
+
+            var query = new GetRoomByIdQuery(id);
+
+            var result = await _mediator.Send(query);
+
+            return result != null ? Ok(result) : NotFound($"Pokój o ID {id} nie istnieje");
+
+        }
+
+
 
 
 
