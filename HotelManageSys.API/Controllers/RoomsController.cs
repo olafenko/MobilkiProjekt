@@ -99,7 +99,25 @@ namespace HotelManageSys.API.Controllers
 
         }
 
+        [HttpDelete("{id}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> DeleteRoom(int id)
+        {
 
+            var deleteCommand = new DeleteRoomCommand(id);
+
+            try
+            {
+                await _mediator.Send(deleteCommand);
+                return NoContent();
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
+
+        }
 
     }
 }

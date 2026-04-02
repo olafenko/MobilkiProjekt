@@ -20,9 +20,17 @@ namespace HotelManageSys.API.Features.Rooms.Services
             await _context.SaveChangesAsync(cancellationToken);
         }
 
+        
         public async Task UpdateRoom(Room room, CancellationToken cancellationToken = default)
         {
             await _context.SaveChangesAsync(cancellationToken);
         }
+
+        public async Task DeleteRoom(Room room, CancellationToken cancellationToken = default)
+        {
+            room.IsActive = false;
+            await _context.SaveChangesAsync(cancellationToken);
+        }
+
     }
 }
