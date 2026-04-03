@@ -2,7 +2,7 @@
 
 namespace HotelManageSys.API.Features.Rooms.Messages.Queries
 {
-    public class GetRoomByIdQuery : IRequest<RoomDTO?>
+    public class GetRoomByIdQuery : IRequest<RoomDTO>
     {
       
         public int Id { get; set; }
