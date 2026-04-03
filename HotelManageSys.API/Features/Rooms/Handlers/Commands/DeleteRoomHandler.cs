@@ -25,12 +25,6 @@ namespace HotelManageSys.API.Features.Rooms.Handlers.Commands
 
             var room = await _roomProvider.GetRoomByIdAsync(request.Id,false, cancellationToken);
 
-            if(room == null)
-            {
-                throw new KeyNotFoundException($"Nie znaleziono pokoju z ID {request.Id}");
-            }
-
-
             _logger.LogInformation("Usuwanie pokoju ID: {RoomId}", request.Id);
 
             await _roomService.DeleteRoom(room, cancellationToken);

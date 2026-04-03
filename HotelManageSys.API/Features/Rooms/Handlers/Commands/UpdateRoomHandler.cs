@@ -25,12 +25,6 @@ namespace HotelManageSys.API.Features.Rooms.Handlers.Commands
 
             var room = await _roomProvider.GetRoomByIdAsync(request.RoomId,false, cancellationToken);
 
-            if (room == null)
-            {
-                throw new KeyNotFoundException($"Nie znaleziono pokoju z ID {request.RoomId}");
-
-            }
-
             _logger.LogInformation("Aktualizowanie pokoju ID: {RoomId}", request.RoomId);
 
             request.Adapt(room);
