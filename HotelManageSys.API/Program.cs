@@ -27,8 +27,6 @@ namespace HotelManageSys.API
 
             builder.Services.AddScoped<IRoomService, RoomService>();
 
-            // Add services to the container.
-
             builder.Services.AddControllers();
 
             var app = builder.Build();
@@ -47,7 +45,6 @@ namespace HotelManageSys.API
                 }
             }
 
-            // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {
                 app.MapOpenApi();
