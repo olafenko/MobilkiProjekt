@@ -1,35 +1,43 @@
-
-version: '3.8'
-
 services:
+  api:
+    build:
+      context: .
+      dockerfile: HotelManageSys.API/Dockerfile
+    container_name: hotelMobilki-api
+    ports:
+      - "5000:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:8080
+      - ASPNETCORE_HTTP_PORTS=8080
+      - ConnectionStrings__ApplicationDbContext=Server=sqlserver;Database=HotelMobilkiDb;User=sa;Password=YourStrong@Password123;TrustServerCertificate=True
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+    networks:
+      - dev-network
+
   sqlserver:
     image: mcr.microsoft.com/mssql/server:2022-latest
     container_name: hotelMobilkiDb-sqlserver
     environment:
-      # Akceptacja licencji
       - ACCEPT_EULA=Y
       
-      # Hasło SA (administrator)
-      - SA_PASSWORD=YourStrong@Password123
+      - MSSQL_SA_PASSWORD=YourStrong@Password123
       
-      # Edycja SQL Server (Developer = darmowa)
       - MSSQL_PID=Developer
     
     ports:
-      # Host:Container
       - "1433:1433"
     
     volumes:
-      # Trwałość danych (nie ginie po restart)
       - hotelMobilkiDb-data:/var/opt/mssql
     
     networks:
       - dev-network
     
-    # Restart policy
     restart: unless-stopped
     
-    # Health check
     healthcheck:
       test: /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P "YourStrong@Password123" -C -Q "SELECT 1" || exit 1
       interval: 10s
