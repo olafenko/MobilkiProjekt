@@ -17,42 +17,23 @@ namespace HotelManageSys.API
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
                options.UseSqlServer(builder.Configuration.GetConnectionString("ApplicationDbContext")));
 
-            builder.Services.AddOpenApi();
-
             builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
 
             TypeAdapterConfig.GlobalSettings.Scan(Assembly.GetExecutingAssembly());
 
-            builder.Services.AddScoped<IRoomProvider, RoomProvider>();
+            RegisterProviders(builder);
 
-            builder.Services.AddScoped<IRoomService, RoomService>();
+            RegisterServices(builder);
+
+            SetUpCORS(builder);
 
             builder.Services.AddControllers();
 
+            builder.Services.AddOpenApi();
+
             var app = builder.Build();
 
-            using (var scope = app.Services.CreateScope())
-            {
-                try
-                {
-                    var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-                    dbContext.Database.Migrate();
-                }
-                catch (Exception ex)
-                {
-                    var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
-                    logger.LogError(ex, "Błąd podczas migracji bazy danych");
-                }
-            }
-
-            if (app.Environment.IsDevelopment())
-            {
-                app.MapOpenApi();
-                app.UseSwaggerUI(options =>
-                {
-                    options.SwaggerEndpoint("/openapi/v1.json", "v1");
-                });
-            }
+            ConfigureDevelompent(app);
 
             app.UseHttpsRedirection();
 
@@ -60,7 +41,65 @@ namespace HotelManageSys.API
 
             app.MapControllers();
 
+
+
             app.Run();
+        }
+
+        private static void RegisterProviders(WebApplicationBuilder builder)
+        {
+            builder.Services.AddScoped<IRoomProvider, RoomProvider>();
+        }
+
+
+        private static void RegisterServices(WebApplicationBuilder builder)
+        {
+            builder.Services.AddScoped<IRoomService, RoomService>();
+
+            
+        }
+
+        private static void SetUpCORS(WebApplicationBuilder builder)
+        {
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("AllowAll",
+                    policy => policy
+                        .AllowAnyOrigin()
+                        .AllowAnyMethod()
+                        .AllowAnyHeader());
+            });
+        }
+
+        private static void ConfigureDevelompent(WebApplication app)
+        {
+            if (app.Environment.IsDevelopment())
+            {
+
+                using (var scope = app.Services.CreateScope())
+                {
+                    try
+                    {
+                        var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                        dbContext.Database.Migrate();
+                    }
+                    catch (Exception ex)
+                    {
+                        var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
+                        logger.LogError(ex, "Błąd podczas migracji bazy danych");
+                    }
+                }
+
+                app.UseCors("AllowAll");
+
+                app.MapOpenApi();
+                app.UseSwaggerUI(options =>
+                {
+                    options.SwaggerEndpoint("/openapi/v1.json", "v1");
+                });
+
+               
+            }
         }
     }
 }
