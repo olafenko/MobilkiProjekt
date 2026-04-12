@@ -68,7 +68,7 @@ class ApiService {
         return this.request<Room>(`/Rooms/${id}`);
     }
     
-    async createRoom(data: Omit<Room, "roomId">) : Promise<{id: number}>{
+    async createRoom(data: CreateRoomRequest) : Promise<{ id: number }>{
         return this.request<{id: number}>('/Rooms', {
             method: "POST",
             body: JSON.stringify(data),
@@ -89,3 +89,5 @@ class ApiService {
     }
 
 }
+
+export default new ApiService();
