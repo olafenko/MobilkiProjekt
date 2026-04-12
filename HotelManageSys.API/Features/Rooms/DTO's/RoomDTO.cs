@@ -10,11 +10,14 @@ namespace HotelManageSys.API.Features.Rooms.Messages.Queries
         public int Floor { get; set; }
         public string? Description { get; set; }
         public string? Status { get; set; }
+        public int RoomTypeId { get; set; }
         public string? RoomTypeName { get; set; }
 
         public decimal BasePrice { get; set; }
 
         public List<string> AmenitiesNames { get; set; }
+
+        public bool IsActive { get; set; }
 
     }
 }
