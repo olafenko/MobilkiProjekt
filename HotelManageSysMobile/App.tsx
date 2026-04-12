@@ -1,11 +1,28 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, StatusBar, useColorScheme, StyleSheet } from 'react-native';
+import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
+import { RoomsProvider } from './src/context/RoomsContext';
+// import RootNavigator from './src/navigation/RootNavigator';
 
 function App(): React.JSX.Element {
+    const isDarkMode = useColorScheme() === 'dark';
+
     return (
-        <View style={styles.container}>
-            <Text style={styles.title}>Elo!</Text>
-            <Text style={styles.subtitle}>with TypeScript 🚀</Text>
+        <SafeAreaProvider>
+            <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
+            <RoomsProvider>
+                <AppContent />
+            </RoomsProvider>
+        </SafeAreaProvider>
+    );
+}
+
+function AppContent(): React.JSX.Element {
+    const insets = useSafeAreaInsets();
+
+    return (
+        <View style={[styles.container, { paddingTop: insets.top }]}>
+            {/*<RootNavigator />*/}
         </View>
     );
 }
@@ -13,19 +30,6 @@ function App(): React.JSX.Element {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: '#f5f5f5',
-    },
-    title: {
-        fontSize: 24,
-        fontWeight: 'bold',
-        color: '#333',
-    },
-    subtitle: {
-        fontSize: 16,
-        color: '#666',
-        marginTop: 8,
     },
 });
 
