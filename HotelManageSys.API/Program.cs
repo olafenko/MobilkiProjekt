@@ -3,6 +3,8 @@ using HotelManageSys.API.Features.Rooms.Providers;
 using HotelManageSys.API.Features.Rooms.Services;
 using HotelManageSys.API.Features.Amenities.Providers;
 using HotelManageSys.API.Features.Amenities.Services;
+using HotelManageSys.API.Features.AdditionalOffers.Providers;
+using HotelManageSys.API.Features.AdditionalOffers.Services;
 using HotelManageSys.API.Features.RoomTypes.Providers;
 using HotelManageSys.API.Features.RoomTypes.Services;
 using HotelManageSys.API.Models.Data;
@@ -55,6 +57,7 @@ namespace HotelManageSys.API
             builder.Services.AddScoped<IRoomProvider, RoomProvider>();
             builder.Services.AddScoped<IRoomTypeProvider, RoomTypeProvider>();
             builder.Services.AddScoped<IAmenityProvider, AmenityProvider>();
+            builder.Services.AddScoped<IAdditionalOfferProvider, AdditionalOfferProvider>();
 
         }
 
@@ -64,6 +67,7 @@ namespace HotelManageSys.API
             builder.Services.AddScoped<IRoomService, RoomService>();
             builder.Services.AddScoped<IRoomTypeService, RoomTypeService>();
             builder.Services.AddScoped<IAmenityService, AmenityService>();
+            builder.Services.AddScoped<IAdditionalOfferService, AdditionalOfferService>();
 
             
         }
