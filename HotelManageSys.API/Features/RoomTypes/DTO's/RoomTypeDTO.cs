@@ -2,6 +2,7 @@
 {
     public class RoomTypeDTO
     {
+        public int RoomTypeId { get; set; }
 
         public required string Name { get; set; }
 

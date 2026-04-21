@@ -2,6 +2,7 @@
 using HotelManageSys.API.Features.Rooms.Providers;
 using HotelManageSys.API.Features.Rooms.Services;
 using HotelManageSys.API.Features.RoomTypes.Providers;
+using HotelManageSys.API.Features.RoomTypes.Services;
 using HotelManageSys.API.Models.Data;
 using Mapster;
 using Microsoft.EntityFrameworkCore;
@@ -58,7 +59,7 @@ namespace HotelManageSys.API
         private static void RegisterServices(WebApplicationBuilder builder)
         {
             builder.Services.AddScoped<IRoomService, RoomService>();
-            //builder.Services.AddScoped<IRoomTypeService, RoomService>();
+            builder.Services.AddScoped<IRoomTypeService, RoomTypeService>();
 
             
         }

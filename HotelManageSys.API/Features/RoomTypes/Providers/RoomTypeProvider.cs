@@ -24,9 +24,19 @@ namespace HotelManageSys.API.Features.RoomTypes.Providers
                 .ToListAsync(cancellationToken);
         }
 
-        public Task<RoomType> GetRoomTypeByIdAsync(int roomId, bool asNoTracking = true, CancellationToken cancellationToken = default)
+        public async Task<RoomType> GetRoomTypeByIdAsync(int roomId, bool asNoTracking = true, CancellationToken cancellationToken = default)
         {
-            throw new NotImplementedException();
+            IQueryable<RoomType> query = _dbContext.RoomTypes
+                .Include(rt => rt.Rooms);
+
+            if (asNoTracking)
+            {
+                query = query.AsNoTracking();
+            }
+
+            var roomType = await query.FirstOrDefaultAsync(rt => rt.IsActive && rt.RoomTypeId == roomId, cancellationToken);
+
+            return roomType ?? throw new KeyNotFoundException($"Nie znaleziono typu pokoju o ID {roomId}");
         }
     }
 }
