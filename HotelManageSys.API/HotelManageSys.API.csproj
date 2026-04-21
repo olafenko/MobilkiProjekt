@@ -33,9 +33,7 @@
     <Folder Include="Features\Payments\" />
     <Folder Include="Features\Reservations\" />
     <Folder Include="Features\Rooms\Validators\Queries\" />
-    <Folder Include="Features\RoomTypes\Mappings\" />
     <Folder Include="Features\RoomTypes\Services\" />
-    <Folder Include="Features\RoomTypes\Providers\" />
     <Folder Include="Features\RoomTypes\Validators\Commands\" />
     <Folder Include="Features\RoomTypes\Validators\Queries\" />
     <Folder Include="Features\Workers\" />
