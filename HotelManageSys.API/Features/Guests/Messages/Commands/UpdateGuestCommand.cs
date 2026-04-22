@@ -13,8 +13,6 @@ namespace HotelManageSys.API.Features.Guests.Messages.Commands
         public required string Email { get; set; }
 
         public required string IdentityCardNumber { get; set; }
-
-        public bool IsActive { get; set; } = true;
     }
 }
 
