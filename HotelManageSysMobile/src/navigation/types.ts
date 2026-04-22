@@ -6,7 +6,7 @@ export type RootStackParamList = {
     Home: undefined;
     
     Rooms: undefined;
-    CreateRoom: undefined;
+    AddRoom: undefined;
     EditRoom: { room: Room};
     
     RoomTypes: undefined;

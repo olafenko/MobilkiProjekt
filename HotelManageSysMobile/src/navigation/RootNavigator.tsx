@@ -1,6 +1,7 @@
 ﻿import {createNativeStackNavigator} from "@react-navigation/native-stack";
 import React from "react";
 import {NavigationContainer} from "@react-navigation/native";
+import RoomsScreen from "../screens/RoomsScreen.tsx";
 
 
 const Stack = createNativeStackNavigator();
@@ -18,16 +19,16 @@ function RootNavigator(): React.JSX.Element {
                 component={RoomsScreen}
                 options={{title: "Pokoje"}}
                 />
-                <Stack.Screen
-                    name="AddRoom"
-                    component={AddRoomScreen}
-                    options={{title: "Pokoje"}}
-                />
-                <Stack.Screen
-                    name="EditRoom"
-                    component={EditRoomScreen}
-                    options={{title: "Pokoje"}}
-                />
+                {/*<Stack.Screen*/}
+                {/*    name="AddRoom"*/}
+                {/*    component={AddRoomScreen}*/}
+                {/*    options={{title: "Pokoje"}}*/}
+                {/*/>*/}
+                {/*<Stack.Screen*/}
+                {/*    name="EditRoom"*/}
+                {/*    component={EditRoomScreen}*/}
+                {/*    options={{title: "Pokoje"}}*/}
+                {/*/>*/}
                 
                 
                 

@@ -1,8 +1,9 @@
 import React from 'react';
 import { View, StatusBar, useColorScheme, StyleSheet } from 'react-native';
 import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
-import { RoomsProvider } from './src/context/RoomsContext';
-// import RootNavigator from './src/navigation/RootNavigator';
+import { RoomsProvider } from './src/context/RoomsContext.tsx';
+import RootNavigator from "./src/navigation/RootNavigator.tsx";
+
 
 function App(): React.JSX.Element {
     const isDarkMode = useColorScheme() === 'dark';
@@ -22,7 +23,7 @@ function AppContent(): React.JSX.Element {
 
     return (
         <View style={[styles.container, { paddingTop: insets.top }]}>
-            {/*<RootNavigator />*/}
+            <RootNavigator />
         </View>
     );
 }

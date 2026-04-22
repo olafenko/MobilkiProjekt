@@ -9,7 +9,7 @@ export interface Room {
     roomId: number;
     number: string;
     floor: number;
-    description?: string;
+    description: string;
     status: RoomStatus;
     roomTypeId: number;
     roomTypeName: string;
