@@ -7,7 +7,6 @@ namespace HotelManageSys.API.Features.Amenities.Messages.Commands
         public int AmenityId { get; set; }
         public required string Name { get; set; }
         public string? Description { get; set; }
-        public bool IsActive { get; set; } = true;
     }
 }
 

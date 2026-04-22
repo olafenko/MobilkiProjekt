@@ -9,6 +9,8 @@ using HotelManageSys.API.Features.RoomTypes.Providers;
 using HotelManageSys.API.Features.RoomTypes.Services;
 using HotelManageSys.API.Features.Guests.Providers;
 using HotelManageSys.API.Features.Guests.Services;
+using HotelManageSys.API.Features.Workers.Providers;
+using HotelManageSys.API.Features.Workers.Services;
 using HotelManageSys.API.Models.Data;
 using Mapster;
 using Microsoft.EntityFrameworkCore;
@@ -61,6 +63,7 @@ namespace HotelManageSys.API
             builder.Services.AddScoped<IAmenityProvider, AmenityProvider>();
             builder.Services.AddScoped<IAdditionalOfferProvider, AdditionalOfferProvider>();
             builder.Services.AddScoped<IGuestProvider, GuestProvider>();
+            builder.Services.AddScoped<IWorkerProvider, WorkerProvider>();
 
         }
 
@@ -72,6 +75,7 @@ namespace HotelManageSys.API
             builder.Services.AddScoped<IAmenityService, AmenityService>();
             builder.Services.AddScoped<IAdditionalOfferService, AdditionalOfferService>();
             builder.Services.AddScoped<IGuestService, GuestService>();
+            builder.Services.AddScoped<IWorkerService, WorkerService>();
 
             
         }
