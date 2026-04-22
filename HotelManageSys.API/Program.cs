@@ -13,6 +13,8 @@ using HotelManageSys.API.Features.Workers.Providers;
 using HotelManageSys.API.Features.Workers.Services;
 using HotelManageSys.API.Features.Payments.Providers;
 using HotelManageSys.API.Features.Payments.Services;
+using HotelManageSys.API.Features.Reservations.Providers;
+using HotelManageSys.API.Features.Reservations.Services;
 using HotelManageSys.API.Models.Data;
 using Mapster;
 using Microsoft.EntityFrameworkCore;
@@ -67,6 +69,7 @@ namespace HotelManageSys.API
             builder.Services.AddScoped<IGuestProvider, GuestProvider>();
             builder.Services.AddScoped<IWorkerProvider, WorkerProvider>();
             builder.Services.AddScoped<IPaymentProvider, PaymentProvider>();
+            builder.Services.AddScoped<IReservationProvider, ReservationProvider>();
 
         }
 
@@ -80,6 +83,7 @@ namespace HotelManageSys.API
             builder.Services.AddScoped<IGuestService, GuestService>();
             builder.Services.AddScoped<IWorkerService, WorkerService>();
             builder.Services.AddScoped<IPaymentService, PaymentService>();
+            builder.Services.AddScoped<IReservationService, ReservationService>();
 
             
         }
