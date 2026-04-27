@@ -3,7 +3,7 @@
 import type {
     Room,
     CreateRoomRequest,
-    UpdateRoomRequest
+    UpdateRoomRequest, Amenity, RoomType
 } from "../types/models.ts";
 
 class ApiService {
@@ -86,6 +86,22 @@ class ApiService {
         return this.request<void>(`/Rooms/${id}`, {
             method: "DELETE"
         });
+    }
+    
+    async getAmenities(): Promise<Amenity[]> {
+       
+        return [
+            {amenityId: 1,name: "kibel"},
+            {amenityId: 2,name: "wentylacja"}
+        ];
+    }
+
+    async getRoomTypes(): Promise<RoomType[]> {
+       
+        return [
+            {roomTypeId: 1,name: "luksus",basePrice: 300},
+            {roomTypeId: 2,name: "zwykly", basePrice: 219.99}
+        ];
     }
 
 }
