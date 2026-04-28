@@ -7,7 +7,7 @@ export type RootStackParamList = {
     
     Rooms: undefined;
     AddRoom: undefined;
-    EditRoom: { room: Room};
+    UpdateRoom: { room: Room};
     
     RoomTypes: undefined;
     Reservations: undefined;

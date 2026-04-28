@@ -4,6 +4,7 @@ import {NavigationContainer} from "@react-navigation/native";
 import RoomsScreen from "../screens/RoomsScreen.tsx";
 import AddRoomScreen from "../screens/AddRoomScreen.tsx";
 import {RootStackParamList} from "./types.ts";
+import UpdateRoomScreen from "../screens/UpdateRoomScreen.tsx";
 
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -24,13 +25,13 @@ function RootNavigator(): React.JSX.Element {
                 <Stack.Screen
                     name="AddRoom"
                     component={AddRoomScreen}
-                    options={{title: "Pokoje"}}
+                    options={{title: "Nowy pokój"}}
                 />
-                {/*<Stack.Screen*/}
-                {/*    name="EditRoom"*/}
-                {/*    component={EditRoomScreen}*/}
-                {/*    options={{title: "Pokoje"}}*/}
-                {/*/>*/}
+                <Stack.Screen
+                    name="UpdateRoom"
+                    component={UpdateRoomScreen}
+                    options={{title: "Edytuj pokój"}}
+                />
                 
                 
                 

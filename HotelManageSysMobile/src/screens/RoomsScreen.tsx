@@ -31,7 +31,7 @@ function RoomsScreen({ navigation }: Props) {
     }
     
     const handleEdit = (room: Room) => {
-        navigation.navigate('EditRoom',{ room });
+        navigation.navigate('UpdateRoom',{ room });
     }
     
     const renderRoom = ({item:room } : { item:Room }) => {
