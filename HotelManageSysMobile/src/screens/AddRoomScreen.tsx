@@ -15,6 +15,7 @@ import {
     TouchableOpacity,
     View
 } from "react-native";
+import {PickerField} from "../components/PickerField.tsx";
 
 type Props = NativeStackScreenProps<RootStackParamList, "AddRoom">;
 
@@ -26,15 +27,16 @@ function AddRoomScreen({ navigation }: Props) {
     const [description, setDescription] = useState('');
     const [basePrice, setBasePrice] = useState('');
     const [status, setStatus] = useState<RoomStatus>(RoomStatus.AVAILABLE);
-    const [roomTypeId, setRoomTypeId] = useState('');
+    const [roomTypeId, setRoomTypeId] = useState<number | null>(null);
 
     const [roomTypes, setRoomTypes] = useState<RoomType[]>([]);
     const [loading, setLoading] = useState(true);
     const [submitting, setSubmitting] = useState(false);
+    const [errors,setErrors] = useState<{roomType?: string}>({});
     
     useEffect(() => {
         if (roomTypeId) {
-            const selectedType = roomTypes.find(rt => rt.roomTypeId.toString() === roomTypeId);
+            const selectedType = roomTypes.find(rt => rt.roomTypeId === roomTypeId);
             if (selectedType) {
                 setBasePrice(selectedType.basePrice.toString());
             }
@@ -47,7 +49,7 @@ function AddRoomScreen({ navigation }: Props) {
                 const types = await apiService.getRoomTypes();
                 setRoomTypes(types);
             } catch (err) {
-                Alert.alert("Błąd", "Nie udało się załadować typów pokoi.");
+                Alert.alert("Błąd", "Nie udało się załadować danych.");
             } finally {
                 setLoading(false);
             }
@@ -56,11 +58,19 @@ function AddRoomScreen({ navigation }: Props) {
     }, []);
 
     const handleSubmit = async () => {
-        if (!number.trim() || !floor || !roomTypeId) {
-            Alert.alert("Błąd", "Wypełnij wszystkie pola wymagane");
+        if (!number.trim()){
+            Alert.alert("Błąd", "Podaj numer pokoju");
             return;
         }
-
+        if (!floor) {
+            Alert.alert("Błąd", "Podaj piętro");
+            return;
+        }
+        if (!roomTypeId) {
+            setErrors(e => ({...e,roomType: "Wybierz typ pokoju"}));
+            return;
+        }
+        
         try {
             setSubmitting(true);
             await addRoom({
@@ -68,7 +78,7 @@ function AddRoomScreen({ navigation }: Props) {
                 description: description.trim(),
                 floor: parseInt(floor),
                 status: status,
-                roomTypeId: parseInt(roomTypeId)
+                roomTypeId: roomTypeId
             });
 
             Alert.alert("Sukces", "Pokój został dodany pomyślnie", [
@@ -104,24 +114,20 @@ function AddRoomScreen({ navigation }: Props) {
                 <Text style={styles.label}>Cena</Text>
                 <TextInput style={styles.input} value={basePrice} editable={false} />
 
-                <Text style={styles.label}>Typ pokoju *</Text>
-                <View style={styles.pickerContainer}>
-                    {roomTypes.map(rt => {
-                        const isSelected = roomTypeId === rt.roomTypeId.toString();
-                        return (
-                            <TouchableOpacity
-                                key={rt.roomTypeId}
-                                style={[styles.chip, isSelected && styles.chipSelected]}
-                                onPress={() => setRoomTypeId(rt.roomTypeId.toString())}
-                            >
-                                <Text style={[styles.chipText, isSelected && styles.chipTextSelected]}>{rt.name}</Text>
-                            </TouchableOpacity>
-                        );
-                    })}
-                </View>
-
-               
-
+                
+                <PickerField 
+                    label="Typ pokoju"
+                    value={roomTypeId}
+                    items={roomTypes}
+                    getValue={t => t.roomTypeId}
+                    getLabel={t => t.name}
+                    onChange={val => setRoomTypeId(val as number | null)}
+                    placeholder={"Wybierz typ pokoju..."}
+                    required
+                    disabled={submitting}
+                    error={errors.roomType}
+                />
+                
                 <Text style={styles.label}>Status</Text>
                 <View style={styles.pickerContainer}>
                     {Object.values(RoomStatus).map((s) => (
