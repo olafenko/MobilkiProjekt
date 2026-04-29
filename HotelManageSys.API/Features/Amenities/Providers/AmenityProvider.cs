@@ -23,19 +23,45 @@ namespace HotelManageSys.API.Features.Amenities.Providers
                 .ToListAsync(cancellationToken);
         }
 
-        public async Task<Amenity> GetAmenityByIdAsync(int amenityId, bool asNoTracking = true, CancellationToken cancellationToken = default)
+        public Task<Amenity> GetAmenityByIdAsync(int amenityId, bool asNoTracking = true, CancellationToken cancellationToken = default)
         {
-            IQueryable<Amenity> query = _dbContext.Amenities
-                .Include(a => a.Rooms);
+            throw new NotImplementedException();
+        }
+
+        public async Task<List<Amenity>> GetAmenitiesByIdsAsync(IEnumerable<int> amenityIds, bool asNoTracking = true, CancellationToken cancellationToken = default)
+        {
+            var ids = amenityIds
+                .Where(id => id > 0)
+                .Distinct()
+                .ToList();
+
+            if (ids.Count == 0)
+            {
+                return new List<Amenity>();
+            }
+
+            IQueryable<Amenity> query = _dbContext.Amenities;
 
             if (asNoTracking)
             {
                 query = query.AsNoTracking();
             }
 
-            var amenity = await query.FirstOrDefaultAsync(a => a.IsActive && a.AmenityId == amenityId, cancellationToken);
+            var amenities = await query
+                .Where(a => a.IsActive && ids.Contains(a.AmenityId))
+                .ToListAsync(cancellationToken);
 
-            return amenity ?? throw new KeyNotFoundException($"Nie znaleziono udogodnienia o ID {amenityId}");
+            var foundIds = amenities.Select(a => a.AmenityId).ToHashSet();
+            var missingIds = ids.Where(id => !foundIds.Contains(id)).ToList();
+
+            if (missingIds.Count > 0)
+            {
+                throw new KeyNotFoundException($"Nie znaleziono udogodnień o ID: {string.Join(", ", missingIds)}");
+            }
+
+            return amenities;
         }
+
+        
     }
 }

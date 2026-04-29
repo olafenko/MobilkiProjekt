@@ -18,8 +18,7 @@ namespace HotelManageSys.API.Features.Rooms.Mappings
             config.NewConfig<CreateRoomCommand, Room>()
                 .Ignore(d => d.RoomId)
                 .Ignore(d => d.RoomType)
-                .Ignore(d => d.Reservations)
-                .Ignore(d => d.Amenities);
+                .Ignore(d => d.Reservations);
 
         }
     }

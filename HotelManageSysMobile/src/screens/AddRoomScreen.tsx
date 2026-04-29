@@ -1,22 +1,12 @@
-﻿import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { RootStackParamList } from "../navigation/types.ts";
-import { useRooms } from "../context/RoomsContext.tsx";
-import { useEffect, useState } from "react";
-import { RoomStatus, RoomType } from "../types/models.ts";
+﻿import {NativeStackScreenProps} from "@react-navigation/native-stack";
+import {RootStackParamList} from "../navigation/types.ts";
+import {useRooms} from "../context/RoomsContext.tsx";
+import {useEffect, useState} from "react";
+import {Amenity, RoomStatus, RoomType} from "../types/models.ts";
 import apiService from "../api/apiService.ts";
-import {
-    ActivityIndicator,
-    Alert,
-    Button,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View
-} from "react-native";
+import {ActivityIndicator, Alert, Button, ScrollView, StyleSheet, Text, TextInput, View} from "react-native";
 import {PickerField} from "../components/PickerField.tsx";
-import {SmPickerField} from "../components/SmPickerField.tsx";
+import {MultiPickerField} from "../components/MultiPickerField.tsx";
 
 type Props = NativeStackScreenProps<RootStackParamList, "AddRoom">;
 
@@ -29,8 +19,10 @@ function AddRoomScreen({ navigation }: Props) {
     const [basePrice, setBasePrice] = useState('');
     const [status, setStatus] = useState<RoomStatus | null>(null);
     const [roomTypeId, setRoomTypeId] = useState<number | null>(null);
+    const [selectedAmenities, setSelectedAmenities] = useState<(number | string)[]>([]);
 
     const [roomTypes, setRoomTypes] = useState<RoomType[]>([]);
+    const [amenities, setAmenities] = useState<Amenity[]>([]);
     const [statuses,setStatuses] = useState<RoomStatus[]>([]);
     const [loading, setLoading] = useState(true);
     const [submitting, setSubmitting] = useState(false);
@@ -48,9 +40,14 @@ function AddRoomScreen({ navigation }: Props) {
     useEffect(() => {
         const loadData = async () => {
             try {
-                const types = await apiService.getRoomTypes();
+                 const [types, amenities] =  await Promise.all(
+                    [
+                    apiService.getRoomTypes(),
+                    apiService.getAmenities(),
+                    ]);
                 const statuses = Object.values(RoomStatus);
                 setRoomTypes(types);
+                setAmenities(amenities)
                 setStatuses(statuses);
             } catch (err) {
                 Alert.alert("Błąd", "Nie udało się załadować danych.");
@@ -86,7 +83,9 @@ function AddRoomScreen({ navigation }: Props) {
                 description: description.trim(),
                 floor: parseInt(floor) || 0,
                 status: status,
-                roomTypeId: roomTypeId
+                roomTypeId: roomTypeId,
+                amenitiesIds: selectedAmenities
+                
             });
 
             Alert.alert("Sukces", "Pokój został dodany pomyślnie", [
@@ -122,7 +121,7 @@ function AddRoomScreen({ navigation }: Props) {
                 <Text style={styles.label}>Cena</Text>
                 <TextInput style={styles.input} value={basePrice} editable={false} />
 
-                <SmPickerField
+                <PickerField
                     label="Typ pokoju"
                     selectedValue={roomTypeId}
                     items={roomTypes}
@@ -132,7 +131,17 @@ function AddRoomScreen({ navigation }: Props) {
                     required
                 />
                 
-                <SmPickerField
+                <MultiPickerField
+                    label="Udogodnienia"
+                    selectedValues={selectedAmenities}
+                    items={amenities}
+                    getValue={a => a.amenityId} 
+                    getLabel={a => a.name}
+                    onChange={values => setSelectedAmenities(values) }
+                    required={false}
+                />
+                
+                <PickerField
                     label="Status"
                     selectedValue={status}
                     items={statuses}

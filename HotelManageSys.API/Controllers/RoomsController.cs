@@ -64,7 +64,15 @@ namespace HotelManageSys.API.Controllers
         public async Task<IActionResult> CreateRoom([FromBody] CreateRoomCommand createCommand)
         {
 
-            var roomId = await _mediator.Send(createCommand);
+            int roomId;
+            try
+            {
+                roomId = await _mediator.Send(createCommand);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return BadRequest(ex.Message);
+            }
 
             return CreatedAtAction(
                 nameof(GetRoomById),

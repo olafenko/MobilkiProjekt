@@ -45,6 +45,7 @@ export interface CreateRoomRequest {
     description?: string;
     status: RoomStatus;
     roomTypeId: number;
+    amenitiesIds: (number | string)[];
 }
 
 export interface UpdateRoomRequest extends CreateRoomRequest{

@@ -1,66 +1,48 @@
 ﻿import React from 'react';
-import {StyleSheet, Text, View} from "react-native";
-import {Picker} from "@react-native-picker/picker";
+import {StyleSheet, Text, TouchableOpacity, View} from "react-native";
 
 
-interface PickerFieldProps<T> {
+interface PickerFieldProps<T>{
     label: string;
-    value: string | number | null;
+    selectedValue: string | number | null;
     items: T[];
     getValue: (item: T) => string | number;
     getLabel: (item: T) => string;
-    onChange: (value: string | number | null) => void;
-    placeholder?: string;
+    onChange: (value: string | number) => void;
     required?: boolean;
-    disabled?: boolean;
-    error?: string;
 }
-export function PickerField<T>({label,value,items,getValue,getLabel,onChange,placeholder = "Wybierz...",required = true,disabled=false,error}: PickerFieldProps<T>) {
-    return (
-        <View style={styles.container}>
-            <Text style={styles.label}>
-                {label}
-                {required && <Text style={styles.required}> *</Text>}
-            </Text>
-            <View style={[
-                styles.pickerContainer,
-                disabled && styles.disabled,
-                error && styles.errorBorder,
-            ]}>
-                <Picker
-                    selectedValue={value}
-                    onValueChange={onChange}
-                    style={styles.picker}
-                    enabled={!disabled}
+
+export function PickerField<T>({label, items, selectedValue,getValue,getLabel,onChange,required = true}: PickerFieldProps<T>) {
+    
+    return (<View>
+        <Text style={styles.label}>{label}{required && <Text style={styles.required}> *</Text>}</Text>
+        <View style={styles.pickerContainer}>
+            {items.map((item) => {
+                const val = getValue(item);
+                const isSelected = selectedValue === val;
+                return (
+                <TouchableOpacity
+                    key={val}
+                    style={[styles.chip, isSelected && styles.chipSelected]}
+                    onPress={() => onChange(val)}
                 >
-                    <Picker.Item label={placeholder} value={null} />
-                    {items.map((item) => (
-                        <Picker.Item
-                            key={getValue(item).toString()}
-                            label={getLabel(item)}
-                            value={getValue(item)}
-                        />
-                    ))}
-                </Picker>
-            </View>
-            {error && <Text style={styles.errorText}>{error}</Text>}
+                    <Text style={[styles.chipText, isSelected && styles.chipTextSelected]}>{getLabel(item)}</Text>
+                </TouchableOpacity>
+            );
+            })
+            };
         </View>
-    );
+    </View>);
     
 }
 
 const styles = StyleSheet.create({
-    container: { marginBottom: 16 },
-    label: { fontWeight: '600', marginBottom: 8, color: '#333' },
+    label: { fontSize: 14, fontWeight: '600', color: '#333', marginBottom: 8, marginTop: 16 },
+    pickerContainer: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 8 },
+    chip: { paddingHorizontal: 16, paddingVertical: 10, borderRadius: 8, backgroundColor: '#e0e0e0', borderWidth: 2, borderColor: '#e0e0e0' },
+    chipSelected: { backgroundColor: '#007AFF', borderColor: '#007AFF' },
+    chipText: { fontSize: 14, fontWeight: '600', color: '#333' },
+    chipTextSelected: { color: '#fff' },
     required: { color: '#F44336' },
-    pickerContainer: {
-        backgroundColor: '#fff',
-        borderRadius: 4,
-        borderWidth: 1,
-        borderColor: '#ddd',
-    },
-    picker: { height: 50 },
-    disabled: { backgroundColor: '#f5f5f5', opacity: 0.7 },
-    errorBorder: { borderColor: '#F44336' },
-    errorText: { color: '#F44336', fontSize: 12, marginTop: 4 },
 });
+
