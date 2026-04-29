@@ -98,13 +98,13 @@ function UpdateRoomScreen({navigation,route}: Props) {
                 <Text style={styles.label}>Numer pokoju *</Text>
                 <TextInput style={styles.input} value={number} onChangeText={setNumber} editable={!submitting} />
 
-                <Text style={styles.label}>Piętro</Text>
+                <Text style={styles.label}>Piętro *</Text>
                 <TextInput style={styles.input} value={floor} onChangeText={setFloor} keyboardType="numeric" editable={!submitting} />
 
                 <Text style={styles.label}>Opis</Text>
                 <TextInput style={[styles.input, styles.multiline]} value={description} onChangeText={setDescription} multiline numberOfLines={3} editable={!submitting} />
 
-                <Text style={styles.label}>Cena bazowa (z typu pokoju)</Text>
+                <Text style={styles.label}>Cena</Text>
                 <TextInput style={styles.input} value={basePrice} editable={false} />
 
                 <Text style={styles.label}>Typ pokoju *</Text>
@@ -138,7 +138,7 @@ function UpdateRoomScreen({navigation,route}: Props) {
 
                 <View style={styles.buttons}>
                     <Button title="Anuluj" onPress={() => navigation.goBack()} color="#999" disabled={submitting} />
-                    <Button title={submitting ? 'Wysyłanie...' : 'Utwórz'} onPress={handleSubmit} disabled={submitting} />
+                    <Button title={submitting ? 'Wysyłanie...' : 'Zapisz'} onPress={handleSubmit} disabled={submitting} />
                 </View>
             </View>
         </ScrollView>

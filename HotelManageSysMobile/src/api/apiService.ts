@@ -90,18 +90,12 @@ class ApiService {
     
     async getAmenities(): Promise<Amenity[]> {
        
-        return [
-            {amenityId: 1,name: "kibel"},
-            {amenityId: 2,name: "wentylacja"}
-        ];
+        return this.request<Amenity[]>('/Amenities');
     }
 
     async getRoomTypes(): Promise<RoomType[]> {
-       
-        return [
-            {roomTypeId: 1,name: "luksus",basePrice: 300},
-            {roomTypeId: 2,name: "zwykly", basePrice: 219.99}
-        ];
+
+        return this.request<RoomType[]>('/RoomTypes');
     }
 
 }

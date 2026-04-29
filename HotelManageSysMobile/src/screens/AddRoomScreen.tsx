@@ -95,13 +95,13 @@ function AddRoomScreen({ navigation }: Props) {
                 <Text style={styles.label}>Numer pokoju *</Text>
                 <TextInput style={styles.input} value={number} onChangeText={setNumber} editable={!submitting} />
 
-                <Text style={styles.label}>Piętro</Text>
+                <Text style={styles.label}>Piętro *</Text>
                 <TextInput style={styles.input} value={floor} onChangeText={setFloor} keyboardType="numeric" editable={!submitting} />
 
                 <Text style={styles.label}>Opis</Text>
                 <TextInput style={[styles.input, styles.multiline]} value={description} onChangeText={setDescription} multiline numberOfLines={3} editable={!submitting} />
 
-                <Text style={styles.label}>Cena bazowa (z typu pokoju)</Text>
+                <Text style={styles.label}>Cena</Text>
                 <TextInput style={styles.input} value={basePrice} editable={false} />
 
                 <Text style={styles.label}>Typ pokoju *</Text>
@@ -119,6 +119,8 @@ function AddRoomScreen({ navigation }: Props) {
                         );
                     })}
                 </View>
+
+               
 
                 <Text style={styles.label}>Status</Text>
                 <View style={styles.pickerContainer}>

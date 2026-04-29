@@ -41,7 +41,7 @@ function RoomsScreen({ navigation }: Props) {
                 <Text style={styles.roomNumber}>Piętro: {room.floor || 'N/A'}</Text>
                 <Text style={styles.roomType}>Typ pokoju: {room.roomTypeName || 'Brak'}</Text>
                 <Text>Status: {room.status || 'N/A'}</Text>
-                <Text style={styles.roomPrice}>Cena bazowa: {room.basePrice?.toFixed(2) || "0.00"}zł</Text>
+                <Text style={styles.roomPrice}>Cena: {room.basePrice?.toFixed(2) || "0.00"} zł</Text>
                 <Text>Udogodnienia: {room.amenitiesNames || "Brak"}</Text>
                 <Text>Opis: {room.description || "Brak"}</Text>
             </View>
