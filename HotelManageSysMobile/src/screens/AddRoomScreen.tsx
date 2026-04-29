@@ -16,6 +16,7 @@ import {
     View
 } from "react-native";
 import {PickerField} from "../components/PickerField.tsx";
+import {SmPickerField} from "../components/SmPickerField.tsx";
 
 type Props = NativeStackScreenProps<RootStackParamList, "AddRoom">;
 
@@ -26,13 +27,14 @@ function AddRoomScreen({ navigation }: Props) {
     const [floor, setFloor] = useState("");
     const [description, setDescription] = useState('');
     const [basePrice, setBasePrice] = useState('');
-    const [status, setStatus] = useState<RoomStatus>(RoomStatus.AVAILABLE);
+    const [status, setStatus] = useState<RoomStatus | null>(null);
     const [roomTypeId, setRoomTypeId] = useState<number | null>(null);
 
     const [roomTypes, setRoomTypes] = useState<RoomType[]>([]);
+    const [statuses,setStatuses] = useState<RoomStatus[]>([]);
     const [loading, setLoading] = useState(true);
     const [submitting, setSubmitting] = useState(false);
-    const [errors,setErrors] = useState<{roomType?: string}>({});
+    // const [errors,setErrors] = useState<{roomType?: string}>({});
     
     useEffect(() => {
         if (roomTypeId) {
@@ -47,7 +49,9 @@ function AddRoomScreen({ navigation }: Props) {
         const loadData = async () => {
             try {
                 const types = await apiService.getRoomTypes();
+                const statuses = Object.values(RoomStatus);
                 setRoomTypes(types);
+                setStatuses(statuses);
             } catch (err) {
                 Alert.alert("Błąd", "Nie udało się załadować danych.");
             } finally {
@@ -66,8 +70,12 @@ function AddRoomScreen({ navigation }: Props) {
             Alert.alert("Błąd", "Podaj piętro");
             return;
         }
+        if (!status) {
+            Alert.alert("Błąd", "Wybierz status");
+            return;
+        }
         if (!roomTypeId) {
-            setErrors(e => ({...e,roomType: "Wybierz typ pokoju"}));
+            Alert.alert("Błąd", "Wybierz typ pokoju");
             return;
         }
         
@@ -76,7 +84,7 @@ function AddRoomScreen({ navigation }: Props) {
             await addRoom({
                 number: number.trim(),
                 description: description.trim(),
-                floor: parseInt(floor),
+                floor: parseInt(floor) || 0,
                 status: status,
                 roomTypeId: roomTypeId
             });
@@ -114,32 +122,25 @@ function AddRoomScreen({ navigation }: Props) {
                 <Text style={styles.label}>Cena</Text>
                 <TextInput style={styles.input} value={basePrice} editable={false} />
 
-                
-                <PickerField 
+                <SmPickerField
                     label="Typ pokoju"
-                    value={roomTypeId}
+                    selectedValue={roomTypeId}
                     items={roomTypes}
-                    getValue={t => t.roomTypeId}
-                    getLabel={t => t.name}
+                    getValue={r => r.roomTypeId}
+                    getLabel={r=> r.name}
                     onChange={val => setRoomTypeId(val as number | null)}
-                    placeholder={"Wybierz typ pokoju..."}
                     required
-                    disabled={submitting}
-                    error={errors.roomType}
                 />
                 
-                <Text style={styles.label}>Status</Text>
-                <View style={styles.pickerContainer}>
-                    {Object.values(RoomStatus).map((s) => (
-                        <TouchableOpacity
-                            key={s}
-                            style={[styles.chip, status === s && styles.chipSelected]}
-                            onPress={() => setStatus(s)}
-                        >
-                            <Text style={[styles.chipText, status === s && styles.chipTextSelected]}>{s}</Text>
-                        </TouchableOpacity>
-                    ))}
-                </View>
+                <SmPickerField
+                    label="Status"
+                    selectedValue={status}
+                    items={statuses}
+                    getValue={s => s}
+                    getLabel={s=> s}
+                    onChange={val => setStatus(val as RoomStatus)}
+                    required
+                />
 
                 <View style={styles.buttons}>
                     <Button title="Anuluj" onPress={() => navigation.goBack()} color="#999" disabled={submitting} />
@@ -157,11 +158,6 @@ const styles = StyleSheet.create({
     label: { fontSize: 14, fontWeight: '600', color: '#333', marginBottom: 8, marginTop: 16 },
     input: { borderWidth: 1, borderColor: '#ddd', borderRadius: 8, padding: 12, fontSize: 16, backgroundColor: '#fff' },
     multiline: { height: 80, textAlignVertical: 'top' },
-    pickerContainer: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 8 },
-    chip: { paddingHorizontal: 16, paddingVertical: 10, borderRadius: 8, backgroundColor: '#e0e0e0', borderWidth: 2, borderColor: '#e0e0e0' },
-    chipSelected: { backgroundColor: '#007AFF', borderColor: '#007AFF' },
-    chipText: { fontSize: 14, fontWeight: '600', color: '#333' },
-    chipTextSelected: { color: '#fff' },
     buttons: { flexDirection: 'row', columnGap: 10, marginTop: 20, marginBottom: 30 },
 });
 

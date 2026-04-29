@@ -180,8 +180,3 @@ export interface UpdatePaymentRequest extends Omit<CreatePaymentRequest, 'paymen
     paymentId: number;
     paymentDate: string;
 }
-
-export interface CreatedEntityResponse {
-    id: number;
-    message?: string;
-}
