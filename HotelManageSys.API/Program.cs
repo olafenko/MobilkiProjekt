@@ -19,6 +19,7 @@ using HotelManageSys.API.Models.Data;
 using Mapster;
 using Microsoft.EntityFrameworkCore;
 using System.Reflection;
+using System.Text.Json.Serialization;
 
 namespace HotelManageSys.API
 {
@@ -41,7 +42,10 @@ namespace HotelManageSys.API
 
             SetUpCORS(builder);
 
-            builder.Services.AddControllers();
+            builder.Services.AddControllers().AddJsonOptions(x =>
+            {
+                x.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+            });
 
             builder.Services.AddOpenApi();
 
