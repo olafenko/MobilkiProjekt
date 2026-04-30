@@ -41,7 +41,7 @@ export function MultiPickerField<T>({label, items, selectedValues,getValue,getLa
                         </TouchableOpacity>
                     );
                 })
-                };
+                }
                 
             </View>
     </View>

@@ -40,14 +40,14 @@ function AddRoomScreen({ navigation }: Props) {
     useEffect(() => {
         const loadData = async () => {
             try {
-                 const [types, amenities] =  await Promise.all(
+                 const [types, allAmenities] =  await Promise.all(
                     [
                     apiService.getRoomTypes(),
                     apiService.getAmenities(),
                     ]);
                 const statuses = Object.values(RoomStatus);
                 setRoomTypes(types);
-                setAmenities(amenities)
+                setAmenities(allAmenities)
                 setStatuses(statuses);
             } catch (err) {
                 Alert.alert("Błąd", "Nie udało się załadować danych.");

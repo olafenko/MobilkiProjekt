@@ -2,7 +2,7 @@
 import {NativeStackScreenProps} from "@react-navigation/native-stack";
 import {useRooms} from "../context/RoomsContext.tsx";
 import {useEffect, useState} from "react";
-import {RoomStatus, RoomType} from "../types/models.ts";
+import {Amenity, RoomStatus, RoomType} from "../types/models.ts";
 import apiService from "../api/apiService.ts";
 import {
     ActivityIndicator,
@@ -15,6 +15,9 @@ import {
     TouchableOpacity,
     View
 } from "react-native";
+import {PickerField} from "../components/PickerField.tsx";
+import {MultiPickerField} from "../components/MultiPickerField.tsx";
+import {installAll} from "@react-native-community/cli/build/tools/packageManager";
 
 type Props = NativeStackScreenProps<RootStackParamList, 'UpdateRoom'>;
 
@@ -22,21 +25,24 @@ function UpdateRoomScreen({navigation,route}: Props) {
 
     const { room } = route.params;
     const { updateRoom } = useRooms();
-    
-    const [number, setNumber] = useState(room.number || "");
-    const [floor, setFloor] = useState(room.floor.toString() || "");
-    const [description, setDescription] = useState(room.description || "");
-    const [basePrice, setBasePrice] = useState(room.basePrice.toString() || "");
+
+    const [number, setNumber] = useState(room.number);
+    const [floor, setFloor] = useState(room.floor.toString());
+    const [description, setDescription] = useState(room.description);
+    const [basePrice, setBasePrice] = useState(room.basePrice.toString());
     const [status, setStatus] = useState<RoomStatus>(room.status);
-    const [roomTypeId, setRoomTypeId] = useState(room.roomTypeId.toString() || '');
+    const [roomTypeId, setRoomTypeId] = useState<number>(room.roomTypeId);
+    const [selectedAmenities, setSelectedAmenities] = useState<(number | string)[]>([]);
 
     const [roomTypes, setRoomTypes] = useState<RoomType[]>([]);
+    const [amenities, setAmenities] = useState<Amenity[]>([]);
+    const [statuses,setStatuses] = useState<RoomStatus[]>([]);
     const [loading, setLoading] = useState(true);
     const [submitting, setSubmitting] = useState(false);
 
     useEffect(() => {
         if (roomTypeId) {
-            const selectedType = roomTypes.find(rt => rt.roomTypeId.toString() === roomTypeId);
+            const selectedType = roomTypes.find(rt => rt.roomTypeId === roomTypeId);
             if (selectedType) {
                 setBasePrice(selectedType.basePrice.toString());
             }
@@ -46,10 +52,24 @@ function UpdateRoomScreen({navigation,route}: Props) {
     useEffect(() => {
         const loadData = async () => {
             try {
-                const types = await apiService.getRoomTypes();
+                const [types, allAmenities] =  await Promise.all(
+                    [
+                        apiService.getRoomTypes(),
+                        apiService.getAmenities(),
+                    ]);
+                const statuses = Object.values(RoomStatus);
                 setRoomTypes(types);
+                setAmenities(allAmenities)
+                setStatuses(statuses);
+                
+                if(room.amenitiesNames.length > 0){
+                    const matchedAmenities =allAmenities.filter(a => room.amenitiesNames.includes(a.name))
+                        .map(a => a.amenityId);
+                    setSelectedAmenities(matchedAmenities);
+                }
+                
             } catch (err) {
-                Alert.alert("Błąd", "Nie udało się załadować typów pokoi.");
+                Alert.alert("Błąd", "Nie udało się załadować danych.");
             } finally {
                 setLoading(false);
             }
@@ -58,20 +78,32 @@ function UpdateRoomScreen({navigation,route}: Props) {
     }, []);
 
     const handleSubmit = async () => {
-        if (!number.trim() || !floor || !roomTypeId) {
-            Alert.alert("Błąd", "Wypełnij wszystkie pola wymagane");
+        if (!number.trim()){
+            Alert.alert("Błąd", "Podaj numer pokoju");
             return;
         }
-
+        if (!floor) {
+            Alert.alert("Błąd", "Podaj piętro");
+            return;
+        }
+        if (!status) {
+            Alert.alert("Błąd", "Wybierz status");
+            return;
+        }
+        if (!roomTypeId) {
+            Alert.alert("Błąd", "Wybierz typ pokoju");
+            return;
+        }
         try {
             setSubmitting(true);
             await updateRoom(room.roomId, {
                 roomId: room.roomId,
                 number: number.trim(),
                 description: description.trim(),
-                floor: parseInt(floor),
+                floor: parseInt(floor) || 0,
                 status: status,
-                roomTypeId: parseInt(roomTypeId)
+                roomTypeId: roomTypeId,
+                amenitiesIds: selectedAmenities
             });
 
             Alert.alert("Sukces", "Pokój został zaaktualizowany!", [
@@ -106,35 +138,36 @@ function UpdateRoomScreen({navigation,route}: Props) {
 
                 <Text style={styles.label}>Cena</Text>
                 <TextInput style={styles.input} value={basePrice} editable={false} />
+                
+                <PickerField
+                    label="Typ pokoju"
+                    selectedValue={roomTypeId}
+                    items={roomTypes}
+                    getValue={r => r.roomTypeId}
+                    getLabel={r=> r.name}
+                    onChange={val => setRoomTypeId(val as number)}
+                    required
+                />
 
-                <Text style={styles.label}>Typ pokoju *</Text>
-                <View style={styles.pickerContainer}>
-                    {roomTypes.map(rt => {
-                        const isSelected = roomTypeId === rt.roomTypeId.toString();
-                        return (
-                            <TouchableOpacity
-                                key={rt.roomTypeId}
-                                style={[styles.chip, isSelected && styles.chipSelected]}
-                                onPress={() => setRoomTypeId(rt.roomTypeId.toString())}
-                            >
-                                <Text style={[styles.chipText, isSelected && styles.chipTextSelected]}>{rt.name}</Text>
-                            </TouchableOpacity>
-                        );
-                    })}
-                </View>
+                <MultiPickerField
+                    label="Udogodnienia"
+                    selectedValues={selectedAmenities}
+                    items={amenities}
+                    getValue={a => a.amenityId}
+                    getLabel={a => a.name}
+                    onChange={values => setSelectedAmenities(values) }
+                    required={false}
+                />
 
-                <Text style={styles.label}>Status</Text>
-                <View style={styles.pickerContainer}>
-                    {Object.values(RoomStatus).map((s) => (
-                        <TouchableOpacity
-                            key={s}
-                            style={[styles.chip, status === s && styles.chipSelected]}
-                            onPress={() => setStatus(s)}
-                        >
-                            <Text style={[styles.chipText, status === s && styles.chipTextSelected]}>{s}</Text>
-                        </TouchableOpacity>
-                    ))}
-                </View>
+                <PickerField
+                    label="Status"
+                    selectedValue={status}
+                    items={statuses}
+                    getValue={s => s}
+                    getLabel={s=> s}
+                    onChange={val => setStatus(val as RoomStatus)}
+                    required
+                />
 
                 <View style={styles.buttons}>
                     <Button title="Anuluj" onPress={() => navigation.goBack()} color="#999" disabled={submitting} />

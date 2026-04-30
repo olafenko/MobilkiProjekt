@@ -30,7 +30,7 @@ export function PickerField<T>({label, items, selectedValue,getValue,getLabel,on
                 </TouchableOpacity>
             );
             })
-            };
+            }
         </View>
     </View>);
     
