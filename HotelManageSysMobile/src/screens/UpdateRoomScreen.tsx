@@ -4,20 +4,9 @@ import {useRooms} from "../context/RoomsContext.tsx";
 import {useEffect, useState} from "react";
 import {Amenity, RoomStatus, RoomType} from "../types/models.ts";
 import apiService from "../api/apiService.ts";
-import {
-    ActivityIndicator,
-    Alert,
-    Button,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View
-} from "react-native";
+import {ActivityIndicator, Alert, Button, ScrollView, StyleSheet, Text, TextInput, View} from "react-native";
 import {PickerField} from "../components/PickerField.tsx";
 import {MultiPickerField} from "../components/MultiPickerField.tsx";
-import {installAll} from "@react-native-community/cli/build/tools/packageManager";
 
 type Props = NativeStackScreenProps<RootStackParamList, 'UpdateRoom'>;
 

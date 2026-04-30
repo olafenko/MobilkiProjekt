@@ -5,6 +5,8 @@ import type {
     CreateRoomRequest,
     UpdateRoomRequest, Amenity, RoomType
 } from "../types/models.ts";
+import {Update} from "@sinclair/typebox/value";
+import UpdateRoomScreen from "../screens/UpdateRoomScreen.tsx";
 
 class ApiService {
     
@@ -75,7 +77,7 @@ class ApiService {
         });
     }
 
-    async updateRoom(id: number, data: Partial<Room>) : Promise<void>{
+    async updateRoom(id: number, data: UpdateRoomRequest) : Promise<void>{
         return this.request<void>(`/Rooms/${id}`, {
             method: "PUT",
             body: JSON.stringify({...data, roomId: id})

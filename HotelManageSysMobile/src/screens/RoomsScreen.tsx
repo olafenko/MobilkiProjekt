@@ -37,12 +37,12 @@ function RoomsScreen({ navigation }: Props) {
     const renderRoom = ({item:room } : { item:Room }) => {
         return (<View style={styles.roomCard}>
             <View style={styles.roomContent}>
-                <Text style={styles.roomNumber}>Numer pokoju: {room.number || 'N/A'}</Text>
-                <Text style={styles.roomNumber}>Piętro: {room.floor || 'N/A'}</Text>
-                <Text style={styles.roomType}>Typ pokoju: {room.roomTypeName || 'Brak'}</Text>
-                <Text>Status: {room.status || 'N/A'}</Text>
+                <Text style={styles.roomNumber}>Numer pokoju: {room.number}</Text>
+                <Text style={styles.roomNumber}>Piętro: {room.floor}</Text>
+                <Text style={styles.roomType}>Typ pokoju: {room.roomTypeName}</Text>
+                <Text style={styles.roomNumber}>Status: {room.status}</Text>
                 <Text style={styles.roomPrice}>Cena: {room.basePrice?.toFixed(2) || "0.00"} zł</Text>
-                <Text>Udogodnienia: {room.amenitiesNames || "Brak"}</Text>
+                <Text style={styles.roomNumber}>Udogodnienia: {room.amenitiesNames.length > 0 ? room.amenitiesNames : "Brak"}</Text>
                 <Text>Opis: {room.description || "Brak"}</Text>
             </View>
             <View style={styles.roomActions}>

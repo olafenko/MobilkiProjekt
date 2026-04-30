@@ -36,7 +36,6 @@ namespace HotelManageSys.API.Features.Rooms.Handlers.Commands
 
             room.Amenities = newAmenities;
             
-
             await _roomService.UpdateRoom(room, cancellationToken);
 
             _logger.LogInformation("Zaaktualizowano pokój ID: {RoomId}", request.RoomId);
