@@ -1,10 +1,10 @@
 ﻿import {createNativeStackNavigator} from "@react-navigation/native-stack";
 import React from "react";
 import {NavigationContainer} from "@react-navigation/native";
-import RoomsScreen from "../screens/RoomsScreen.tsx";
-import AddRoomScreen from "../screens/AddRoomScreen.tsx";
+import RoomsScreen from "../screens/rooms/RoomsScreen.tsx";
+import AddRoomScreen from "../screens/rooms/AddRoomScreen.tsx";
 import {RootStackParamList} from "./types.ts";
-import UpdateRoomScreen from "../screens/UpdateRoomScreen.tsx";
+import UpdateRoomScreen from "../screens/rooms/UpdateRoomScreen.tsx";
 
 
 const Stack = createNativeStackNavigator<RootStackParamList>();

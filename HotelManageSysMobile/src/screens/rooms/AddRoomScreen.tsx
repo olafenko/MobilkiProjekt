@@ -1,12 +1,12 @@
 ﻿import {NativeStackScreenProps} from "@react-navigation/native-stack";
-import {RootStackParamList} from "../navigation/types.ts";
-import {useRooms} from "../context/RoomsContext.tsx";
+import {RootStackParamList} from "../../navigation/types.ts";
+import {useRooms} from "../../context/RoomsContext.tsx";
 import {useEffect, useState} from "react";
-import {Amenity, RoomStatus, RoomType} from "../types/models.ts";
-import apiService from "../api/apiService.ts";
+import {Amenity, RoomStatus, RoomType} from "../../types/models.ts";
+import apiService from "../../api/apiService.ts";
 import {ActivityIndicator, Alert, Button, ScrollView, StyleSheet, Text, TextInput, View} from "react-native";
-import {PickerField} from "../components/PickerField.tsx";
-import {MultiPickerField} from "../components/MultiPickerField.tsx";
+import {PickerField} from "../../components/PickerField.tsx";
+import {MultiPickerField} from "../../components/MultiPickerField.tsx";
 
 type Props = NativeStackScreenProps<RootStackParamList, "AddRoom">;
 

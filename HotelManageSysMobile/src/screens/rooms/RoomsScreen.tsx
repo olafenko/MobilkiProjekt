@@ -1,7 +1,7 @@
-﻿import { useRooms } from "../context/RoomsContext";
+﻿import { useRooms } from "../../context/RoomsContext";
 import {NativeStackScreenProps} from "@react-navigation/native-stack";
-import {RootStackParamList} from "../navigation/types.ts";
-import {Room} from "../types/models.ts";
+import {RootStackParamList} from "../../navigation/types.ts";
+import {Room} from "../../types/models.ts";
 import {ActivityIndicator, Alert, FlatList, StyleSheet, Text, TouchableOpacity, View} from "react-native";
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Rooms'>;
