@@ -7,7 +7,7 @@ import {useEffect} from "react";
 
 type Props = NativeStackScreenProps<RootStackParamList, 'RoomTypes'>;
 
-function RoomTypes({ navigation }: Props) {
+function RoomTypesScreen({ navigation }: Props) {
 
     const { roomTypes, loading, error, refreshRoomTypes, deleteRoomType} = useRoomTypes();
 
@@ -218,4 +218,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default RoomTypes;
+export default RoomTypesScreen;

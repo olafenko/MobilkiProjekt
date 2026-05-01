@@ -4,6 +4,7 @@ import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-cont
 import { RoomsProvider } from './src/context/RoomsContext.tsx';
 import RootNavigator from "./src/navigation/RootNavigator.tsx";
 import {RoomTypesProvider} from "./src/context/RoomTypesContext.tsx";
+import {AmenitiesProvider} from "./src/context/AmenitiesContext.tsx";
 
 
 function App(): React.JSX.Element {
@@ -14,7 +15,9 @@ function App(): React.JSX.Element {
             <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
             <RoomTypesProvider>
                 <RoomsProvider>
-                    <AppContent />
+                    <AmenitiesProvider>
+                        <AppContent />
+                    </AmenitiesProvider>
                 </RoomsProvider>
             </RoomTypesProvider>
         </SafeAreaProvider>
