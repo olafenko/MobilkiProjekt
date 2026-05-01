@@ -1,11 +1,11 @@
 ﻿import {API_BASE_URL} from "./config.ts";
 
 import type {
-    Amenity,
+    Amenity, CreateAmenityRequest,
     CreateRoomRequest,
     CreateRoomTypeRequest,
     Room,
-    RoomType,
+    RoomType, UpdateAmenityRequest,
     UpdateRoomRequest, UpdateRoomTypeRequest
 } from "../types/models.ts";
 
@@ -96,6 +96,26 @@ class ApiService {
         return this.request<Amenity[]>('/Amenities');
     }
 
+    async createAmenity(data: CreateAmenityRequest) : Promise<{ id: number }>{
+        return this.request<{id: number}>('/Amenities', {
+            method: "POST",
+            body: JSON.stringify(data),
+        });
+    }
+
+    async updateAmenity(id: number, data: UpdateAmenityRequest) : Promise<void>{
+        return this.request<void>(`/Amenities/${id}`, {
+            method: "PUT",
+            body: JSON.stringify({...data, amenityId: id})
+        });
+    }
+
+    async deleteAmenity(id: number) : Promise<void>{
+        return this.request<void>(`/Amenities/${id}`, {
+            method: "DELETE"
+        });
+    }
+
     async getRoomTypes(): Promise<RoomType[]> {
 
         return this.request<RoomType[]>('/RoomTypes');
@@ -111,7 +131,7 @@ class ApiService {
     async updateRoomType(id: number, data: UpdateRoomTypeRequest) : Promise<void>{
         return this.request<void>(`/RoomTypes/${id}`, {
             method: "PUT",
-            body: JSON.stringify({...data, roomId: id})
+            body: JSON.stringify({...data, roomTypeId: id})
         });
     }
 
