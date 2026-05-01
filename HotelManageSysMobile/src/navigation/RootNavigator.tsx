@@ -5,6 +5,10 @@ import RoomsScreen from "../screens/rooms/RoomsScreen.tsx";
 import AddRoomScreen from "../screens/rooms/AddRoomScreen.tsx";
 import {RootStackParamList} from "./types.ts";
 import UpdateRoomScreen from "../screens/rooms/UpdateRoomScreen.tsx";
+import HomeScreen from "../screens/HomeScreen.tsx";
+import RoomTypesScreen from "../screens/roomTypes/RoomTypesScreen.tsx";
+import AddRoomTypeScreen from "../screens/roomTypes/AddRoomTypeScreen.tsx";
+import UpdateRoomTypeScreen from "../screens/roomTypes/UpdateRoomTypeScreen.tsx";
 
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -13,10 +17,18 @@ function RootNavigator(): React.JSX.Element {
     
     return (
         <NavigationContainer>
-            <Stack.Navigator screenOptions={ {headerStyle: { backgroundColor: '#007AFF' },
+            <Stack.Navigator
+                initialRouteName="Home"
+                screenOptions={{
+                headerStyle: { backgroundColor: '#007AFF'},
                 headerTintColor: '#fff',
                 headerTitleStyle: { fontWeight: 'bold' },
             }}>
+                <Stack.Screen
+                    name="Home"
+                    component={HomeScreen}
+                    options={{title: "Panel główny"}}
+                />
                 <Stack.Screen
                 name="Rooms"
                 component={RoomsScreen}
@@ -32,13 +44,27 @@ function RootNavigator(): React.JSX.Element {
                     component={UpdateRoomScreen}
                     options={{title: "Edytuj pokój"}}
                 />
-                
-                
-                
+                <Stack.Screen
+                    name="RoomTypes"
+                    component={RoomTypesScreen}
+                    options={{title: "Typy pokoju"}}
+                />
+                <Stack.Screen
+                    name="AddRoomType"
+                    component={AddRoomTypeScreen}
+                    options={{title: "Nowy typ pokoju"}}
+                />
+                <Stack.Screen
+                    name="UpdateRoomType"
+                    component={UpdateRoomTypeScreen}
+                    options={{title: "Edytuj typ pokoju"}}
+                />
+                {/*<Stack.Screen*/}
+                {/*    name="Amenities"*/}
+                {/*    component={AmenitiesScreen}*/}
+                {/*    options={{title: "Udogodnienia"}}*/}
+                {/*/>*/}
             </Stack.Navigator>
-            
-            
-            
         </NavigationContainer>
         
     );

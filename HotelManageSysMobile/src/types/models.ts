@@ -60,11 +60,30 @@ export interface RoomType {
     isActive?: boolean;
 }
 
+export interface CreateRoomTypeRequest {
+    name: string;
+    basePrice: number;
+    description?: string;
+}
+
+export interface UpdateRoomTypeRequest extends CreateRoomTypeRequest{
+    roomTypeId: number;
+}
+
 export interface Amenity {
     amenityId: number;
     name: string;
     description?: string;
     isActive?: boolean;
+}
+
+export interface CreateAmenityRequest {
+    name: string;
+    description?: string;
+}
+
+export interface UpdateAmenityRequest extends CreateAmenityRequest{
+    amenityId: number;
 }
 
 export interface Guest {

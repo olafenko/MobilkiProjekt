@@ -1,12 +1,13 @@
 ﻿import {API_BASE_URL} from "./config.ts";
 
 import type {
-    Room,
+    Amenity,
     CreateRoomRequest,
-    UpdateRoomRequest, Amenity, RoomType
+    CreateRoomTypeRequest,
+    Room,
+    RoomType,
+    UpdateRoomRequest, UpdateRoomTypeRequest
 } from "../types/models.ts";
-import {Update} from "@sinclair/typebox/value";
-import UpdateRoomScreen from "../screens/UpdateRoomScreen.tsx";
 
 class ApiService {
     
@@ -98,6 +99,26 @@ class ApiService {
     async getRoomTypes(): Promise<RoomType[]> {
 
         return this.request<RoomType[]>('/RoomTypes');
+    }
+
+    async createRoomType(data: CreateRoomTypeRequest) : Promise<{ id: number }>{
+        return this.request<{id: number}>('/RoomTypes', {
+            method: "POST",
+            body: JSON.stringify(data),
+        });
+    }
+
+    async updateRoomType(id: number, data: UpdateRoomTypeRequest) : Promise<void>{
+        return this.request<void>(`/RoomTypes/${id}`, {
+            method: "PUT",
+            body: JSON.stringify({...data, roomId: id})
+        });
+    }
+
+    async deleteRoomType(id: number) : Promise<void>{
+        return this.request<void>(`/RoomTypes/${id}`, {
+            method: "DELETE"
+        });
     }
 
 }

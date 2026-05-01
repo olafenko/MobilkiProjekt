@@ -3,6 +3,7 @@ import { View, StatusBar, useColorScheme, StyleSheet } from 'react-native';
 import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { RoomsProvider } from './src/context/RoomsContext.tsx';
 import RootNavigator from "./src/navigation/RootNavigator.tsx";
+import {RoomTypesProvider} from "./src/context/RoomTypesContext.tsx";
 
 
 function App(): React.JSX.Element {
@@ -11,9 +12,11 @@ function App(): React.JSX.Element {
     return (
         <SafeAreaProvider>
             <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
-            <RoomsProvider>
-                <AppContent />
-            </RoomsProvider>
+            <RoomTypesProvider>
+                <RoomsProvider>
+                    <AppContent />
+                </RoomsProvider>
+            </RoomTypesProvider>
         </SafeAreaProvider>
     );
 }

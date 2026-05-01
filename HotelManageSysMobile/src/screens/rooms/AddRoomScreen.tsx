@@ -26,7 +26,6 @@ function AddRoomScreen({ navigation }: Props) {
     const [statuses,setStatuses] = useState<RoomStatus[]>([]);
     const [loading, setLoading] = useState(true);
     const [submitting, setSubmitting] = useState(false);
-    // const [errors,setErrors] = useState<{roomType?: string}>({});
     
     useEffect(() => {
         if (roomTypeId) {
