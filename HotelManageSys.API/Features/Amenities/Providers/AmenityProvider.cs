@@ -23,9 +23,19 @@ namespace HotelManageSys.API.Features.Amenities.Providers
                 .ToListAsync(cancellationToken);
         }
 
-        public Task<Amenity> GetAmenityByIdAsync(int amenityId, bool asNoTracking = true, CancellationToken cancellationToken = default)
+        public async Task<Amenity> GetAmenityByIdAsync(int amenityId, bool asNoTracking = true, CancellationToken cancellationToken = default)
         {
-            throw new NotImplementedException();
+            IQueryable<Amenity> query = _dbContext.Amenities;
+
+            if (asNoTracking)
+            {
+                query = query.AsNoTracking();
+            }
+
+            var amenity = await  query.FirstOrDefaultAsync(a => a.IsActive && a.AmenityId == amenityId,cancellationToken);
+
+
+            return amenity ?? throw new KeyNotFoundException($"Nie znaleziono udogodnienia o ID {amenityId}");
         }
 
         public async Task<List<Amenity>> GetAmenitiesByIdsAsync(IEnumerable<int> amenityIds, bool asNoTracking = true, CancellationToken cancellationToken = default)
