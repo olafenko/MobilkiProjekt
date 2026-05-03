@@ -101,19 +101,23 @@ namespace HotelManageSys.API.Models.Data
 
             modelBuilder.Entity<ReservationAdditionalOffer>(rhs =>
             {
+
                 rhs.HasKey(rhs => rhs.ReservationAdditionalOfferId);
                 rhs.Property(rhs => rhs.Quantity).IsRequired();
+                rhs.Property(rhs => rhs.PurchasePrice).HasColumnType("decimal(18,2)").IsRequired(); ;
                 rhs.Property(rhs => rhs.Notes).HasMaxLength(300);
                 rhs.Property(rhs => rhs.IsActive).IsRequired();
 
                 rhs.HasOne(rhs => rhs.Reservation)
                     .WithMany(r => r.ReservationAdditionalOffers)
                     .HasForeignKey(rhs => rhs.ReservationId)
+                    .IsRequired()
                     .OnDelete(DeleteBehavior.Cascade);
 
                 rhs.HasOne(rhs => rhs.AdditionalOffer)
                    .WithMany(a => a.ReservationAdditionalOffers)
                    .HasForeignKey(rhs => rhs.AdditionalOfferId)
+                   .IsRequired()
                    .OnDelete(DeleteBehavior.Restrict);
 
 

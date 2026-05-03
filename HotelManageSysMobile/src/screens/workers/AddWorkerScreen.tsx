@@ -95,7 +95,7 @@ function AddWorkerScreen({navigation} : Props) {
                 />
 
                 <PickerField
-                    label="Stanowisko *"
+                    label="Rola"
                     selectedValue={role}
                     items={roles}
                     getValue={r => r}

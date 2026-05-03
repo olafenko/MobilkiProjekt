@@ -92,7 +92,7 @@ function UpdateWorkerScreen({route, navigation} : Props) {
                 />
 
                 <PickerField
-                    label="Rola *"
+                    label="Rola"
                     selectedValue={role}
                     items={roles}
                     getValue={r => r}

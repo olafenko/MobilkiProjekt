@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace HotelManageSys.API.Migrations
 {
     /// <inheritdoc />
-    public partial class InitalCreate : Migration
+    public partial class InitialMigration : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -87,6 +87,7 @@ namespace HotelManageSys.API.Migrations
                     LastName = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     Login = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     Password = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Role = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     IsActive = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
@@ -214,6 +215,7 @@ namespace HotelManageSys.API.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     ReservationId = table.Column<int>(type: "int", nullable: false),
                     AdditionalOfferId = table.Column<int>(type: "int", nullable: false),
+                    PurchasePrice = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     Quantity = table.Column<int>(type: "int", nullable: false),
                     Notes = table.Column<string>(type: "nvarchar(300)", maxLength: 300, nullable: true),
                     IsActive = table.Column<bool>(type: "bit", nullable: false)
@@ -269,8 +271,8 @@ namespace HotelManageSys.API.Migrations
 
             migrationBuilder.InsertData(
                 table: "Workers",
-                columns: new[] { "WorkerId", "FirstName", "IsActive", "LastName", "Login", "Password" },
-                values: new object[] { 1, "Adam", true, "Kowalski", "admin", "admin123" });
+                columns: new[] { "WorkerId", "FirstName", "IsActive", "LastName", "Login", "Password", "Role" },
+                values: new object[] { 1, "Adam", true, "Kowalski", "admin", "admin123", "ADMIN" });
 
             migrationBuilder.InsertData(
                 table: "Rooms",
