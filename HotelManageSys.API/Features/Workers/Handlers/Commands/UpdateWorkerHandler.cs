@@ -25,7 +25,13 @@ namespace HotelManageSys.API.Features.Workers.Handlers.Commands
 
             _logger.LogInformation("Aktualizowanie pracownika ID: {WorkerId}", request.WorkerId);
 
+            _logger.LogInformation("Rola pracownika: {role}", worker.Role);
+            _logger.LogInformation("Rola pracownika z request : {role}", request.Role);
+
             request.Adapt(worker);
+
+            _logger.LogInformation("Rola pracownika nowa: {role}", worker.Role);
+
 
             await _workerService.UpdateWorker(worker, cancellationToken);
 

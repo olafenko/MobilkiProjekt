@@ -4,6 +4,12 @@ export enum RoomStatus {
     OCCUPIED = 'OCCUPIED'
 }
 
+export enum Role {
+    WORKER = 'WORKER',
+    ADMIN = 'ADMIN',
+    MANAGER = 'MANAGER'
+}
+
 export enum ReservationStatus {
     PENDING = 'PENDING',
     CONFIRMED = 'CONFIRMED',
@@ -113,6 +119,7 @@ export interface Worker {
     firstName: string;
     lastName: string;
     login: string;
+    role: Role;
     isActive: boolean;
 }
 
@@ -120,11 +127,16 @@ export interface CreateWorkerRequest {
     firstName: string;
     lastName: string;
     login: string;
+    role: Role;
     password: string;
 }
 
-export interface UpdateWorkerRequest extends CreateWorkerRequest {
+export interface UpdateWorkerRequest {
     workerId: number;
+    firstName: string;
+    lastName: string;
+    login: string;
+    role: Role;
 }
 
 export interface AdditionalOffer {

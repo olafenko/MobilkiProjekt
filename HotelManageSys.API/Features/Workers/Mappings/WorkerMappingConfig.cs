@@ -9,7 +9,11 @@ namespace HotelManageSys.API.Features.Workers.Mappings
     {
         public void Register(TypeAdapterConfig config)
         {
-            config.NewConfig<Worker, WorkerDTO>();
+            config.NewConfig<Worker, WorkerDTO>()
+                .Map(d => d.Role, src => src.Role.ToString());
+
+            config.NewConfig<UpdateWorkerCommand, Worker>()
+                .Ignore(d => d.Password);
 
             config.NewConfig<CreateWorkerCommand, Worker>()
                 .Ignore(d => d.WorkerId)

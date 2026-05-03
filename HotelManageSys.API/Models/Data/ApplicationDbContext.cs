@@ -140,6 +140,7 @@ namespace HotelManageSys.API.Models.Data
                 w.Property(w => w.LastName).HasMaxLength(50).IsRequired();
                 w.Property(w => w.Login).HasMaxLength(50).IsRequired();
                 w.Property(w => w.Password).IsRequired();
+                w.Property(w => w.Role).HasConversion<string>().IsRequired();
                 w.Property(w => w.IsActive).IsRequired();
 
 
@@ -195,7 +196,7 @@ namespace HotelManageSys.API.Models.Data
             );
 
             modelBuilder.Entity<Worker>().HasData(
-                new Worker { WorkerId = 1, FirstName = "Adam", LastName = "Kowalski", Login = "admin", Password = "admin123", IsActive = true }
+                new Worker { WorkerId = 1, FirstName = "Adam", LastName = "Kowalski", Login = "admin", Password = "admin123", Role = Role.ADMIN, IsActive = true }
             );
 
             modelBuilder.Entity<Guest>().HasData(

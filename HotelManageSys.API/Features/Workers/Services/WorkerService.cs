@@ -28,6 +28,7 @@ namespace HotelManageSys.API.Features.Workers.Services
             worker.IsActive = false;
             await _context.SaveChangesAsync(cancellationToken);
         }
+
     }
 }
 
