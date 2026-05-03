@@ -14,8 +14,8 @@ function UpdateAmenityScreen({navigation, route} : Props) {
     
     const { updateAmenity } = useAmenities();
 
-    const [name, setName] = useState(amenity.name);
-    const [description, setDescription] = useState(amenity.description);
+    const [name, setName] = useState(amenity.name || "");
+    const [description, setDescription] = useState(amenity.description || "");
 
     const [loading, setLoading] = useState(false);
     const [submitting, setSubmitting] = useState(false);

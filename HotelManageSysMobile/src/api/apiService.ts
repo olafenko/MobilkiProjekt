@@ -172,7 +172,7 @@ class ApiService {
     }
 
     async createGuest(data: CreateGuestRequest) : Promise<{ id: number }>{
-        return this.request<{id: number}>('/Guest', {
+        return this.request<{id: number}>('/Guests', {
             method: "POST",
             body: JSON.stringify(data),
         });

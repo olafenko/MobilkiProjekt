@@ -13,6 +13,8 @@ import AmenitiesScreen from "../screens/amenities/AmenitiesScreen.tsx";
 import AddAmenityScreen from "../screens/amenities/AddAmenityScreen.tsx";
 import UpdateAmenityScreen from "../screens/amenities/UpdateAmenityScreen.tsx";
 import GuestsScreen from "../screens/guests/GuestsScreen.tsx";
+import AddGuestScreen from "../screens/guests/AddGuestScreen.tsx";
+import UpdateGuestScreen from "../screens/guests/UpdateGuestScreen.tsx";
 
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -82,6 +84,16 @@ function RootNavigator(): React.JSX.Element {
                     name="Guests"
                     component={GuestsScreen}
                     options={{title: "Baza gości"}}
+                />
+                <Stack.Screen
+                    name="AddGuest"
+                    component={AddGuestScreen}
+                    options={{title: "Nowy gość"}}
+                />
+                <Stack.Screen
+                    name="UpdateGuest"
+                    component={UpdateGuestScreen}
+                    options={{title: "Edytuj gościa"}}
                 />
             </Stack.Navigator>
         </NavigationContainer>
