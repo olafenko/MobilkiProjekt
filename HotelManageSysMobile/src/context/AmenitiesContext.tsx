@@ -1,12 +1,5 @@
 ﻿import {createContext, ReactNode, useContext, useEffect, useState} from "react";
-import {
-    Amenity,
-    CreateAmenityRequest,
-    CreateRoomTypeRequest,
-    RoomType,
-    UpdateAmenityRequest,
-    UpdateRoomTypeRequest
-} from "../types/models.ts";
+import {Amenity, CreateAmenityRequest, UpdateAmenityRequest} from "../types/models.ts";
 import apiService from "../api/apiService.ts";
 
 

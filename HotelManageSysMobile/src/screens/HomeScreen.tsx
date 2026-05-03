@@ -28,6 +28,12 @@ function HomeScreen({navigation} : Props ) {
             >
                 <Text>Udogodnienia ➕</Text>
             </TouchableOpacity>
+            <TouchableOpacity
+                style={styles.menuButton}
+                onPress={() => navigation.navigate('Guests')}
+            >
+                <Text>Baza gości 👨</Text>
+            </TouchableOpacity>
         </View>
         
     );

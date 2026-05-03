@@ -1,32 +1,32 @@
-import {NativeStackScreenProps} from "@react-navigation/native-stack";
+﻿import {NativeStackScreenProps} from "@react-navigation/native-stack";
 import {RootStackParamList} from "../../navigation/types.ts";
-import {Amenity} from "../../types/models.ts";
+import {Guest} from "../../types/models.ts";
 import {ActivityIndicator, Alert, FlatList, StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import {useEffect} from "react";
-import {useAmenities} from "../../context/AmenitiesContext.tsx";
+import {useGuests} from "../../context/GuestsContext.tsx";
 
-type Props = NativeStackScreenProps<RootStackParamList, 'Amenities'>;
+type Props = NativeStackScreenProps<RootStackParamList, 'Guests'>;
 
-function AmenitiesScreen({ navigation }: Props) {
+function GuestsScreen({ navigation }: Props) {
 
-    const { amenities, loading, error, refreshAmenities, deleteAmenity} = useAmenities();
+    const { guests, loading, error, refreshGuests, deleteGuest} = useGuests();
 
     useEffect(() => {
-        refreshAmenities();
+        refreshGuests();
     }, []);
 
-    const handleDelete = (amenity: Amenity)=> {
+    const handleDelete = (guest: Guest)=> {
 
-        Alert.alert("Usuwanie udogodnienia",`Czy napewno usunąć udogodnienie ${amenity.name}?`,
+        Alert.alert("Usuwanie gościa",`Czy na pewno usunąć gościa ${guest.firstName} ${guest.lastName}?`,
             [
                 { text: "Anuluj", style: 'cancel'},
                 {
                     text: "Usuń", style: 'destructive',
                     onPress: async () => {
                         try {
-                            await deleteAmenity(amenity.amenityId);
-                            Alert.alert("Operacja powiodła się.","Usunięto udogodnienie.");
-                        } catch (err){
+                            await deleteGuest(guest.guestId);
+                            Alert.alert("Operacja powiodła się.","Usunięto gościa.");
+                        } catch (err: any){
                             const errMessage = err instanceof Error ? err.message : "Unknown error";
                             Alert.alert("Błąd",errMessage);
                         }
@@ -36,26 +36,28 @@ function AmenitiesScreen({ navigation }: Props) {
 
     }
 
-    const handleEdit = (amenity: Amenity) => {
-        navigation.navigate('UpdateAmenity',{ amenity });
+    const handleEdit = (guest: Guest) => {
+        navigation.navigate('UpdateGuest',{ guest });
     }
 
-    const renderAmenity = ({item:amenity } : { item:Amenity }) => {
-        return (<View style={styles.roomCard}>
-            <View style={styles.roomContent}>
-                <Text style={styles.roomNumber}>Nazwa: {amenity.name}</Text>
-                <Text>Opis: {amenity.description || "Brak"}</Text>
+    const renderGuest = ({item: guest } : { item: Guest }) => {
+        return (<View style={styles.card}>
+            <View style={styles.cardContent}>
+                <Text style={styles.mainText}>{guest.firstName} {guest.lastName}</Text>
+                <Text style={styles.subText}>Email: {guest.email || "Brak"}</Text>
+                <Text style={styles.subText}>Nr tel.: {guest.phoneNumber || "Brak"}</Text>
+                <Text style={styles.subText}>Nr dowodu osobistego: {guest.identityCardNumber || "Brak"}</Text>
             </View>
-            <View style={styles.roomActions}>
+            <View style={styles.actions}>
                 <TouchableOpacity
                     style={styles.editButton}
-                    onPress={() => handleEdit(amenity)}
+                    onPress={() => handleEdit(guest)}
                 >
                     <Text style={styles.buttonText}>Edytuj ✏️</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
                     style={styles.deleteButton}
-                    onPress={() => handleDelete(amenity)}
+                    onPress={() => handleDelete(guest)}
                 >
                     <Text style={styles.buttonText}>Usuń 🗑️</Text>
                 </TouchableOpacity>
@@ -68,7 +70,7 @@ function AmenitiesScreen({ navigation }: Props) {
         return (
             <View style={styles.centerContainer}>
                 <ActivityIndicator size="large" color="#007AFF" />
-                <Text style={styles.loadingText}>Ładowanie udogodnień...</Text>
+                <Text style={styles.loadingText}>Ładowanie gości...</Text>
             </View>
 
         );
@@ -85,22 +87,22 @@ function AmenitiesScreen({ navigation }: Props) {
     return (
         <View style={styles.container}>
             <View style={styles.header}>
-                <Text style={styles.title}>Udogodnienia ({amenities.length})</Text>
+                <Text style={styles.title}>Goście ({guests.length})</Text>
                 <TouchableOpacity
                     style={styles.addButton}
-                    onPress={() => navigation.navigate('AddAmenity')}
+                    onPress={() => navigation.navigate('AddGuest')}
                 >
                     <Text style={styles.addButtonText}>+ Dodaj</Text>
                 </TouchableOpacity>
             </View>
 
             <FlatList
-                data={amenities}
-                renderItem={renderAmenity}
-                keyExtractor={(amenity) => amenity.amenityId.toString()}
+                data={guests}
+                renderItem={renderGuest}
+                keyExtractor={(guest) => guest.guestId.toString()}
                 contentContainerStyle={styles.listContent}
                 ListEmptyComponent={
-                    <Text style={styles.emptyText}>Brak udogodnień</Text>
+                    <Text style={styles.emptyText}>Brak gości</Text>
                 }
             />
         </View>
@@ -154,7 +156,7 @@ const styles = StyleSheet.create({
     listContent: {
         padding: 16,
     },
-    roomCard: {
+    card: {
         flexDirection: 'row',
         backgroundColor: '#fff',
         padding: 12,
@@ -166,33 +168,24 @@ const styles = StyleSheet.create({
         shadowRadius: 2,
         elevation: 2,
     },
-    roomContent: {
+    cardContent: {
         flex: 1,
+        justifyContent: 'center',
     },
-    roomNumber: {
+    mainText: {
         fontSize: 16,
         fontWeight: '600',
         color: '#333',
     },
-    roomPrice: {
+    subText: {
         fontSize: 14,
-        color: '#007AFF',
+        color: '#666',
         marginTop: 4,
-        fontWeight: '500',
     },
-    roomType: {
-        fontSize: 12,
-        color: '#666',
-        marginTop: 2,
-    },
-    itemUnit: {
-        fontSize: 12,
-        color: '#666',
-        marginTop: 2,
-    },
-    roomActions: {
+    actions: {
         flexDirection: 'row',
-        columnGap: 8,  // gap wspierany od RN 0.71+
+        columnGap: 8,
+        alignItems: 'center',
     },
     editButton: {
         backgroundColor: '#4CAF50',
@@ -217,4 +210,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default AmenitiesScreen;
+export default GuestsScreen;

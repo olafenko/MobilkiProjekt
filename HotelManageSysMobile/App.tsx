@@ -5,6 +5,7 @@ import { RoomsProvider } from './src/context/RoomsContext.tsx';
 import RootNavigator from "./src/navigation/RootNavigator.tsx";
 import {RoomTypesProvider} from "./src/context/RoomTypesContext.tsx";
 import {AmenitiesProvider} from "./src/context/AmenitiesContext.tsx";
+import {GuestsProvider} from "./src/context/GuestsContext.tsx";
 
 
 function App(): React.JSX.Element {
@@ -16,7 +17,9 @@ function App(): React.JSX.Element {
             <RoomTypesProvider>
                 <RoomsProvider>
                     <AmenitiesProvider>
-                        <AppContent />
+                        <GuestsProvider>
+                            <AppContent />
+                        </GuestsProvider>
                     </AmenitiesProvider>
                 </RoomsProvider>
             </RoomTypesProvider>

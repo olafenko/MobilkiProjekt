@@ -1,12 +1,12 @@
 ﻿import {API_BASE_URL} from "./config.ts";
 
 import type {
-    Amenity, CreateAmenityRequest,
+    Amenity, CreateAmenityRequest, CreateGuestRequest,
     CreateRoomRequest,
-    CreateRoomTypeRequest,
+    CreateRoomTypeRequest, CreateWorkerRequest, Guest,
     Room,
-    RoomType, UpdateAmenityRequest,
-    UpdateRoomRequest, UpdateRoomTypeRequest
+    RoomType, UpdateAmenityRequest, UpdateGuestRequest,
+    UpdateRoomRequest, UpdateRoomTypeRequest, UpdateWorkerRequest, Worker
 } from "../types/models.ts";
 
 class ApiService {
@@ -137,6 +137,56 @@ class ApiService {
 
     async deleteRoomType(id: number) : Promise<void>{
         return this.request<void>(`/RoomTypes/${id}`, {
+            method: "DELETE"
+        });
+    }
+
+    async getWorkers(): Promise<Worker[]> {
+
+        return this.request<Worker[]>('/Workers');
+    }
+
+    async createWorker(data: CreateWorkerRequest) : Promise<{ id: number }>{
+        return this.request<{id: number}>('/Workers', {
+            method: "POST",
+            body: JSON.stringify(data),
+        });
+    }
+
+    async updateWorker(id: number, data: UpdateWorkerRequest) : Promise<void>{
+        return this.request<void>(`/Workers/${id}`, {
+            method: "PUT",
+            body: JSON.stringify({...data, workerId: id})
+        });
+    }
+
+    async deleteWorker(id: number) : Promise<void>{
+        return this.request<void>(`/Workers/${id}`, {
+            method: "DELETE"
+        });
+    }
+
+    async getGuests(): Promise<Guest[]> {
+
+        return this.request<Guest []>('/Guests');
+    }
+
+    async createGuest(data: CreateGuestRequest) : Promise<{ id: number }>{
+        return this.request<{id: number}>('/Guest', {
+            method: "POST",
+            body: JSON.stringify(data),
+        });
+    }
+
+    async updateGuest(id: number, data: UpdateGuestRequest) : Promise<void>{
+        return this.request<void>(`/Guests/${id}`, {
+            method: "PUT",
+            body: JSON.stringify({...data, guestId: id})
+        });
+    }
+
+    async deleteGuest(id: number) : Promise<void>{
+        return this.request<void>(`/Guests/${id}`, {
             method: "DELETE"
         });
     }
