@@ -20,6 +20,9 @@ import AddWorkerScreen from "../screens/workers/AddWorkerScreen.tsx";
 import UpdateWorkerScreen from "../screens/workers/UpdateWorkerScreen.tsx";
 import PaymentsScreen from "../screens/payments/PaymentsScreen.tsx";
 import CreatePaymentScreen from "../screens/payments/CreatePaymentScreen.tsx";
+import AddAdditionalOfferScreen from "../screens/additionalOffers/AddAdditionalOfferScreen.tsx";
+import AdditionalOffersScreen from "../screens/additionalOffers/AdditionalOffersScreen.tsx";
+import UpdateAdditionalOfferScreen from "../screens/additionalOffers/UpdateAdditionalOfferScreen.tsx";
 
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -124,6 +127,21 @@ function RootNavigator(): React.JSX.Element {
                     name="AddPayment"
                     component={CreatePaymentScreen}
                     options={{title: "Nowa płatność"}}
+                />
+                <Stack.Screen
+                    name="AdditionalOffers"
+                    component={AdditionalOffersScreen}
+                    options={{title: "Oferty dodatkowe"}}
+                />
+                <Stack.Screen
+                    name="AddAdditionalOffer"
+                    component={AddAdditionalOfferScreen}
+                    options={{title: "Dodaj oferte dodatkową"}}
+                />
+                <Stack.Screen
+                    name="UpdateAdditionalOffer"
+                    component={UpdateAdditionalOfferScreen}
+                    options={{title: "Edytuj oferte dodatkową"}}
                 />
                 
             </Stack.Navigator>

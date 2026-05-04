@@ -26,7 +26,7 @@ function HomeScreen({navigation} : Props ) {
                 style={styles.menuButton}
                 onPress={() => navigation.navigate('Amenities')}
             >
-                <Text>Udogodnienia ➕</Text>
+                <Text>Udogodnienia 👨‍🦽</Text>
             </TouchableOpacity>
             <TouchableOpacity
                 style={styles.menuButton}
@@ -45,6 +45,12 @@ function HomeScreen({navigation} : Props ) {
                 onPress={() => navigation.navigate('Payments')}
             >
                 <Text>Płatności 💰</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+                style={styles.menuButton}
+                onPress={() => navigation.navigate('AdditionalOffers')}
+            >
+                <Text>Dodatkowe oferty ➕</Text>
             </TouchableOpacity>
         </View>
         

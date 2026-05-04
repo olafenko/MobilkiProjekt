@@ -1,5 +1,6 @@
 using HotelManageSys.API.Models;
 using HotelManageSys.API.Models.Data;
+using HotelManageSys.API.Models.Enums;
 
 namespace HotelManageSys.API.Features.Payments.Services
 {
@@ -26,6 +27,7 @@ namespace HotelManageSys.API.Features.Payments.Services
         public async Task DeletePayment(Payment payment, CancellationToken cancellationToken = default)
         {
             payment.IsActive = false;
+            payment.PaymentStatus = PaymentStatus.CANCELLED;
             await _context.SaveChangesAsync(cancellationToken);
         }
     }

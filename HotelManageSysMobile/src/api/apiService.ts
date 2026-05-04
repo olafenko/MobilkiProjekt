@@ -1,7 +1,8 @@
 ﻿import {API_BASE_URL} from "./config.ts";
 
 import {
-    Amenity,
+    AdditionalOffer,
+    Amenity, CreateAdditionalOfferRequest,
     CreateAmenityRequest,
     CreateGuestRequest,
     CreatePaymentRequest,
@@ -11,7 +12,7 @@ import {
     Guest,
     Payment, PaymentStatus, Reservation,
     Room,
-    RoomType,
+    RoomType, UpdateAdditionalOfferRequest,
     UpdateAmenityRequest,
     UpdateGuestRequest,
     UpdateRoomRequest,
@@ -198,6 +199,31 @@ class ApiService {
 
     async deleteGuest(id: number) : Promise<void>{
         return this.request<void>(`/Guests/${id}`, {
+            method: "DELETE"
+        });
+    }
+
+    async getAdditionalOffers(): Promise<AdditionalOffer[]> {
+
+        return this.request<AdditionalOffer []>('/AdditionalOffers');
+    }
+
+    async createAdditionalOffer(data: CreateAdditionalOfferRequest) : Promise<{ id: number }>{
+        return this.request<{id: number}>('/AdditionalOffers', {
+            method: "POST",
+            body: JSON.stringify(data),
+        });
+    }
+
+    async updateAdditionalOffer(id: number, data: UpdateAdditionalOfferRequest) : Promise<void>{
+        return this.request<void>(`/AdditionalOffers/${id}`, {
+            method: "PUT",
+            body: JSON.stringify({...data, additionalOfferId: id})
+        });
+    }
+
+    async deleteAdditionalOffer(id: number) : Promise<void>{
+        return this.request<void>(`/AdditionalOffers/${id}`, {
             method: "DELETE"
         });
     }
