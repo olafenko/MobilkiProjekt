@@ -1,3 +1,4 @@
+using HotelManageSys.API.Models.Enums;
 using MediatR;
 
 namespace HotelManageSys.API.Features.Workers.Messages.Commands
@@ -8,6 +9,8 @@ namespace HotelManageSys.API.Features.Workers.Messages.Commands
         public required string LastName { get; set; }
 
         public required string Login { get; set; }
+
+        public required Role role { get; set; }
         public required string Password { get; set; }
     }
 }

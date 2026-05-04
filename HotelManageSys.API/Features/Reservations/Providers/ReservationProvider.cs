@@ -1,5 +1,6 @@
 using HotelManageSys.API.Models;
 using HotelManageSys.API.Models.Data;
+using HotelManageSys.API.Models.Enums;
 using Microsoft.EntityFrameworkCore;
 
 namespace HotelManageSys.API.Features.Reservations.Providers
@@ -13,9 +14,9 @@ namespace HotelManageSys.API.Features.Reservations.Providers
             _dbContext = dbContext;
         }
 
-        public async Task<IEnumerable<Reservation>> GetAllReservationsAsync(CancellationToken cancellationToken = default)
+        public async Task<IEnumerable<Reservation>> GetAllReservationsAsync(PaymentStatus? paymentStatus = null, CancellationToken cancellationToken = default)
         {
-            return await _dbContext.Reservations
+            IQueryable<Reservation> query = _dbContext.Reservations
                 .AsNoTracking()
                 .Include(r => r.Guest)
                 .Include(r => r.Room)
@@ -23,7 +24,21 @@ namespace HotelManageSys.API.Features.Reservations.Providers
                 .Include(r => r.Payments)
                 .Include(r => r.ReservationAdditionalOffers)
                     .ThenInclude(rao => rao.AdditionalOffer)
-                .Where(r => r.IsActive)
+                .Where(r => r.IsActive);
+
+            if (paymentStatus != null)
+            {
+                if(paymentStatus == PaymentStatus.UNPAID)
+                {
+                    query = query.Where(r => !r.Payments.Any(p => p.PaymentStatus == PaymentStatus.PAID));
+                } else
+                {
+                    query = query.Where(r => r.Payments.Any(p => p.PaymentStatus == paymentStatus.Value));
+                }
+
+            }
+
+                return await query
                 .OrderByDescending(r => r.ReservationDate)
                 .ToListAsync(cancellationToken);
         }

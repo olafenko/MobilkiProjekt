@@ -15,6 +15,7 @@ namespace HotelManageSys.API.Features.Rooms.Services
 
         public async Task CreateRoom(Room room, CancellationToken cancellationToken = default)
         {
+
             _context.Add(room);
 
             await _context.SaveChangesAsync(cancellationToken);

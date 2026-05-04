@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HotelManageSys.API.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260401165754_InitalCreate")]
-    partial class InitalCreate
+    [Migration("20260503192504_InitialMigration")]
+    partial class InitialMigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -278,6 +278,9 @@ namespace HotelManageSys.API.Migrations
                         .HasMaxLength(300)
                         .HasColumnType("nvarchar(300)");
 
+                    b.Property<decimal>("PurchasePrice")
+                        .HasColumnType("decimal(18,2)");
+
                     b.Property<int>("Quantity")
                         .HasColumnType("int");
 
@@ -425,6 +428,10 @@ namespace HotelManageSys.API.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("Role")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.HasKey("WorkerId");
 
                     b.ToTable("Workers");
@@ -437,7 +444,8 @@ namespace HotelManageSys.API.Migrations
                             IsActive = true,
                             LastName = "Kowalski",
                             Login = "admin",
-                            Password = "admin123"
+                            Password = "admin123",
+                            Role = "ADMIN"
                         });
                 });
 

@@ -78,6 +78,7 @@ namespace HotelManageSys.API.Controllers
         [HttpDelete("{id}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status409Conflict)]
         public async Task<IActionResult> DeleteRoomType(int id)
         {
             var deleteCommand = new DeleteRoomTypeCommand(id);
@@ -90,6 +91,9 @@ namespace HotelManageSys.API.Controllers
             catch (KeyNotFoundException ex)
             {
                 return NotFound(ex.Message);
+            } catch (InvalidOperationException ex)
+            {
+                return Conflict(ex.Message);
             }
         }
     }

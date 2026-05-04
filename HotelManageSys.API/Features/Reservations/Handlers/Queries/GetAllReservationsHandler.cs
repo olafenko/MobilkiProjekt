@@ -17,7 +17,7 @@ namespace HotelManageSys.API.Features.Reservations.Handlers.Queries
 
         public async Task<IEnumerable<ReservationDTO>> Handle(GetAllReservationsQuery request, CancellationToken cancellationToken)
         {
-            return (await _reservationProvider.GetAllReservationsAsync(cancellationToken)).Adapt<IEnumerable<ReservationDTO>>();
+            return (await _reservationProvider.GetAllReservationsAsync(request.PaymentStatus ,cancellationToken)).Adapt<IEnumerable<ReservationDTO>>();
         }
     }
 }

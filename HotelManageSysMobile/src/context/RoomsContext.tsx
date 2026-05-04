@@ -9,7 +9,7 @@ interface RoomsContextType {
     error: string | null;
     
     refreshRooms: () => Promise<void>;
-    createRoom: (data: CreateRoomRequest) => Promise<void>;
+    addRoom: (data: CreateRoomRequest) => Promise<void>;
     updateRoom: (id:number, data: UpdateRoomRequest) => Promise<void>;
     deleteRoom: (id: number) => Promise<void>;
 }
@@ -38,7 +38,7 @@ export function RoomsProvider({children} : { children: ReactNode}) {
         }
     };
     
-    const createRoom = async (data: CreateRoomRequest) => {
+    const addRoom = async (data: CreateRoomRequest) => {
         
         try {
             setError(null);
@@ -93,7 +93,7 @@ export function RoomsProvider({children} : { children: ReactNode}) {
           loading,
           error,
           refreshRooms,
-          createRoom,
+          addRoom,
           updateRoom,
           deleteRoom
       }}

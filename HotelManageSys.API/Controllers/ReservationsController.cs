@@ -1,6 +1,7 @@
 using HotelManageSys.API.Features.Reservations.DTO_s;
 using HotelManageSys.API.Features.Reservations.Messages.Commands;
 using HotelManageSys.API.Features.Reservations.Messages.Queries;
+using HotelManageSys.API.Models.Enums;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -19,9 +20,9 @@ namespace HotelManageSys.API.Controllers
 
         [HttpGet]
         [ProducesResponseType(typeof(List<ReservationDTO>), StatusCodes.Status200OK)]
-        public async Task<IActionResult> GetAllReservations()
+        public async Task<IActionResult> GetAllReservations([FromQuery] PaymentStatus? paymentStatus = null)
         {
-            var query = new GetAllReservationsQuery();
+            var query = new GetAllReservationsQuery { PaymentStatus = paymentStatus };
             return Ok(await _mediator.Send(query));
         }
 

@@ -6,7 +6,7 @@
         public int ReservationAdditionalOfferId { get; set; }
         public int ReservationId { get; set; }
         public int AdditionalOfferId { get; set; }
-
+        public decimal PurchasePrice{ get; set; }
         public int Quantity { get; set; }
         public string? Notes { get; set; }
 

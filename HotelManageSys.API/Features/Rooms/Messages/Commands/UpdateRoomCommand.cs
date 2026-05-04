@@ -13,6 +13,7 @@ namespace HotelManageSys.API.Features.Rooms.Messages.Commands
         public string? Description { get; set; }
         public RoomStatus Status { get; set; }
         public int RoomTypeId { get; set; }
+        public List<int> AmenitiesIds { get; set; } = new List<int>();
 
     }
 }

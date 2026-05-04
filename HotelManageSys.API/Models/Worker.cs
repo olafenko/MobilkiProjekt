@@ -1,4 +1,6 @@
-﻿namespace HotelManageSys.API.Models
+﻿using HotelManageSys.API.Models.Enums;
+
+namespace HotelManageSys.API.Models
 {
     public class Worker
     {
@@ -9,6 +11,7 @@
         public required string LastName { get; set; }
         public required string Login { get; set; }
         public required string Password { get; set; }
+        public required Role Role { get; set; }
         public bool IsActive { get; set; } = true;
 
         public virtual ICollection<Reservation> Reservations { get; set; } = new List<Reservation>();

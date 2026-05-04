@@ -275,6 +275,9 @@ namespace HotelManageSys.API.Migrations
                         .HasMaxLength(300)
                         .HasColumnType("nvarchar(300)");
 
+                    b.Property<decimal>("PurchasePrice")
+                        .HasColumnType("decimal(18,2)");
+
                     b.Property<int>("Quantity")
                         .HasColumnType("int");
 
@@ -422,6 +425,10 @@ namespace HotelManageSys.API.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("Role")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.HasKey("WorkerId");
 
                     b.ToTable("Workers");
@@ -434,7 +441,8 @@ namespace HotelManageSys.API.Migrations
                             IsActive = true,
                             LastName = "Kowalski",
                             Login = "admin",
-                            Password = "admin123"
+                            Password = "admin123",
+                            Role = "ADMIN"
                         });
                 });
 

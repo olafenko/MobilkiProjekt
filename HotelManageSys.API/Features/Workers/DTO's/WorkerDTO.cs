@@ -8,6 +8,7 @@ namespace HotelManageSys.API.Features.Workers.DTO_s
         public required string LastName { get; set; }
 
         public required string Login { get; set; }
+        public string? Role { get; set; }
 
         public bool IsActive { get; set; } = true;
     }

@@ -101,19 +101,23 @@ namespace HotelManageSys.API.Models.Data
 
             modelBuilder.Entity<ReservationAdditionalOffer>(rhs =>
             {
+
                 rhs.HasKey(rhs => rhs.ReservationAdditionalOfferId);
                 rhs.Property(rhs => rhs.Quantity).IsRequired();
+                rhs.Property(rhs => rhs.PurchasePrice).HasColumnType("decimal(18,2)").IsRequired(); ;
                 rhs.Property(rhs => rhs.Notes).HasMaxLength(300);
                 rhs.Property(rhs => rhs.IsActive).IsRequired();
 
                 rhs.HasOne(rhs => rhs.Reservation)
                     .WithMany(r => r.ReservationAdditionalOffers)
                     .HasForeignKey(rhs => rhs.ReservationId)
+                    .IsRequired()
                     .OnDelete(DeleteBehavior.Cascade);
 
                 rhs.HasOne(rhs => rhs.AdditionalOffer)
                    .WithMany(a => a.ReservationAdditionalOffers)
                    .HasForeignKey(rhs => rhs.AdditionalOfferId)
+                   .IsRequired()
                    .OnDelete(DeleteBehavior.Restrict);
 
 
@@ -140,6 +144,7 @@ namespace HotelManageSys.API.Models.Data
                 w.Property(w => w.LastName).HasMaxLength(50).IsRequired();
                 w.Property(w => w.Login).HasMaxLength(50).IsRequired();
                 w.Property(w => w.Password).IsRequired();
+                w.Property(w => w.Role).HasConversion<string>().IsRequired();
                 w.Property(w => w.IsActive).IsRequired();
 
 
@@ -195,7 +200,7 @@ namespace HotelManageSys.API.Models.Data
             );
 
             modelBuilder.Entity<Worker>().HasData(
-                new Worker { WorkerId = 1, FirstName = "Adam", LastName = "Kowalski", Login = "admin", Password = "admin123", IsActive = true }
+                new Worker { WorkerId = 1, FirstName = "Adam", LastName = "Kowalski", Login = "admin", Password = "admin123", Role = Role.ADMIN, IsActive = true }
             );
 
             modelBuilder.Entity<Guest>().HasData(

@@ -37,7 +37,6 @@
     <Folder Include="Features\RoomTypes\Validators\Commands\" />
     <Folder Include="Features\RoomTypes\Validators\Queries\" />
     <Folder Include="Features\Workers\" />
-    <Folder Include="Migrations\" />
   </ItemGroup>
 
 </Project>

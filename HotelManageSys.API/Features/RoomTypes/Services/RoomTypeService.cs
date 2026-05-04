@@ -25,6 +25,12 @@ namespace HotelManageSys.API.Features.RoomTypes.Services
 
         public async Task DeleteRoomType(RoomType roomType, CancellationToken cancellationToken = default)
         {
+
+            if (_context.Rooms.Any(r => r.IsActive && r.RoomType == roomType))
+            {
+                throw new InvalidOperationException("Nie można usunąć typu pokoju,do którego przypisane są aktywne pokoje.");
+            }
+
             roomType.IsActive = false;
             await _context.SaveChangesAsync(cancellationToken);
         }

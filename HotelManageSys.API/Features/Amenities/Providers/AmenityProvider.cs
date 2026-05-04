@@ -25,17 +25,53 @@ namespace HotelManageSys.API.Features.Amenities.Providers
 
         public async Task<Amenity> GetAmenityByIdAsync(int amenityId, bool asNoTracking = true, CancellationToken cancellationToken = default)
         {
-            IQueryable<Amenity> query = _dbContext.Amenities
-                .Include(a => a.Rooms);
+            IQueryable<Amenity> query = _dbContext.Amenities;
 
             if (asNoTracking)
             {
                 query = query.AsNoTracking();
             }
 
-            var amenity = await query.FirstOrDefaultAsync(a => a.IsActive && a.AmenityId == amenityId, cancellationToken);
+            var amenity = await  query.FirstOrDefaultAsync(a => a.IsActive && a.AmenityId == amenityId,cancellationToken);
+
 
             return amenity ?? throw new KeyNotFoundException($"Nie znaleziono udogodnienia o ID {amenityId}");
         }
+
+        public async Task<List<Amenity>> GetAmenitiesByIdsAsync(IEnumerable<int> amenityIds, bool asNoTracking = true, CancellationToken cancellationToken = default)
+        {
+            var ids = amenityIds
+                .Where(id => id > 0)
+                .Distinct()
+                .ToList();
+
+            if (ids.Count == 0)
+            {
+                return new List<Amenity>();
+            }
+
+            IQueryable<Amenity> query = _dbContext.Amenities;
+
+            if (asNoTracking)
+            {
+                query = query.AsNoTracking();
+            }
+
+            var amenities = await query
+                .Where(a => a.IsActive && ids.Contains(a.AmenityId))
+                .ToListAsync(cancellationToken);
+
+            var foundIds = amenities.Select(a => a.AmenityId).ToHashSet();
+            var missingIds = ids.Where(id => !foundIds.Contains(id)).ToList();
+
+            if (missingIds.Count > 0)
+            {
+                throw new KeyNotFoundException($"Nie znaleziono udogodnień o ID: {string.Join(", ", missingIds)}");
+            }
+
+            return amenities;
+        }
+
+        
     }
 }
