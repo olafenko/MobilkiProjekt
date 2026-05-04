@@ -1,12 +1,23 @@
 ﻿import {API_BASE_URL} from "./config.ts";
 
-import type {
-    Amenity, CreateAmenityRequest, CreateGuestRequest,
+import {
+    Amenity,
+    CreateAmenityRequest,
+    CreateGuestRequest,
+    CreatePaymentRequest,
     CreateRoomRequest,
-    CreateRoomTypeRequest, CreateWorkerRequest, Guest,
+    CreateRoomTypeRequest,
+    CreateWorkerRequest,
+    Guest,
+    Payment, PaymentStatus, Reservation,
     Room,
-    RoomType, UpdateAmenityRequest, UpdateGuestRequest,
-    UpdateRoomRequest, UpdateRoomTypeRequest, UpdateWorkerRequest, Worker
+    RoomType,
+    UpdateAmenityRequest,
+    UpdateGuestRequest,
+    UpdateRoomRequest,
+    UpdateRoomTypeRequest,
+    UpdateWorkerRequest,
+    Worker
 } from "../types/models.ts";
 
 class ApiService {
@@ -189,6 +200,33 @@ class ApiService {
         return this.request<void>(`/Guests/${id}`, {
             method: "DELETE"
         });
+    }
+
+    async getPayments(): Promise<Payment[]> {
+
+        return this.request<Payment []>('/Payments');
+    }
+
+    async createPayment(data: CreatePaymentRequest) : Promise<{ id: number }>{
+        return this.request<{id: number}>('/Payments', {
+            method: "POST",
+            body: JSON.stringify(data),
+        });
+    }
+
+    async deletePayment(id: number) : Promise<void>{
+        return this.request<void>(`/Payments/${id}`, {
+            method: "DELETE"
+        });
+    }
+
+    async getReservations(paymentStatus?: PaymentStatus): Promise<Reservation[]> {
+
+        if(paymentStatus){
+            return this.request<Reservation []>(`/Reservations?paymentStatus=${paymentStatus}`); 
+        }
+        
+        return this.request<Reservation []>('/Reservations');
     }
 
 }

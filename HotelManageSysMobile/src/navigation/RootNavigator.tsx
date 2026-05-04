@@ -18,6 +18,8 @@ import UpdateGuestScreen from "../screens/guests/UpdateGuestScreen.tsx";
 import WorkersScreen from "../screens/workers/WorkersScreen.tsx";
 import AddWorkerScreen from "../screens/workers/AddWorkerScreen.tsx";
 import UpdateWorkerScreen from "../screens/workers/UpdateWorkerScreen.tsx";
+import PaymentsScreen from "../screens/payments/PaymentsScreen.tsx";
+import CreatePaymentScreen from "../screens/payments/CreatePaymentScreen.tsx";
 
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -112,6 +114,16 @@ function RootNavigator(): React.JSX.Element {
                     name="UpdateWorker"
                     component={UpdateWorkerScreen}
                     options={{title: "Edytuj pracownika"}}
+                />
+                <Stack.Screen
+                    name="Payments"
+                    component={PaymentsScreen}
+                    options={{title: "Płatności"}}
+                />
+                <Stack.Screen
+                    name="AddPayment"
+                    component={CreatePaymentScreen}
+                    options={{title: "Nowa płatność"}}
                 />
                 
             </Stack.Navigator>

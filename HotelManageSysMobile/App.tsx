@@ -7,6 +7,7 @@ import {RoomTypesProvider} from "./src/context/RoomTypesContext.tsx";
 import {AmenitiesProvider} from "./src/context/AmenitiesContext.tsx";
 import {GuestsProvider} from "./src/context/GuestsContext.tsx";
 import {WorkersProvider} from "./src/context/WorkersContext.tsx";
+import {PaymentsProvider} from "./src/context/PaymentsContext.tsx";
 
 
 function App(): React.JSX.Element {
@@ -15,17 +16,19 @@ function App(): React.JSX.Element {
     return (
         <SafeAreaProvider>
             <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
-            <WorkersProvider>
-                <RoomTypesProvider>
-                    <RoomsProvider>
-                        <AmenitiesProvider>
-                            <GuestsProvider>
-                                <AppContent />
-                            </GuestsProvider>
-                        </AmenitiesProvider>
-                    </RoomsProvider>
-                </RoomTypesProvider>
-            </WorkersProvider>
+            <PaymentsProvider>
+                <WorkersProvider>
+                    <RoomTypesProvider>
+                        <RoomsProvider>
+                            <AmenitiesProvider>
+                                <GuestsProvider>
+                                    <AppContent />
+                                </GuestsProvider>
+                            </AmenitiesProvider>
+                        </RoomsProvider>
+                    </RoomTypesProvider>
+                </WorkersProvider>
+            </PaymentsProvider>
         </SafeAreaProvider>
     );
 }

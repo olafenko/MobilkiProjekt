@@ -22,6 +22,7 @@ export enum PaymentStatus {
     PENDING = 'PENDING',
     CANCELLED = 'CANCELLED',
     FAILED = 'FAILED',
+    UNPAID = 'UNPAID'
 }
 
 export enum PaymentMethod {
@@ -206,9 +207,4 @@ export interface CreatePaymentRequest {
     price: number;
     paymentDate?: string;
     reservationId: number;
-}
-
-export interface UpdatePaymentRequest extends Omit<CreatePaymentRequest, 'paymentDate'> {
-    paymentId: number;
-    paymentDate: string;
 }

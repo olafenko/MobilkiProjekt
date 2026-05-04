@@ -40,6 +40,12 @@ function HomeScreen({navigation} : Props ) {
             >
                 <Text>Baza pracowników 👷</Text>
             </TouchableOpacity>
+            <TouchableOpacity
+                style={styles.menuButton}
+                onPress={() => navigation.navigate('Payments')}
+            >
+                <Text>Płatności 💰</Text>
+            </TouchableOpacity>
         </View>
         
     );
