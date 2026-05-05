@@ -49,6 +49,7 @@ namespace HotelManageSys.API.Features.Reservations.Providers
             IQueryable<Reservation> query = _dbContext.Reservations
                 .Include(r => r.Guest)
                 .Include(r => r.Room)
+                    .ThenInclude(r => r.RoomType)
                 .Include(r => r.Worker)
                 .Include(r => r.Payments)
                 .Include(r => r.ReservationAdditionalOffers)
