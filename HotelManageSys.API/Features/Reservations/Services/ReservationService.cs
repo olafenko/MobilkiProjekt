@@ -1,21 +1,125 @@
+using HotelManageSys.API.Features.ReservationAdditionalOffers;
+using HotelManageSys.API.Features.Reservations.Handlers.Commands;
+using HotelManageSys.API.Features.Reservations.Messages.Commands;
 using HotelManageSys.API.Models;
 using HotelManageSys.API.Models.Data;
+using Mapster;
+using Microsoft.EntityFrameworkCore;
 
 namespace HotelManageSys.API.Features.Reservations.Services
 {
     public class ReservationService : IReservationService
     {
         private readonly ApplicationDbContext _context;
+        private readonly ILogger<ReservationService> _logger;
 
-        public ReservationService(ApplicationDbContext context)
+        public ReservationService(ApplicationDbContext context, ILogger<ReservationService> logger)
         {
             _context = context;
+            _logger = logger;
         }
 
-        public async Task CreateReservation(Reservation reservation, CancellationToken cancellationToken = default)
+        public async Task<int> CreateReservation(CreateReservationCommand request, CancellationToken cancellationToken = default)
         {
-            _context.Add(reservation);
-            await _context.SaveChangesAsync(cancellationToken);
+
+            var workerExists = await _context.Workers.AnyAsync(w => w.WorkerId == request.WorkerId && w.IsActive, cancellationToken);
+            if(!workerExists) throw new ArgumentException($"Pracownik o ID {request.WorkerId} nie istnieje.");
+
+            if (request.CheckInDate > request.CheckOutDate) throw new ArgumentException("Data zameldowania musi być wcześniej niż data wymeldowania.");
+
+            var isRoomOccupied = await _context.Reservations.AnyAsync(r => r.RoomId == request.RoomId && r.IsActive
+                    && request.CheckInDate > r.CheckInDate && request.CheckInDate < r.CheckOutDate
+                    && request.CheckOutDate > r.CheckInDate && request.CheckOutDate < r.CheckOutDate, cancellationToken);
+
+            if (isRoomOccupied) throw new ArgumentException("Nie można stworzyć rezerwacji dla tego pokoju.");
+
+          
+            var additionalOffersIds = request.AdditionalOffers.Select(o => o.AdditionalOfferId).ToList();
+
+            var additionalOffers = await _context.AdditionalOffers.Where(o => additionalOffersIds.Contains(o.AdditionalOfferId))
+                .ToDictionaryAsync(o => o.AdditionalOfferId, cancellationToken);
+
+            if (additionalOffers.Count > 0)
+            {
+                foreach (var additionalOfferDTO in request.AdditionalOffers)
+                {
+                    if (!additionalOffers.ContainsKey(additionalOfferDTO.AdditionalOfferId))
+                        throw new ArgumentException($"Oferta dodatkowa o ID {additionalOfferDTO.AdditionalOfferId} nie istnieje.");
+
+                    if (!additionalOffers[additionalOfferDTO.AdditionalOfferId].IsActive)
+                        throw new ArgumentException($"Oferta dodatkowa o ID {additionalOffers[additionalOfferDTO.AdditionalOfferId].Name} jest nie aktywna.");
+
+                    if (additionalOfferDTO.Quantity < 0)
+                        throw new ArgumentException($"Ilość oferty musi być większa niż 0");
+
+                }
+
+            }
+
+
+            using var transaction = await _context.Database.BeginTransactionAsync(cancellationToken);
+
+
+            try
+            {
+
+                if (request.GuestId.HasValue)
+                {
+                    var guestExists = await _context.Guests.AnyAsync(g => g.GuestId == request.GuestId && g.IsActive, cancellationToken);
+                    if (!guestExists) throw new ArgumentException($"Gość o ID {request.GuestId} nie istnieje.");
+
+                }
+                else if (request.NewGuest != null)
+                {
+                    var newGuest = request.NewGuest.Adapt<Guest>();
+                    _context.Guests.Add(newGuest);
+                    await _context.SaveChangesAsync(cancellationToken);
+                    _logger.LogInformation("Dodano dane gościa o ID {GuestId}", newGuest.GuestId);
+                    request.GuestId = newGuest.GuestId;
+
+                }
+                else throw new ArgumentException("Do stworzenia rezerwacji muszą zostać podane dane gościa.");
+
+                var room = await _context.Rooms.Include(r => r.RoomType).FirstOrDefaultAsync(r => r.RoomId == request.RoomId && r.IsActive);
+                var nights = (request.CheckOutDate - request.CheckInDate).Days;
+                var totalPrice = room.RoomType.BasePrice * nights;
+
+                var reservation = request.Adapt<Reservation>();
+                reservation.GuestId = request.GuestId.Value;
+
+                foreach (var additionalOfferDTO in request.AdditionalOffers)
+                {
+
+                    var additionalOffer = additionalOffers[additionalOfferDTO.AdditionalOfferId];
+
+                    var reservationAdditionalOffer = additionalOfferDTO.Adapt<ReservationAdditionalOffer>();
+
+                    reservationAdditionalOffer.OfferPrice = additionalOffer.Price;
+
+                    totalPrice += additionalOffer.Price * additionalOfferDTO.Quantity;
+
+                    reservation.ReservationAdditionalOffers.Add(reservationAdditionalOffer);
+
+                }
+
+                reservation.TotalPrice = totalPrice;
+                _context.Reservations.Add(reservation);
+
+                await _context.SaveChangesAsync(cancellationToken);
+                await transaction.CommitAsync(cancellationToken);
+
+                _logger.LogInformation("Utworzono rezerwacje. Wykupione dodatkowe usługi: {Offers}",additionalOffers.Values);
+
+                return reservation.ReservationId;
+
+            }
+            catch (Exception ex)
+            {
+                await transaction.RollbackAsync(cancellationToken);
+                _logger.LogError(ex, "Błąd podczas tworzenia rezerwacji");
+                throw;
+            }
+
         }
 
         public async Task UpdateReservation(Reservation reservation, CancellationToken cancellationToken = default)
