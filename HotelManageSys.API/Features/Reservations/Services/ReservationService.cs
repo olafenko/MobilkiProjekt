@@ -167,6 +167,12 @@ namespace HotelManageSys.API.Features.Reservations.Services
 
         public async Task DeleteReservation(Reservation reservation, CancellationToken cancellationToken = default)
         {
+
+            foreach (var additionalOffer in reservation.ReservationAdditionalOffers)
+            {
+                additionalOffer.IsActive = false;
+            }
+
             reservation.IsActive = false;
             await _context.SaveChangesAsync(cancellationToken);
         }
