@@ -69,6 +69,7 @@ namespace HotelManageSys.API.Models.Data
                 r.Property(r => r.ReservationDate).IsRequired();
                 r.Property(r => r.CheckInDate).IsRequired();
                 r.Property(r => r.CheckOutDate).IsRequired();
+                r.Property(r => r.Notes);
                 r.Property(r => r.ReservationStatus).HasConversion<string>().IsRequired();
                 r.Property(r => r.IsActive).IsRequired();
 
@@ -104,7 +105,7 @@ namespace HotelManageSys.API.Models.Data
 
                 rhs.HasKey(rhs => rhs.ReservationAdditionalOfferId);
                 rhs.Property(rhs => rhs.Quantity).IsRequired();
-                rhs.Property(rhs => rhs.PurchasePrice).HasColumnType("decimal(18,2)").IsRequired(); ;
+                rhs.Property(rhs => rhs.OfferPrice).HasColumnType("decimal(18,2)").IsRequired(); ;
                 rhs.Property(rhs => rhs.Notes).HasMaxLength(300);
                 rhs.Property(rhs => rhs.IsActive).IsRequired();
 

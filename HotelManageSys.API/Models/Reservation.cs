@@ -13,6 +13,8 @@ namespace HotelManageSys.API.Models
         public DateTime CheckInDate { get; set; }
         public DateTime CheckOutDate { get; set; }
 
+        public string? Notes{ get; set; }
+
         public bool IsActive { get; set; } = true;
         public ReservationStatus ReservationStatus { get; set; }
 

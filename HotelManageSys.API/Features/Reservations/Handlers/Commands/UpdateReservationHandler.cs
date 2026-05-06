@@ -21,15 +21,10 @@ namespace HotelManageSys.API.Features.Reservations.Handlers.Commands
 
         public async Task<Unit> Handle(UpdateReservationCommand request, CancellationToken cancellationToken)
         {
-            var reservation = await _reservationProvider.GetReservationByIdAsync(request.ReservationId, false, cancellationToken);
 
             _logger.LogInformation("Aktualizowanie rezerwacji ID: {ReservationId}", request.ReservationId);
 
-            request.Adapt(reservation);
-
-            await _reservationService.UpdateReservation(reservation, cancellationToken);
-
-            _logger.LogInformation("Zaaktualizowano rezerwację ID: {ReservationId}", request.ReservationId);
+            await _reservationService.UpdateReservation(request, cancellationToken);
 
             return Unit.Value;
         }

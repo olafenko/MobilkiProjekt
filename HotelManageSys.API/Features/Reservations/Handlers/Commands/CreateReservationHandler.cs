@@ -21,13 +21,7 @@ namespace HotelManageSys.API.Features.Reservations.Handlers.Commands
         {
             _logger.LogInformation("Dodawanie nowej rezerwacji dla gościa ID: {GuestId}", request.GuestId);
 
-            var reservation = request.Adapt<Reservation>();
-
-            await _reservationService.CreateReservation(reservation, cancellationToken);
-
-            _logger.LogInformation("Dodano rezerwację ID: {ReservationId}", reservation.ReservationId);
-
-            return reservation.ReservationId;
+            return await _reservationService.CreateReservation(request, cancellationToken);
         }
     }
 }
