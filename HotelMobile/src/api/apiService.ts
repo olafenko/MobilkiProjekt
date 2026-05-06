@@ -5,7 +5,7 @@ import {
     Amenity, CreateAdditionalOfferRequest,
     CreateAmenityRequest,
     CreateGuestRequest,
-    CreatePaymentRequest,
+    CreatePaymentRequest, CreateReservationRequest,
     CreateRoomRequest,
     CreateRoomTypeRequest,
     CreateWorkerRequest,
@@ -14,7 +14,7 @@ import {
     Room,
     RoomType, UpdateAdditionalOfferRequest,
     UpdateAmenityRequest,
-    UpdateGuestRequest,
+    UpdateGuestRequest, UpdateReservationRequest,
     UpdateRoomRequest,
     UpdateRoomTypeRequest,
     UpdateWorkerRequest,
@@ -253,6 +253,26 @@ class ApiService {
         }
         
         return this.request<Reservation []>('/Reservations');
+    }
+
+    async createReservation(data: CreateReservationRequest) : Promise<{ id: number }>{
+        return this.request<{id: number}>('/Reservations', {
+            method: "POST",
+            body: JSON.stringify(data),
+        });
+    }
+
+    async updateReservation(id: number, data: UpdateReservationRequest) : Promise<void>{
+        return this.request<void>(`/Reservations/${id}`, {
+            method: "PUT",
+            body: JSON.stringify({...data, reservationId: id})
+        });
+    }
+
+    async deleteReservation(id: number) : Promise<void>{
+        return this.request<void>(`/Reservations/${id}`, {
+            method: "DELETE"
+        });
     }
 
 }

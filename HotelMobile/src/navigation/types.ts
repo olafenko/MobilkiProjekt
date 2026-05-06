@@ -1,4 +1,4 @@
-﻿import type {AdditionalOffer, Amenity, Guest, Payment, Room, RoomType, Worker} from '../types/models';
+﻿import type {AdditionalOffer, Amenity, Guest, Payment, Reservation, Room, RoomType, Worker} from '../types/models';
 
 
 export type RootStackParamList = {
@@ -18,6 +18,8 @@ export type RootStackParamList = {
     UpdateAmenity: { amenity: Amenity};
     
     Reservations: undefined;
+    AddReservation: undefined;
+    UpdateReservation: { reservation: Reservation};
     
     Workers: undefined;
     AddWorker: undefined;

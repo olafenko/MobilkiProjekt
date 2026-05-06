@@ -162,31 +162,60 @@ export interface Reservation {
     reservationDate: string;
     checkInDate: string;
     checkOutDate: string;
-    reservationStatus: ReservationStatus | null;
+    nightCount: number;
+    notes: string | null;
+    amountPaid: number;
+    amountRemaining: number;
+    reservationStatus: string;
     guestId: number;
-    guestFullName: string | null;
+    guestFullName: string;
     roomId: number;
-    roomNumber: string | null;
+    roomNumber: string;
+    roomTypeName: string;
     workerId: number;
-    workerFullName: string | null;
-    additionalOffersNames: string[];
+    workerFullName: string;
+    
+    additionalOffers: ReservationAdditionalOfferDto[];
     isActive: boolean;
 }
 
 export interface CreateReservationRequest {
-    totalPrice: number;
     reservationDate?: string;
     checkInDate: string;
     checkOutDate: string;
-    reservationStatus: ReservationStatus;
-    guestId: number;
+    reservationStatus: number;
+    notes?: string | null;
+    guestId?: number | null;
+    newGuest?: CreateGuestRequest | null;
     roomId: number;
     workerId: number;
+    additionalOffers: CreateReservationAdditionalOfferDto[];
 }
 
-export interface UpdateReservationRequest extends Omit<CreateReservationRequest, 'reservationDate'> {
+export interface UpdateReservationRequest {
     reservationId: number;
-    reservationDate: string;
+    checkInDate: string;
+    checkOutDate: string;
+    reservationStatus: number;
+    roomId: number;
+    notes?: string | null;
+}
+export interface ReservationAdditionalOfferDto {
+    
+    reservationAdditionalOfferId: number;
+    reservationId: number;
+    additionalOfferId: number;
+    additionalOfferName: string | null;
+    notes: string | null;
+    quantity: number;
+    offerPrice: number;
+    isActive: boolean;
+}
+
+export interface CreateReservationAdditionalOfferDto {
+    additionalOfferId: number;
+    quantity: number;
+    notes?: string | null;
 }
 
 export interface Payment {

@@ -9,30 +9,38 @@ import {GuestsProvider} from "./src/context/GuestsContext.tsx";
 import {WorkersProvider} from "./src/context/WorkersContext.tsx";
 import {PaymentsProvider} from "./src/context/PaymentsContext.tsx";
 import {AdditionalOffersProvider} from "./src/context/AdditionalOffersContext.tsx";
+import {PaperProvider} from "react-native-paper";
+import {ReservationsProvider} from "./src/context/ReservationsContext.tsx";
 
 
 function App(): React.JSX.Element {
     const isDarkMode = useColorScheme() === 'dark';
 
     return (
-        <SafeAreaProvider>
-            <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
-            <AdditionalOffersProvider>
-                <PaymentsProvider>
-                    <WorkersProvider>
-                        <RoomTypesProvider>
-                            <RoomsProvider>
-                                <AmenitiesProvider>
-                                    <GuestsProvider>
-                                        <AppContent />
-                                    </GuestsProvider>
-                                </AmenitiesProvider>
-                            </RoomsProvider>
-                        </RoomTypesProvider>
-                    </WorkersProvider>
-                </PaymentsProvider> 
-            </AdditionalOffersProvider>
-        </SafeAreaProvider>
+        
+            <SafeAreaProvider>
+                <PaperProvider>
+                <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
+                    <ReservationsProvider>
+                        <AdditionalOffersProvider>
+                            <PaymentsProvider>
+                                <WorkersProvider>
+                                    <RoomTypesProvider>
+                                        <RoomsProvider>
+                                            <AmenitiesProvider>
+                                                <GuestsProvider>
+                                                    <AppContent />
+                                                </GuestsProvider>
+                                            </AmenitiesProvider>
+                                        </RoomsProvider>
+                                    </RoomTypesProvider>
+                                </WorkersProvider>
+                            </PaymentsProvider>
+                        </AdditionalOffersProvider>
+                    </ReservationsProvider>
+                </PaperProvider>
+            </SafeAreaProvider>
+        
     );
 }
 
