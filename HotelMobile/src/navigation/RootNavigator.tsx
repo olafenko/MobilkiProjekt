@@ -19,13 +19,13 @@ import WorkersScreen from "../screens/workers/WorkersScreen.tsx";
 import AddWorkerScreen from "../screens/workers/AddWorkerScreen.tsx";
 import UpdateWorkerScreen from "../screens/workers/UpdateWorkerScreen.tsx";
 import PaymentsScreen from "../screens/payments/PaymentsScreen.tsx";
-import CreatePaymentScreen from "../screens/payments/CreatePaymentScreen.tsx";
 import AddAdditionalOfferScreen from "../screens/additionalOffers/AddAdditionalOfferScreen.tsx";
 import AdditionalOffersScreen from "../screens/additionalOffers/AdditionalOffersScreen.tsx";
 import UpdateAdditionalOfferScreen from "../screens/additionalOffers/UpdateAdditionalOfferScreen.tsx";
 import ReservationsScreen from "../screens/reservations/ReservationsScreen.tsx";
 import CreateReservationScreen from "../screens/reservations/CreateReservationScreen.tsx";
 import UpdateReservationScreen from "../screens/reservations/UpdateReservationScreen.tsx";
+import AddPaymentScreen from "../screens/payments/AddPaymentScreen.tsx";
 
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -129,7 +129,7 @@ function RootNavigator(): React.JSX.Element {
                 />
                 <Stack.Screen
                     name="AddPayment"
-                    component={CreatePaymentScreen}
+                    component={AddPaymentScreen}
                     options={{title: "Nowa płatność"}}
                 />
                 <Stack.Screen

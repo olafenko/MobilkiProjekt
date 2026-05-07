@@ -1,92 +1,104 @@
-﻿import {NativeStackScreenProps} from "@react-navigation/native-stack";
-import {RootStackParamList} from "../../navigation/types.ts";
-import {Payment} from "../../types/models.ts";
-import {ActivityIndicator, Alert, FlatList, StyleSheet, Text, TouchableOpacity, View} from "react-native";
-import {useEffect} from "react";
-import {usePayments} from "../../context/PaymentsContext.tsx";
+﻿import React, { useEffect } from "react";
+import { Alert, FlatList, StyleSheet, View } from "react-native";
+import { NativeStackScreenProps } from "@react-navigation/native-stack";
+import { RootStackParamList } from "../../navigation/types.ts";
+import { Payment } from "../../types/models.ts";
+import { usePayments } from "../../context/PaymentsContext.tsx";
+import { Text, Card, Button, ActivityIndicator, FAB, useTheme, Avatar, IconButton, Surface } from "react-native-paper";
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Payments'>;
 
 function PaymentsScreen({ navigation }: Props) {
-
-    const { payments, loading, error, refreshPayments, deletePayment} = usePayments();
+    const { payments, loading, error, refreshPayments, deletePayment } = usePayments();
+    const theme = useTheme();
 
     useEffect(() => {
         refreshPayments();
     }, []);
 
-    const handleDelete = (payment: Payment)=> {
-
-        Alert.alert("Usuwanie płatności",`Czy na pewno usunąć płatność: ${payment.title}?`,
+    const handleDelete = (payment: Payment) => {
+        Alert.alert(
+            "Usuwanie transakcji",
+            `Czy na pewno chcesz usunąć płatność: ${payment.title}?`,
             [
-                { text: "Anuluj", style: 'cancel'},
+                { text: "Anuluj", style: 'cancel' },
                 {
-                    text: "Usuń", style: 'destructive',
+                    text: "Usuń",
+                    style: 'destructive',
                     onPress: async () => {
                         try {
                             await deletePayment(payment.paymentId);
-                            Alert.alert("Operacja powiodła się.","Usunięto płatność.");
-                        } catch (err){
-                            const errMessage = err instanceof Error ? err.message : "Unknown error";
-                            Alert.alert("Błąd",errMessage);
+                            Alert.alert("Status", "Płatność została usunięta.");
+                        } catch (err) {
+                            const errMessage = err instanceof Error ? err.message : "Nieznany błąd";
+                            Alert.alert("Błąd", errMessage);
                         }
                     }
                 },
-            ]);
+            ]
+        );
+    };
 
-    }
-    
-    const renderPayment = ({item: payment } : { item: Payment }) => {
-        return (<View style={styles.roomCard}>
-            <View style={styles.roomContent}>
-                <Text style={styles.roomNumber}>{payment.title}</Text>
-                <Text style={styles.roomPrice}>Kwota: {payment.price.toFixed(2)} zł</Text>
-                <Text>Status: {payment.paymentStatus || "Brak"}</Text>
-                <Text>Metoda: {payment.paymentMethod || "Brak"}</Text>
-                <Text>Data: {payment.paymentDate ? new Date(payment.paymentDate).toLocaleDateString() : "Brak"}</Text>
-                <Text>Rezerwacja ID: {payment.reservationId}</Text>
-            </View>
-            <View style={styles.roomActions}>
-                <TouchableOpacity
-                    style={styles.deleteButton}
-                    onPress={() => handleDelete(payment)}
-                >
-                    <Text style={styles.buttonText}>Usuń 🗑️</Text>
-                </TouchableOpacity>
-            </View>
-
-        </View>);
-    }
-
-    if(loading) {
+    const renderPayment = ({ item: payment }: { item: Payment }) => {
         return (
-            <View style={styles.centerContainer}>
-                <ActivityIndicator size="large" color="#007AFF" />
-                <Text style={styles.loadingText}>Ładowanie płatności...</Text>
-            </View>
+            <Card style={styles.card} mode="contained">
+                <View style={styles.cardInner}>
+                    <View style={styles.cardHeaderRow}>
+                        <Avatar.Icon icon="credit-card-outline" size={40} color={theme.colors.onPrimary} style={{ backgroundColor: theme.colors.primary, marginTop: 4 }} />
 
+                        <View style={styles.titleContainer}>
+                            <Text variant="titleMedium" style={styles.titleStyleWrapped}>{payment.title}</Text>
+                            <Text variant="labelLarge" style={{ color: theme.colors.primary, marginTop: 2 }}>{payment.price.toFixed(2)} zł</Text>
+                        </View>
+
+                        <View style={styles.topRightActions}>
+                            <IconButton icon="trash-can" size={20} containerColor="rgba(207, 102, 121, 0.1)" iconColor={theme.colors.error}
+                                        onPress={() => handleDelete(payment)} style={styles.actionButton} />
+                        </View>
+                    </View>
+
+                    <View style={styles.cardBody}>
+                        <Text variant="bodyMedium" style={{ color: theme.colors.onSurfaceVariant, marginBottom: 2 }}>Status: {payment.paymentStatus || "Brak"}</Text>
+                        <Text variant="bodyMedium" style={{ color: theme.colors.onSurfaceVariant, marginBottom: 2 }}>Metoda: {payment.paymentMethod || "Brak"}</Text>
+                        <Text variant="bodyMedium" style={{ color: theme.colors.onSurfaceVariant, marginBottom: 2 }}>
+                            Data: {payment.paymentDate ? new Date(payment.paymentDate).toLocaleDateString() : "Brak"}</Text>
+                        <Text variant="bodySmall" style={{ color: theme.colors.onSurfaceVariant, opacity: 0.7, marginTop: 4 }}>Rezerwacja ID: #{payment.reservationId}</Text>
+                    </View>
+                </View>
+            </Card>
+        );
+    };
+
+    if (loading) {
+        return (
+            <View style={[styles.container, styles.centerContainer, { backgroundColor: theme.colors.background }]}>
+                <ActivityIndicator size="large" color={theme.colors.primary} />
+                <Text variant="bodySmall" style={styles.loadingText}>Ładowanie...</Text>
+            </View>
         );
     }
 
-    if(error){
+    if (error) {
         return (
-            <View style={styles.centerContainer}>
-                <Text style={styles.errorText}>❌ Błąd: {error}</Text>
+            <View style={[styles.container, styles.centerContainer, { backgroundColor: theme.colors.background }]}>
+                <IconButton icon="wifi-off" iconColor={theme.colors.error} size={48} />
+                <Text variant="titleMedium" style={{ color: theme.colors.error, marginTop: 8 }}>Błąd połączenia</Text>
+                <Button mode="text" textColor={theme.colors.primary} onPress={refreshPayments} style={{ marginTop: 12 }}>Ponów próbę</Button>
             </View>
         );
     }
 
     return (
-        <View style={styles.container}>
-            <View style={styles.header}>
-                <Text style={styles.title}>Płatności ({payments.length})</Text>
-                <TouchableOpacity
-                    style={styles.addButton}
-                    onPress={() => navigation.navigate('AddPayment')}
-                >
-                    <Text style={styles.addButtonText}>+ Dodaj</Text>
-                </TouchableOpacity>
-            </View>
+        <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
+            <Surface style={styles.header} elevation={2}>
+                <View>
+                    <Text variant="headlineSmall" style={styles.headerTitle}>Płatności</Text>
+                    <Text variant="bodySmall" style={{ color: theme.colors.onSurfaceVariant }}>Historia wpłat i transakcji</Text>
+                </View>
+                <View style={[styles.badge, { backgroundColor: theme.colors.primary }]}>
+                    <Text variant="titleMedium" style={styles.badgeText}>{payments.length}</Text>
+                </View>
+            </Surface>
 
             <FlatList
                 data={payments}
@@ -94,9 +106,14 @@ function PaymentsScreen({ navigation }: Props) {
                 keyExtractor={(payment) => payment.paymentId.toString()}
                 contentContainerStyle={styles.listContent}
                 ListEmptyComponent={
-                    <Text style={styles.emptyText}>Brak płatności</Text>
+                    <View style={styles.centerContainer}>
+                        <Text variant="bodyMedium" style={{ color: theme.colors.onSurfaceVariant }}>Brak płatności</Text>
+                    </View>
                 }
             />
+
+            <FAB icon="plus" style={[styles.fab, { backgroundColor: theme.colors.primary }]} color={theme.colors.onPrimary}
+                 onPress={() => navigation.navigate('AddPayment')} />
         </View>
     );
 }
@@ -104,103 +121,88 @@ function PaymentsScreen({ navigation }: Props) {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#f5f5f5',
     },
     centerContainer: {
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-    },
-    loadingText: {
-        marginTop: 10,
-        fontSize: 16,
-        color: '#666',
-    },
-    errorText: {
-        fontSize: 16,
-        color: 'red',
-        textAlign: 'center',
+        padding: 16,
     },
     header: {
+        paddingTop: 16,
+        paddingHorizontal: 24,
+        paddingBottom: 24,
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        padding: 16,
-        backgroundColor: '#fff',
-        borderBottomWidth: 1,
-        borderBottomColor: '#ddd',
+        borderBottomLeftRadius: 24,
+        borderBottomRightRadius: 24,
     },
-    title: {
-        fontSize: 24,
+    headerTitle: {
         fontWeight: 'bold',
-        color: '#333',
+        letterSpacing: 0.5,
     },
-    addButton: {
-        backgroundColor: '#007AFF',
+    badge: {
         paddingHorizontal: 16,
-        paddingVertical: 8,
-        borderRadius: 8,
+        paddingVertical: 6,
+        borderRadius: 12,
+        minWidth: 48,
+        alignItems: 'center',
+        justifyContent: 'center',
     },
-    addButtonText: {
-        color: '#fff',
-        fontWeight: '600',
+    badgeText: {
+        color: '#000',
+        fontWeight: 'bold',
+        fontSize: 14,
+    },
+    loadingText: {
+        marginTop: 16,
+        opacity: 0.6,
     },
     listContent: {
-        padding: 16,
+        padding: 20,
+        paddingBottom: 100,
     },
-    roomCard: {
-        flexDirection: 'row',
-        backgroundColor: '#fff',
-        padding: 12,
+    card: {
         marginBottom: 12,
-        borderRadius: 8,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 1 },
-        shadowOpacity: 0.1,
-        shadowRadius: 2,
-        elevation: 2,
+        borderRadius: 16,
+        overflow: 'hidden',
     },
-    roomContent: {
-        flex: 1,
-        columnGap: 4,
+    cardInner: {
+        padding: 12,
     },
-    roomNumber: {
-        fontSize: 16,
-        fontWeight: '600',
-        color: '#333',
-        marginBottom: 4,
-    },
-    roomPrice: {
-        fontSize: 14,
-        color: '#007AFF',
-        marginBottom: 4,
-        fontWeight: '500',
-    },
-    roomActions: {
+    cardHeaderRow: {
         flexDirection: 'row',
-        columnGap: 8,
-        alignItems: 'center',
+        alignItems: 'flex-start',
     },
-    editButton: {
-        backgroundColor: '#4CAF50',
-        padding: 10,
-        borderRadius: 6,
+    titleContainer: {
+        flex: 1,
+        marginHorizontal: 12,
         justifyContent: 'center',
+        paddingTop: 8,
     },
-    deleteButton: {
-        backgroundColor: '#F44336',
-        padding: 10,
-        borderRadius: 6,
-        justifyContent: 'center',
+    titleStyleWrapped: {
+        fontWeight: 'bold',
+        flexWrap: 'wrap',
     },
-    buttonText: {
-        fontSize: 18,
+    topRightActions: {
+        flexDirection: 'row',
+        gap: 4,
     },
-    emptyText: {
-        textAlign: 'center',
-        fontSize: 16,
-        color: '#999',
-        marginTop: 40,
+    actionButton: {
+        margin: 0,
+    },
+    cardBody: {
+        paddingTop: 8,
+        paddingLeft: 52,
+        paddingBottom: 4,
+    },
+    fab: {
+        position: 'absolute',
+        margin: 16,
+        right: 0,
+        bottom: 16,
+        borderRadius: 16,
     },
 });
 
