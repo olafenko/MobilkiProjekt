@@ -37,8 +37,9 @@ function RootNavigator(): React.JSX.Element {
             <Stack.Navigator
                 initialRouteName="Home"
                 screenOptions={{
-                headerStyle: { backgroundColor: '#007AFF'},
-                headerTintColor: '#fff',
+                headerStyle: { backgroundColor: '#1e1e26',},
+                headerTintColor: '#C5A059',
+                headerShadowVisible: false,
                 headerTitleStyle: { fontWeight: 'bold' },
             }}>
                 <Stack.Screen

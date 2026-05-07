@@ -1,107 +1,149 @@
-﻿import {NativeStackScreenProps} from "@react-navigation/native-stack";
-import {RootStackParamList} from "../../navigation/types.ts";
-import {AdditionalOffer} from "../../types/models.ts";
-import {ActivityIndicator, Alert, FlatList, StyleSheet, Text, TouchableOpacity, View} from "react-native";
-import {useEffect} from "react";
-import {useAdditionalOffers} from "../../context/AdditionalOffersContext.tsx";
+﻿import React, { useEffect } from 'react';
+import { View, StyleSheet, FlatList, Alert } from 'react-native';
+import { NativeStackScreenProps } from "@react-navigation/native-stack";
+import { RootStackParamList } from "../../navigation/types.ts";
+import { useAdditionalOffers } from "../../context/AdditionalOffersContext.tsx";
+import { AdditionalOffer } from "../../types/models.ts";
+
+import {
+    Text,
+    ActivityIndicator,
+    Card,
+    IconButton,
+    FAB,
+    useTheme,
+    Surface,
+    Button,
+} from 'react-native-paper';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'AdditionalOffers'>;
 
 function AdditionalOffersScreen({ navigation }: Props) {
-
-    const { additionalOffers, loading, error, refreshAdditionalOffers, deleteAdditionalOffer} = useAdditionalOffers();
+    const theme = useTheme();
+    const {
+        additionalOffers,
+        loading,
+        error,
+        refreshAdditionalOffers,
+        deleteAdditionalOffer
+    } = useAdditionalOffers();
 
     useEffect(() => {
         refreshAdditionalOffers();
     }, []);
 
-    const handleDelete = (offer: AdditionalOffer)=> {
-
-        Alert.alert("Usuwanie oferty dodatkowej",`Czy na pewno usunąć ofertę: ${offer.name}?`,
+    const handleDelete = (offer: AdditionalOffer) => {
+        Alert.alert(
+            "Usuwanie zasobu",
+            `Czy na pewno chcesz trwale usunąć ofertę: ${offer.name}?`,
             [
-                { text: "Anuluj", style: 'cancel'},
+                { text: "Anuluj", style: 'cancel' },
                 {
-                    text: "Usuń", style: 'destructive',
+                    text: "Usuń",
+                    style: 'destructive',
                     onPress: async () => {
                         try {
                             await deleteAdditionalOffer(offer.additionalOfferId);
-                            Alert.alert("Operacja powiodła się.","Usunięto ofertę dodatkową.");
-                        } catch (err){
-                            const errMessage = err instanceof Error ? err.message : "Unknown error";
-                            Alert.alert("Błąd",errMessage);
+                            Alert.alert("Status", "Oferta została usunięta.");
+                        } catch (err) {
+                            const errMessage = err instanceof Error ? err.message : "Nieznany błąd";
+                            Alert.alert("Błąd", errMessage);
                         }
                     }
                 },
-            ]);
+            ]
+        );
+    };
 
-    }
+    const renderOffer = ({ item }: { item: AdditionalOffer }) => (
+        <Card style={styles.card} mode="contained">
+            <Card.Content style={styles.cardContent}>
+                <View style={styles.infoSection}>
+                    <Text variant="titleMedium" style={styles.offerName}>{item.name}</Text>
+                    <Text variant="labelLarge" style={{ color: theme.colors.primary, marginTop: 4 }}>
+                        {item.price.toFixed(2)} zł
+                    </Text>
+                </View>
 
-    const handleEdit = (additionalOffer: AdditionalOffer) => {
-        navigation.navigate('UpdateAdditionalOffer',{ additionalOffer });
-    }
+                <View style={styles.actionSection}>
+                    <IconButton
+                        icon="pencil"
+                        mode="contained"
+                        containerColor={theme.colors.surfaceVariant}
+                        iconColor={theme.colors.primary}
+                        size={20}
+                        onPress={() => navigation.navigate('UpdateAdditionalOffer', { additionalOffer: item })}
+                    />
+                    <IconButton
+                        icon="trash-can"
+                        mode="contained"
+                        containerColor="rgba(207, 102, 121, 0.1)"
+                        iconColor={theme.colors.error}
+                        size={20}
+                        onPress={() => handleDelete(item)}
+                    />
+                </View>
+            </Card.Content>
+        </Card>
+    );
 
-    const renderOffer = ({item:additionalOffer } : { item:AdditionalOffer }) => {
-        return (<View style={styles.roomCard}>
-            <View style={styles.roomContent}>
-                <Text style={styles.roomNumber}>Nazwa: {additionalOffer.name}</Text>
-                <Text style={styles.roomPrice}>Cena: {additionalOffer.price.toFixed(2)} zł</Text>
-            </View>
-            <View style={styles.roomActions}>
-                <TouchableOpacity
-                    style={styles.editButton}
-                    onPress={() => handleEdit(additionalOffer)}
-                >
-                    <Text style={styles.buttonText}>Edytuj ✏️</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                    style={styles.deleteButton}
-                    onPress={() => handleDelete(additionalOffer)}
-                >
-                    <Text style={styles.buttonText}>Usuń 🗑️</Text>
-                </TouchableOpacity>
-            </View>
-
-        </View>);
-    }
-
-    if(loading) {
+    if (loading) {
         return (
-            <View style={styles.centerContainer}>
-                <ActivityIndicator size="large" color="#007AFF" />
-                <Text style={styles.loadingText}>Ładowanie ofert dodatkowych...</Text>
+            <View style={[styles.container, styles.centerContainer, { backgroundColor: theme.colors.background }]}>
+                <ActivityIndicator size="large" color={theme.colors.primary} />
+                <Text variant="bodySmall" style={styles.loadingText}>Ładowanie...</Text>
             </View>
-
         );
     }
 
-    if(error){
+    if (error) {
         return (
-            <View style={styles.centerContainer}>
-                <Text style={styles.errorText}>❌ Błąd: {error}</Text>
+            <View style={[styles.container, styles.centerContainer, { backgroundColor: theme.colors.background }]}>
+                <IconButton icon="wifi-off" iconColor={theme.colors.error} size={48} />
+                <Text variant="titleMedium" style={{ color: theme.colors.error, marginTop: 8 }}>Błąd połączenia</Text>
+                <Button
+                    mode="text"
+                    textColor={theme.colors.primary}
+                    onPress={refreshAdditionalOffers}
+                    style={styles.retryButton}
+                >
+                    Ponów próbę
+                </Button>
             </View>
         );
     }
 
     return (
-        <View style={styles.container}>
-            <View style={styles.header}>
-                <Text style={styles.title}>Oferty dodatkowe ({additionalOffers.length})</Text>
-                <TouchableOpacity
-                    style={styles.addButton}
-                    onPress={() => navigation.navigate('AddAdditionalOffer')}
-                >
-                    <Text style={styles.addButtonText}>+ Dodaj</Text>
-                </TouchableOpacity>
-            </View>
+        <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
+            <Surface style={styles.header} elevation={2}>
+                <View>
+                    <Text variant="headlineSmall" style={styles.headerTitle}>Katalog Usług</Text>
+                    <Text variant="bodySmall" style={{ color: theme.colors.onSurfaceVariant }}>Zarządzanie ofertami dodatkowymi</Text>
+                </View>
+                <View style={[styles.badge, { backgroundColor: theme.colors.primary }]}>
+                    <Text variant="labelSmall" style={styles.badgeText}>{additionalOffers.length}</Text>
+                </View>
+            </Surface>
 
             <FlatList
                 data={additionalOffers}
                 renderItem={renderOffer}
-                keyExtractor={(additionalOffer) => additionalOffer.additionalOfferId.toString()}
+                keyExtractor={(item) => item.additionalOfferId.toString()}
                 contentContainerStyle={styles.listContent}
+                onRefresh={refreshAdditionalOffers}
+                refreshing={loading}
                 ListEmptyComponent={
-                    <Text style={styles.emptyText}>Brak ofert dodatkowych</Text>
+                    <View style={styles.emptyContainer}>
+                        <Text variant="bodyMedium" style={{ color: theme.colors.onSurfaceVariant }}>Brak ofert w systemie</Text>
+                    </View>
                 }
+            />
+
+            <FAB
+                icon="plus"
+                style={[styles.fab, { backgroundColor: theme.colors.primary }]}
+                color={theme.colors.onPrimary}
+                onPress={() => navigation.navigate('AddAdditionalOffer')}
             />
         </View>
     );
@@ -110,111 +152,76 @@ function AdditionalOffersScreen({ navigation }: Props) {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#f5f5f5',
     },
     centerContainer: {
-        flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-    },
-    loadingText: {
-        marginTop: 10,
-        fontSize: 16,
-        color: '#666',
-    },
-    errorText: {
-        fontSize: 16,
-        color: 'red',
-        textAlign: 'center',
+        padding: 40,
     },
     header: {
+        paddingTop: 16,
+        paddingHorizontal: 24,
+        paddingBottom: 24,
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        padding: 16,
-        backgroundColor: '#fff',
-        borderBottomWidth: 1,
-        borderBottomColor: '#ddd',
+        borderBottomLeftRadius: 24,
+        borderBottomRightRadius: 24,
     },
-    title: {
-        fontSize: 24,
+    headerTitle: {
         fontWeight: 'bold',
-        color: '#333',
+        letterSpacing: 0.5,
     },
-    addButton: {
-        backgroundColor: '#007AFF',
-        paddingHorizontal: 16,
-        paddingVertical: 8,
+    badge: {
+        paddingHorizontal: 10,
+        paddingVertical: 2,
         borderRadius: 8,
     },
-    addButtonText: {
-        color: '#fff',
-        fontWeight: '600',
+    badgeText: {
+        color: '#000',
+        fontWeight: 'bold',
     },
     listContent: {
-        padding: 16,
+        padding: 20,
+        paddingBottom: 100,
     },
-    roomCard: {
+    card: {
+        marginBottom: 16,
+        borderRadius: 16,
+    },
+    cardContent: {
         flexDirection: 'row',
-        backgroundColor: '#fff',
-        padding: 12,
-        marginBottom: 12,
-        borderRadius: 8,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 1 },
-        shadowOpacity: 0.1,
-        shadowRadius: 2,
-        elevation: 2,
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        paddingVertical: 8,
     },
-    roomContent: {
+    infoSection: {
         flex: 1,
     },
-    roomNumber: {
-        fontSize: 16,
-        fontWeight: '600',
-        color: '#333',
+    offerName: {
+        fontWeight: 'bold',
     },
-    roomPrice: {
-        fontSize: 14,
-        color: '#007AFF',
-        marginTop: 4,
-        fontWeight: '500',
-        marginBottom: 4,
-    },
-    roomType: {
-        fontSize: 12,
-        color: '#666',
-        marginTop: 2,
-    },
-    itemUnit: {
-        fontSize: 12,
-        color: '#666',
-        marginTop: 2,
-    },
-    roomActions: {
+    actionSection: {
         flexDirection: 'row',
-        columnGap: 8,
+        gap: 4,
     },
-    editButton: {
-        backgroundColor: '#4CAF50',
-        padding: 10,
-        borderRadius: 6,
-        justifyContent: 'center',
+    loadingText: {
+        marginTop: 16,
+        opacity: 0.6,
     },
-    deleteButton: {
-        backgroundColor: '#F44336',
-        padding: 10,
-        borderRadius: 6,
-        justifyContent: 'center',
+    retryButton: {
+        marginTop: 12,
     },
-    buttonText: {
-        fontSize: 18,
+    emptyContainer: {
+        alignItems: 'center',
+        marginTop: 100,
     },
-    emptyText: {
-        textAlign: 'center',
-        fontSize: 16,
-        color: '#999',
-        marginTop: 40,
+    fab: {
+        position: 'absolute',
+        margin: 16,
+        right: 0,
+        bottom: 16,
+        borderRadius: 16,
     },
 });
 

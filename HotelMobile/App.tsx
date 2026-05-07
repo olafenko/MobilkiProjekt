@@ -11,6 +11,7 @@ import {PaymentsProvider} from "./src/context/PaymentsContext.tsx";
 import {AdditionalOffersProvider} from "./src/context/AdditionalOffersContext.tsx";
 import {PaperProvider} from "react-native-paper";
 import {ReservationsProvider} from "./src/context/ReservationsContext.tsx";
+import {theme} from "./src/theme/theme.ts";
 
 
 function App(): React.JSX.Element {
@@ -19,7 +20,7 @@ function App(): React.JSX.Element {
     return (
         
             <SafeAreaProvider>
-                <PaperProvider>
+                <PaperProvider theme={theme}>
                 <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
                     <ReservationsProvider>
                         <AdditionalOffersProvider>
