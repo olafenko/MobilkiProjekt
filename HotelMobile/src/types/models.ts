@@ -166,7 +166,7 @@ export interface Reservation {
     notes: string | null;
     amountPaid: number;
     amountRemaining: number;
-    reservationStatus: string;
+    reservationStatus: ReservationStatus;
     guestId: number;
     guestFullName: string;
     roomId: number;
@@ -183,7 +183,7 @@ export interface CreateReservationRequest {
     reservationDate?: string;
     checkInDate: string;
     checkOutDate: string;
-    reservationStatus: number;
+    reservationStatus: ReservationStatus;
     notes?: string | null;
     guestId?: number | null;
     newGuest?: CreateGuestRequest | null;
@@ -196,7 +196,7 @@ export interface UpdateReservationRequest {
     reservationId: number;
     checkInDate: string;
     checkOutDate: string;
-    reservationStatus: number;
+    reservationStatus: ReservationStatus;
     roomId: number;
     notes?: string | null;
 }
