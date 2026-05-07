@@ -1,107 +1,150 @@
-import {NativeStackScreenProps} from "@react-navigation/native-stack";
-import {RootStackParamList} from "../../navigation/types.ts";
-import {Amenity} from "../../types/models.ts";
-import {ActivityIndicator, Alert, FlatList, StyleSheet, Text, TouchableOpacity, View} from "react-native";
-import {useEffect} from "react";
-import {useAmenities} from "../../context/AmenitiesContext.tsx";
+import React, { useEffect, useState } from "react";
+import { Alert, FlatList, StyleSheet, View, RefreshControl } from "react-native";
+import { NativeStackScreenProps } from "@react-navigation/native-stack";
+import { RootStackParamList } from "../../navigation/types.ts";
+import { Amenity } from "../../types/models.ts";
+import { useAmenities } from "../../context/AmenitiesContext.tsx";
+import {Text, Card, Button, ActivityIndicator, FAB, useTheme, Avatar, IconButton} from "react-native-paper";
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Amenities'>;
 
 function AmenitiesScreen({ navigation }: Props) {
-
-    const { amenities, loading, error, refreshAmenities, deleteAmenity} = useAmenities();
+    const { amenities, loading, error, refreshAmenities, deleteAmenity } = useAmenities();
+    const theme = useTheme();
+    const [refreshing, setRefreshing] = useState(false);
 
     useEffect(() => {
         refreshAmenities();
     }, []);
 
-    const handleDelete = (amenity: Amenity)=> {
+    const onRefresh = async () => {
+        setRefreshing(true);
+        await refreshAmenities();
+        setRefreshing(false);
+    };
 
-        Alert.alert("Usuwanie udogodnienia",`Czy napewno usunąć udogodnienie ${amenity.name}?`,
+    const handleDelete = (amenity: Amenity) => {
+        Alert.alert(
+            "Usuwanie udogodnienia",
+            `Czy na pewno usunąć udogodnienie "${amenity.name}"?`,
             [
-                { text: "Anuluj", style: 'cancel'},
+                { text: "Anuluj", style: 'cancel' },
                 {
-                    text: "Usuń", style: 'destructive',
+                    text: "Usuń",
+                    style: 'destructive',
                     onPress: async () => {
                         try {
                             await deleteAmenity(amenity.amenityId);
-                            Alert.alert("Operacja powiodła się.","Usunięto udogodnienie.");
-                        } catch (err){
-                            const errMessage = err instanceof Error ? err.message : "Unknown error";
-                            Alert.alert("Błąd",errMessage);
+                        } catch (err) {
+                            const errMessage = err instanceof Error ? err.message : "Nieznany błąd";
+                            Alert.alert("Błąd", errMessage);
                         }
                     }
                 },
-            ]);
-
-    }
+            ]
+        );
+    };
 
     const handleEdit = (amenity: Amenity) => {
-        navigation.navigate('UpdateAmenity',{ amenity });
-    }
+        navigation.navigate('UpdateAmenity', { amenity });
+    };
 
-    const renderAmenity = ({item:amenity } : { item:Amenity }) => {
-        return (<View style={styles.roomCard}>
-            <View style={styles.roomContent}>
-                <Text style={styles.roomNumber}>Nazwa: {amenity.name}</Text>
-                <Text>Opis: {amenity.description || "Brak"}</Text>
-            </View>
-            <View style={styles.roomActions}>
-                <TouchableOpacity
-                    style={styles.editButton}
-                    onPress={() => handleEdit(amenity)}
-                >
-                    <Text style={styles.buttonText}>Edytuj ✏️</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                    style={styles.deleteButton}
-                    onPress={() => handleDelete(amenity)}
-                >
-                    <Text style={styles.buttonText}>Usuń 🗑️</Text>
-                </TouchableOpacity>
-            </View>
+    const renderAmenity = ({ item: amenity }: { item: Amenity }) => {
+        return (
+            <Card
+                style={styles.card}
+                mode="outlined"
+                
+            >
+                {/* 1. Tytuł, awatar i przyciski akcji w jednej linii */}
+                <Card.Title
+                    title={amenity.name}
+                    titleVariant="titleMedium"
+                    titleStyle={{ fontWeight: 'bold' }}
+                    // USUNIĘTO subtitle stąd!
+                    left={(props) => (
+                        <Avatar.Icon
+                            {...props}
+                            icon="star"
+                            size={40}
+                            color="white"
+                            style={{ backgroundColor: theme.colors.primary }}
+                        />
+                    )}
+                    right={(props) => (
+                        <View style={styles.rightActions}>
+                            <IconButton
+                                {...props}
+                                icon="pencil-outline"
+                                size={24}
+                                containerColor={theme.colors.secondaryContainer}
+                                iconColor={theme.colors.onSecondaryContainer}
+                                onPress={() => handleEdit(amenity)}
+                            />
+                            <IconButton
+                                {...props}
+                                icon="delete-outline"
+                                size={24}
+                                containerColor={theme.colors.errorContainer}
+                                iconColor={theme.colors.error}
+                                onPress={() => handleDelete(amenity)}
+                            />
+                        </View>
+                    )}
+                />
 
-        </View>);
-    }
+                {/* 2. Opis wyrzucony do osobnego bloku, który może mieć dowolną długość */}
+                <Card.Content style={styles.cardContent}>
+                    <Text variant="bodyMedium" style={{ color: theme.colors.onSurfaceVariant }}>
+                        {amenity.description || "Brak opisu"}
+                    </Text>
+                </Card.Content>
+            </Card>
+        );
+    };
 
-    if(loading) {
+    if (loading && !refreshing) {
         return (
             <View style={styles.centerContainer}>
-                <ActivityIndicator size="large" color="#007AFF" />
-                <Text style={styles.loadingText}>Ładowanie udogodnień...</Text>
+                <ActivityIndicator animating={true} size="large" />
+                <Text variant="bodyMedium" style={styles.loadingText}>Ładowanie udogodnień...</Text>
             </View>
-
         );
     }
 
-    if(error){
+    if (error) {
         return (
             <View style={styles.centerContainer}>
-                <Text style={styles.errorText}>❌ Błąd: {error}</Text>
+                <Text variant="titleMedium" style={{ color: theme.colors.error }}>❌ Błąd</Text>
+                <Text variant="bodyMedium">{error}</Text>
+                <Button mode="outlined" style={{ marginTop: 16 }} onPress={refreshAmenities}>
+                    Spróbuj ponownie
+                </Button>
             </View>
         );
     }
 
     return (
         <View style={styles.container}>
-            <View style={styles.header}>
-                <Text style={styles.title}>Udogodnienia ({amenities.length})</Text>
-                <TouchableOpacity
-                    style={styles.addButton}
-                    onPress={() => navigation.navigate('AddAmenity')}
-                >
-                    <Text style={styles.addButtonText}>+ Dodaj</Text>
-                </TouchableOpacity>
-            </View>
-
             <FlatList
                 data={amenities}
                 renderItem={renderAmenity}
                 keyExtractor={(amenity) => amenity.amenityId.toString()}
                 contentContainerStyle={styles.listContent}
-                ListEmptyComponent={
-                    <Text style={styles.emptyText}>Brak udogodnień</Text>
+                refreshControl={
+                    <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
                 }
+                ListEmptyComponent={
+                    <Text variant="bodyLarge" style={styles.emptyText}>Brak udogodnień w systemie.</Text>
+                }
+            />
+
+            <FAB
+                icon="plus"
+                style={styles.fab}
+                onPress={() => navigation.navigate('AddAmenity')}
+                color="white"
+                theme={{ colors: { primaryContainer: theme.colors.primary } }}
             />
         </View>
     );
@@ -116,104 +159,40 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
+        padding: 16,
     },
     loadingText: {
-        marginTop: 10,
-        fontSize: 16,
+        marginTop: 16,
         color: '#666',
-    },
-    errorText: {
-        fontSize: 16,
-        color: 'red',
-        textAlign: 'center',
-    },
-    header: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        padding: 16,
-        backgroundColor: '#fff',
-        borderBottomWidth: 1,
-        borderBottomColor: '#ddd',
-    },
-    title: {
-        fontSize: 24,
-        fontWeight: 'bold',
-        color: '#333',
-    },
-    addButton: {
-        backgroundColor: '#007AFF',
-        paddingHorizontal: 16,
-        paddingVertical: 8,
-        borderRadius: 8,
-    },
-    addButtonText: {
-        color: '#fff',
-        fontWeight: '600',
     },
     listContent: {
         padding: 16,
+        paddingBottom: 80, // Zapas na FAB
     },
-    roomCard: {
-        flexDirection: 'row',
+    card: {
+        marginBottom: 8,
         backgroundColor: '#fff',
-        padding: 12,
-        marginBottom: 12,
-        borderRadius: 8,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 1 },
-        shadowOpacity: 0.1,
-        shadowRadius: 2,
-        elevation: 2,
+        // mode="outlined" i elevation są w propsach komponentu
     },
-    roomContent: {
-        flex: 1,
+    cardContent: {
+        paddingTop: 0, // Usuwa domyślny górny margines, by tekst był bliżej tytułu
+        paddingBottom: 16, // Dodaje oddech na dole karty
     },
-    roomNumber: {
-        fontSize: 16,
-        fontWeight: '600',
-        color: '#333',
-    },
-    roomPrice: {
-        fontSize: 14,
-        color: '#007AFF',
-        marginTop: 4,
-        fontWeight: '500',
-    },
-    roomType: {
-        fontSize: 12,
-        color: '#666',
-        marginTop: 2,
-    },
-    itemUnit: {
-        fontSize: 12,
-        color: '#666',
-        marginTop: 2,
-    },
-    roomActions: {
+    rightActions: {
         flexDirection: 'row',
-        columnGap: 8,  // gap wspierany od RN 0.71+
-    },
-    editButton: {
-        backgroundColor: '#4CAF50',
-        padding: 10,
-        borderRadius: 6,
-        justifyContent: 'center',
-    },
-    deleteButton: {
-        backgroundColor: '#F44336',
-        padding: 10,
-        borderRadius: 6,
-        justifyContent: 'center',
-    },
-    buttonText: {
-        fontSize: 18,
+        marginRight: 8,
+        gap: 4 // Odstęp między przyciskami (wymaga RN 0.71+)
     },
     emptyText: {
         textAlign: 'center',
-        fontSize: 16,
         color: '#999',
         marginTop: 40,
+    },
+    fab: {
+        position: 'absolute',
+        margin: 16,
+        right: 0,
+        bottom: 0,
     },
 });
 

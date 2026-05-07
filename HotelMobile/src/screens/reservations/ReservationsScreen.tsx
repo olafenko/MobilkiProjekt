@@ -9,11 +9,11 @@ import { Text, Card, Button, ActivityIndicator, FAB, Chip, useTheme } from 'reac
 type Props = NativeStackScreenProps<RootStackParamList, 'Reservations'>;
 
 function ReservationsScreen({ navigation }: Props) {
+    
     const { reservations, loading, error, deleteReservation, refreshReservations } = useReservations();
     const theme = useTheme();
     const [refreshing, setRefreshing] = useState(false);
-
-    // Obsługa przeciągnięcia w dół (Pull-to-refresh)
+    
     const onRefresh = async () => {
         setRefreshing(true);
         await refreshReservations();
@@ -42,7 +42,6 @@ function ReservationsScreen({ navigation }: Props) {
     };
 
     const handleEdit = (reservation: Reservation) => {
-        // Zakładam, że w typach nawigacji masz zdefiniowany ten ekran
         navigation.navigate('UpdateReservation', { reservation });
     };
 
