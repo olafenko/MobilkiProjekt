@@ -172,14 +172,18 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         letterSpacing: 0.5,
     },
-    badge: {
-        paddingHorizontal: 10,
-        paddingVertical: 2,
-        borderRadius: 8,
+    badge: { 
+        paddingHorizontal: 16,
+        paddingVertical: 6,
+        borderRadius: 12,
+        minWidth: 48,
+        alignItems: 'center',
+        justifyContent: 'center'
     },
     badgeText: {
         color: '#000',
         fontWeight: 'bold',
+        fontSize: 14
     },
     listContent: {
         padding: 20,

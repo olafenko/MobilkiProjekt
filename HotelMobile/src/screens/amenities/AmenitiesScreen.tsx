@@ -4,7 +4,7 @@ import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../navigation/types.ts";
 import { Amenity } from "../../types/models.ts";
 import { useAmenities } from "../../context/AmenitiesContext.tsx";
-import {Text, Card, Button, ActivityIndicator, FAB, useTheme, Avatar, IconButton} from "react-native-paper";
+import { Text, Card, Button, ActivityIndicator, FAB, useTheme, Avatar, IconButton, Surface } from "react-native-paper";
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Amenities'>;
 
@@ -25,7 +25,7 @@ function AmenitiesScreen({ navigation }: Props) {
 
     const handleDelete = (amenity: Amenity) => {
         Alert.alert(
-            "Usuwanie udogodnienia",
+            "Usuwanie zasobu",
             `Czy na pewno usunąć udogodnienie "${amenity.name}"?`,
             [
                 { text: "Anuluj", style: 'cancel' },
@@ -51,49 +51,24 @@ function AmenitiesScreen({ navigation }: Props) {
 
     const renderAmenity = ({ item: amenity }: { item: Amenity }) => {
         return (
-            <Card
-                style={styles.card}
-                mode="outlined"
-                
-            >
-                {/* 1. Tytuł, awatar i przyciski akcji w jednej linii */}
+            <Card style={styles.card} mode="contained">
                 <Card.Title
                     title={amenity.name}
                     titleVariant="titleMedium"
-                    titleStyle={{ fontWeight: 'bold' }}
-                    // USUNIĘTO subtitle stąd!
+                    titleStyle={styles.titleStyle}
+                    style={styles.cardTitle}
                     left={(props) => (
-                        <Avatar.Icon
-                            {...props}
-                            icon="star"
-                            size={40}
-                            color="white"
-                            style={{ backgroundColor: theme.colors.primary }}
-                        />
+                        <Avatar.Icon {...props} icon="star-outline" size={40} color={theme.colors.onPrimary} style={{ backgroundColor: theme.colors.primary }} />
                     )}
                     right={(props) => (
                         <View style={styles.rightActions}>
-                            <IconButton
-                                {...props}
-                                icon="pencil-outline"
-                                size={24}
-                                containerColor={theme.colors.secondaryContainer}
-                                iconColor={theme.colors.onSecondaryContainer}
-                                onPress={() => handleEdit(amenity)}
-                            />
-                            <IconButton
-                                {...props}
-                                icon="delete-outline"
-                                size={24}
-                                containerColor={theme.colors.errorContainer}
-                                iconColor={theme.colors.error}
-                                onPress={() => handleDelete(amenity)}
-                            />
+                            <IconButton {...props} icon="pencil" size={20} containerColor={theme.colors.surfaceVariant}
+                                        iconColor={theme.colors.primary} onPress={() => handleEdit(amenity)} />
+                            <IconButton {...props} icon="trash-can" size={20} containerColor="rgba(207, 102, 121, 0.1)"
+                                        iconColor={theme.colors.error} onPress={() => handleDelete(amenity)} />
                         </View>
                     )}
                 />
-
-                {/* 2. Opis wyrzucony do osobnego bloku, który może mieć dowolną długość */}
                 <Card.Content style={styles.cardContent}>
                     <Text variant="bodyMedium" style={{ color: theme.colors.onSurfaceVariant }}>
                         {amenity.description || "Brak opisu"}
@@ -105,47 +80,49 @@ function AmenitiesScreen({ navigation }: Props) {
 
     if (loading && !refreshing) {
         return (
-            <View style={styles.centerContainer}>
-                <ActivityIndicator animating={true} size="large" />
-                <Text variant="bodyMedium" style={styles.loadingText}>Ładowanie udogodnień...</Text>
+            <View style={[styles.container, styles.centerContainer, { backgroundColor: theme.colors.background }]}>
+                <ActivityIndicator size="large" color={theme.colors.primary} />
+                <Text variant="bodySmall" style={styles.loadingText}>Ładowanie...</Text>
             </View>
         );
     }
 
     if (error) {
         return (
-            <View style={styles.centerContainer}>
-                <Text variant="titleMedium" style={{ color: theme.colors.error }}>❌ Błąd</Text>
-                <Text variant="bodyMedium">{error}</Text>
-                <Button mode="outlined" style={{ marginTop: 16 }} onPress={refreshAmenities}>
-                    Spróbuj ponownie
-                </Button>
+            <View style={[styles.container, styles.centerContainer, { backgroundColor: theme.colors.background }]}>
+                <IconButton icon="wifi-off" iconColor={theme.colors.error} size={48} />
+                <Text variant="titleMedium" style={{ color: theme.colors.error, marginTop: 8 }}>Błąd</Text>
+                <Button mode="text" textColor={theme.colors.primary} onPress={refreshAmenities} style={{ marginTop: 12 }}>Ponów próbę</Button>
             </View>
         );
     }
 
     return (
-        <View style={styles.container}>
+        <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
+            <Surface style={styles.header} elevation={2}>
+                <View>
+                    <Text variant="headlineSmall" style={styles.headerTitle}>Udogodnienia pokoi</Text>
+                </View>
+                <View style={[styles.badge, { backgroundColor: theme.colors.primary }]}>
+                    <Text variant="labelSmall" style={styles.badgeText}>{amenities.length}</Text>
+                </View>
+            </Surface>
+
             <FlatList
                 data={amenities}
                 renderItem={renderAmenity}
                 keyExtractor={(amenity) => amenity.amenityId.toString()}
                 contentContainerStyle={styles.listContent}
-                refreshControl={
-                    <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-                }
+                refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={theme.colors.primary} />}
                 ListEmptyComponent={
-                    <Text variant="bodyLarge" style={styles.emptyText}>Brak udogodnień w systemie.</Text>
+                    <View style={styles.centerContainer}>
+                        <Text variant="bodyMedium" style={{ color: theme.colors.onSurfaceVariant }}>Brak udogodnień</Text>
+                    </View>
                 }
             />
 
-            <FAB
-                icon="plus"
-                style={styles.fab}
-                onPress={() => navigation.navigate('AddAmenity')}
-                color="white"
-                theme={{ colors: { primaryContainer: theme.colors.primary } }}
-            />
+            <FAB icon="plus" style={[styles.fab, { backgroundColor: theme.colors.primary }]} color={theme.colors.onPrimary}
+                 onPress={() => navigation.navigate('AddAmenity')} />
         </View>
     );
 }
@@ -153,7 +130,6 @@ function AmenitiesScreen({ navigation }: Props) {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#f5f5f5',
     },
     centerContainer: {
         flex: 1,
@@ -161,38 +137,68 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         padding: 16,
     },
+    header: {
+        paddingTop: 16,
+        paddingHorizontal: 24,
+        paddingBottom: 24,
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        borderBottomLeftRadius: 24,
+        borderBottomRightRadius: 24,
+    },
+    headerTitle: {
+        fontWeight: 'bold',
+        letterSpacing: 0.5,
+    },
+    badge: {
+        paddingHorizontal: 16,
+        paddingVertical: 6,
+        borderRadius: 12,
+        minWidth: 48,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    badgeText: {
+        color: '#000',
+        fontWeight: 'bold',
+        fontSize: 14,
+    },
     loadingText: {
         marginTop: 16,
-        color: '#666',
+        opacity: 0.6,
     },
     listContent: {
-        padding: 16,
-        paddingBottom: 80, // Zapas na FAB
+        padding: 20,
+        paddingBottom: 100,
     },
     card: {
-        marginBottom: 8,
-        backgroundColor: '#fff',
-        // mode="outlined" i elevation są w propsach komponentu
+        marginBottom: 12,
+        borderRadius: 16,
+    },
+    cardTitle: {
+        minHeight: 0,
+        paddingBottom: 4,
+        paddingTop: 12,
+    },
+    titleStyle: {
+        fontWeight: 'bold',
     },
     cardContent: {
-        paddingTop: 0, // Usuwa domyślny górny margines, by tekst był bliżej tytułu
-        paddingBottom: 16, // Dodaje oddech na dole karty
+        paddingTop: 0,
+        paddingBottom: 16,
     },
     rightActions: {
         flexDirection: 'row',
-        marginRight: 8,
-        gap: 4 // Odstęp między przyciskami (wymaga RN 0.71+)
-    },
-    emptyText: {
-        textAlign: 'center',
-        color: '#999',
-        marginTop: 40,
+        marginRight: 16,
+        gap: 8,
     },
     fab: {
         position: 'absolute',
         margin: 16,
         right: 0,
-        bottom: 0,
+        bottom: 16,
+        borderRadius: 16,
     },
 });
 
