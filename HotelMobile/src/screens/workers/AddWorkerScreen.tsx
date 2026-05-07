@@ -1,15 +1,16 @@
 ﻿import {NativeStackScreenProps} from "@react-navigation/native-stack";
 import {RootStackParamList} from "../../navigation/types.ts";
-import {ActivityIndicator, Alert, Button, ScrollView, StyleSheet, Text, TextInput, View} from "react-native";
+import {Alert, ScrollView, StyleSheet, View} from "react-native";
 import {useEffect, useState} from "react";
 import {useWorkers} from "../../context/WorkersContext.tsx";
 import {Role} from "../../types/models.ts";
 import {PickerField} from "../../components/PickerField.tsx";
+import {ActivityIndicator, Button, Card, TextInput, useTheme} from "react-native-paper";
 
 type Props = NativeStackScreenProps<RootStackParamList, "AddWorker">;
 
 function AddWorkerScreen({navigation} : Props) {
-
+    const theme = useTheme();
     const { addWorker } = useWorkers();
 
     const [firstName, setFirstName] = useState("");
@@ -21,7 +22,7 @@ function AddWorkerScreen({navigation} : Props) {
     const [roles, setRoles] = useState<Role[]>([]);
     const [loading, setLoading] = useState(true);
     const [submitting, setSubmitting] = useState(false);
-    
+
     useEffect(() => {
         const loadData = async () => {
             try {
@@ -70,56 +71,130 @@ function AddWorkerScreen({navigation} : Props) {
 
     if (loading) {
         return (
-            <View style={styles.centerContainer}>
-                <ActivityIndicator size="large" color="#007AFF" />
+            <View style={[styles.centerContainer, { backgroundColor: theme.colors.background }]}>
+                <ActivityIndicator size="large" color={theme.colors.primary} />
             </View>
         );
     }
 
     return (
-        <ScrollView style={styles.container}>
-            <View style={styles.form}>
+        <ScrollView style={{ backgroundColor: theme.colors.background }} contentContainerStyle={styles.scrollContent}>
+            <Card style={styles.card} mode="contained">
+                <Card.Content style={styles.gap}>
 
-                <Text style={styles.label}>Imię *</Text>
-                <TextInput style={styles.input} value={firstName} onChangeText={setFirstName} editable={!submitting} />
+                    <TextInput
+                        label="Imię *"
+                        mode="outlined"
+                        value={firstName}
+                        onChangeText={setFirstName}
+                        editable={!submitting}
+                        style={styles.input}
+                        outlineColor={theme.colors.outline}
+                        activeOutlineColor={theme.colors.primary}
+                    />
 
-                <Text style={styles.label}>Nazwisko *</Text>
-                <TextInput style={styles.input} value={lastName} onChangeText={setLastName} editable={!submitting} />
+                    <TextInput
+                        label="Nazwisko *"
+                        mode="outlined"
+                        value={lastName}
+                        onChangeText={setLastName}
+                        editable={!submitting}
+                        style={styles.input}
+                        outlineColor={theme.colors.outline}
+                        activeOutlineColor={theme.colors.primary}
+                    />
 
-                <Text style={styles.label}>Login *</Text>
-                <TextInput style={styles.input} value={login} onChangeText={setLogin} editable={!submitting} autoCapitalize="none"
-                />
+                    <TextInput
+                        label="Login *"
+                        mode="outlined"
+                        value={login}
+                        onChangeText={setLogin}
+                        editable={!submitting}
+                        autoCapitalize="none"
+                        style={styles.input}
+                        outlineColor={theme.colors.outline}
+                        activeOutlineColor={theme.colors.primary}
+                    />
 
-                <Text style={styles.label}>Hasło *</Text>
-                <TextInput style={styles.input} value={password} onChangeText={setPassword} editable={!submitting} secureTextEntry={true}
-                />
+                    <TextInput
+                        label="Hasło *"
+                        mode="outlined"
+                        value={password}
+                        onChangeText={setPassword}
+                        editable={!submitting}
+                        secureTextEntry={true}
+                        style={styles.input}
+                        outlineColor={theme.colors.outline}
+                        activeOutlineColor={theme.colors.primary}
+                    />
 
-                <PickerField
-                    label="Rola"
-                    selectedValue={role}
-                    items={roles}
-                    getValue={r => r}
-                    getLabel={r => r}
-                    onChange={val => setRole(val as Role)}
-                    required
-                />
+                    <PickerField
+                        label="Rola"
+                        selectedValue={role}
+                        items={roles}
+                        getValue={r => r}
+                        getLabel={r => r}
+                        onChange={val => setRole(val as Role)}
+                        required
+                    />
 
-                <View style={styles.buttons}>
-                    <Button title="Anuluj" onPress={() => navigation.goBack()} color="#999" disabled={submitting} />
-                    <Button title={submitting ? 'Wysyłanie...' : 'Utwórz'} onPress={handleSubmit} disabled={submitting} />
-                </View>
-            </View>
+                    <View style={styles.buttons}>
+                        <Button
+                            mode="outlined"
+                            onPress={() => navigation.goBack()}
+                            disabled={submitting}
+                            style={styles.flex1}
+                            textColor={theme.colors.onSurfaceVariant}
+                        >
+                            Anuluj
+                        </Button>
+                        <Button
+                            mode="contained"
+                            onPress={handleSubmit}
+                            disabled={submitting}
+                            loading={submitting}
+                            style={styles.flex1}
+                            buttonColor={theme.colors.primary}
+                            textColor={theme.colors.onPrimary}
+                        >
+                            {submitting ? 'Wysyłanie...' : 'Utwórz'}
+                        </Button>
+                    </View>
+                </Card.Content>
+            </Card>
         </ScrollView>
     );
 }
 
 const styles = StyleSheet.create({
-    container: { flex: 1, backgroundColor: '#f5f5f5' },
-    centerContainer: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-    form: { padding: 16 },
-    label: { fontSize: 14, fontWeight: '600', color: '#333', marginBottom: 8, marginTop: 16 },
-    input: { borderWidth: 1, borderColor: '#ddd', borderRadius: 8, padding: 12, fontSize: 16, backgroundColor: '#fff' },
-    buttons: { flexDirection: 'row', columnGap: 10, marginTop: 20, marginBottom: 30 },
+    centerContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center'
+    },
+    scrollContent: {
+        padding: 16,
+        marginTop: 25,
+        flexGrow: 1
+    },
+    card: {
+        borderRadius: 24,
+        paddingVertical: 8
+    },
+    gap: {
+        gap: 16
+    },
+    input: {
+        backgroundColor: 'transparent'
+    },
+    buttons: {
+        flexDirection: 'row',
+        gap: 12,
+        marginTop: 16
+    },
+    flex1: {
+        flex: 1
+    }
 });
 
 export default AddWorkerScreen;

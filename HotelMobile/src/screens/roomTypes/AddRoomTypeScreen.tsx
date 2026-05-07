@@ -1,26 +1,24 @@
 ﻿import {NativeStackScreenProps} from "@react-navigation/native-stack";
 import {RootStackParamList} from "../../navigation/types.ts";
-import {ActivityIndicator, Alert, Button, ScrollView, StyleSheet, Text, TextInput, View} from "react-native";
+import {Alert, ScrollView, StyleSheet, View} from "react-native";
 import {useRoomTypes} from "../../context/RoomTypesContext.tsx";
 import {useState} from "react";
-
+import {ActivityIndicator, Button, Card, TextInput, useTheme} from "react-native-paper";
 
 type Props = NativeStackScreenProps<RootStackParamList, "AddRoomType">;
 
-
 function AddRoomTypeScreen({navigation} : Props) {
-    
+    const theme = useTheme();
     const { addRoomType } = useRoomTypes();
-    
+
     const [name, setName] = useState("");
     const [basePrice, setBasePrice] = useState('');
     const [description, setDescription] = useState('');
 
     const [loading, setLoading] = useState(false);
     const [submitting, setSubmitting] = useState(false);
-    
-    const handleSubmit = async () => {
 
+    const handleSubmit = async () => {
         if (!name.trim()){
             Alert.alert("Błąd", "Podaj nazwę");
             return;
@@ -29,7 +27,7 @@ function AddRoomTypeScreen({navigation} : Props) {
             Alert.alert("Błąd", "Podaj cene bazową");
             return;
         }
-        
+
         try {
             setSubmitting(true);
             await addRoomType({
@@ -37,7 +35,7 @@ function AddRoomTypeScreen({navigation} : Props) {
                 basePrice: parseFloat(basePrice),
                 description: description
             });
-            
+
             Alert.alert("Sukces", "Typ pokoju został dodany pomyślnie", [
                 { text: "OK", onPress: () => navigation.goBack() },
             ])
@@ -50,42 +48,110 @@ function AddRoomTypeScreen({navigation} : Props) {
 
     if (loading) {
         return (
-            <View style={styles.centerContainer}>
-                <ActivityIndicator size="large" />
+            <View style={[styles.centerContainer, { backgroundColor: theme.colors.background }]}>
+                <ActivityIndicator size="large" color={theme.colors.primary} />
             </View>
         );
     }
 
     return (
-        <ScrollView style={styles.container}>
-            <View style={styles.form}>
-                <Text style={styles.label}>Nazwa *</Text>
-                <TextInput style={styles.input} value={name} onChangeText={setName} editable={!submitting} />
+        <ScrollView style={{ backgroundColor: theme.colors.background }} contentContainerStyle={styles.scrollContent}>
+            <Card style={styles.card} mode="contained">
+                <Card.Content style={styles.gap}>
 
-                <Text style={styles.label}>Cena bazowa *</Text>
-                <TextInput style={styles.input} value={basePrice} onChangeText={setBasePrice} keyboardType="numeric" editable={!submitting} />
+                    <TextInput
+                        label="Nazwa *"
+                        mode="outlined"
+                        value={name}
+                        onChangeText={setName}
+                        editable={!submitting}
+                        style={styles.input}
+                        outlineColor={theme.colors.outline}
+                        activeOutlineColor={theme.colors.primary}
+                    />
 
-                <Text style={styles.label}>Opis</Text>
-                <TextInput style={[styles.input, styles.multiline]} value={description} onChangeText={setDescription} multiline numberOfLines={3} editable={!submitting} />
+                    <TextInput
+                        label="Cena bazowa *"
+                        mode="outlined"
+                        value={basePrice}
+                        onChangeText={setBasePrice}
+                        keyboardType="numeric"
+                        editable={!submitting}
+                        style={styles.input}
+                        outlineColor={theme.colors.outline}
+                        activeOutlineColor={theme.colors.primary}
+                    />
 
-                <View style={styles.buttons}>
-                    <Button title="Anuluj" onPress={() => navigation.goBack()} color="#999" disabled={submitting} />
-                    <Button title={submitting ? 'Wysyłanie...' : 'Utwórz'} onPress={handleSubmit} disabled={submitting} />
-                </View>
-            </View>
+                    <TextInput
+                        label="Opis"
+                        mode="outlined"
+                        value={description}
+                        onChangeText={setDescription}
+                        multiline
+                        numberOfLines={3}
+                        editable={!submitting}
+                        style={styles.input}
+                        outlineColor={theme.colors.outline}
+                        activeOutlineColor={theme.colors.primary}
+                    />
+
+                    <View style={styles.buttons}>
+                        <Button
+                            mode="outlined"
+                            onPress={() => navigation.goBack()}
+                            disabled={submitting}
+                            style={styles.flex1}
+                            textColor={theme.colors.onSurfaceVariant}
+                        >
+                            Anuluj
+                        </Button>
+                        <Button
+                            mode="contained"
+                            onPress={handleSubmit}
+                            disabled={submitting}
+                            loading={submitting}
+                            style={styles.flex1}
+                            buttonColor={theme.colors.primary}
+                            textColor={theme.colors.onPrimary}
+                        >
+                            {submitting ? 'Wysyłanie...' : 'Utwórz'}
+                        </Button>
+                    </View>
+                </Card.Content>
+            </Card>
         </ScrollView>
     );
-    
 }
 
 const styles = StyleSheet.create({
-    container: { flex: 1, backgroundColor: '#f5f5f5' },
-    centerContainer: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-    form: { padding: 16 },
-    label: { fontSize: 14, fontWeight: '600', color: '#333', marginBottom: 8, marginTop: 16 },
-    input: { borderWidth: 1, borderColor: '#ddd', borderRadius: 8, padding: 12, fontSize: 16, backgroundColor: '#fff' },
-    multiline: { height: 80, textAlignVertical: 'top' },
-    buttons: { flexDirection: 'row', columnGap: 10, marginTop: 20, marginBottom: 30 },
+    centerContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center'
+    },
+    scrollContent: {
+        padding: 16,
+        marginTop: 25,
+        flexGrow: 1
+    },
+    card: {
+        borderRadius: 24,
+        paddingVertical: 8
+    },
+    gap: {
+        gap: 16
+    },
+    input: {
+        backgroundColor: 'transparent'
+    },
+    buttons: {
+        flexDirection: 'row',
+        gap: 12,
+        marginTop: 16
+    },
+    flex1: {
+        flex: 1
+    }
 });
 
 export default AddRoomTypeScreen;

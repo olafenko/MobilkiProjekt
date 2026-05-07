@@ -1,98 +1,113 @@
-﻿import {NativeStackScreenProps} from "@react-navigation/native-stack";
-import {RootStackParamList} from "../../navigation/types.ts";
-import {Worker} from "../../types/models.ts";
-import {ActivityIndicator, Alert, FlatList, StyleSheet, Text, TouchableOpacity, View} from "react-native";
-import {useEffect} from "react";
-import {useWorkers} from "../../context/WorkersContext.tsx";
+﻿import React, { useEffect } from 'react';
+import { Alert, FlatList, StyleSheet, View } from 'react-native';
+import { NativeStackScreenProps } from "@react-navigation/native-stack";
+import { RootStackParamList } from "../../navigation/types.ts";
+import { Worker } from "../../types/models.ts";
+import { useWorkers } from "../../context/WorkersContext.tsx";
+import { ActivityIndicator, Card, FAB, IconButton, Surface, Text, useTheme } from 'react-native-paper';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Workers'>;
 
 function WorkersScreen({ navigation }: Props) {
-
-    const { workers, loading, error, refreshWorkers, deleteWorker} = useWorkers();
+    const { workers, loading, refreshWorkers, deleteWorker } = useWorkers();
+    const theme = useTheme();
 
     useEffect(() => {
         refreshWorkers();
     }, []);
 
-    const handleDelete = (worker: Worker)=> {
-
-        Alert.alert("Usuwanie pracownika",`Czy na pewno usunąć pracownika ${worker.firstName} ${worker.lastName}?`,
+    const handleDelete = (worker: Worker) => {
+        Alert.alert(
+            "Usuwanie pracownika",
+            `Czy na pewno usunąć pracownika ${worker.firstName} ${worker.lastName}?`,
             [
-                { text: "Anuluj", style: 'cancel'},
+                { text: "Anuluj", style: 'cancel' },
                 {
-                    text: "Usuń", style: 'destructive',
+                    text: "Usuń",
+                    style: 'destructive',
                     onPress: async () => {
                         try {
                             await deleteWorker(worker.workerId);
-                            Alert.alert("Operacja powiodła się.","Usunięto pracownika.");
-                        } catch (err){
+                            Alert.alert("Sukces.", "Usunięto pracownika.");
+                        } catch (err) {
                             const errMessage = err instanceof Error ? err.message : "Unknown error";
-                            Alert.alert("Błąd",errMessage);
+                            Alert.alert("Błąd", errMessage);
                         }
                     }
                 },
-            ]);
-
-    }
+            ]
+        );
+    };
 
     const handleEdit = (worker: Worker) => {
-        navigation.navigate('UpdateWorker',{ worker });
-    }
+        navigation.navigate('UpdateWorker', { worker });
+    };
 
-    const renderWorker = ({item: worker } : { item: Worker }) => {
-        return (<View style={styles.card}>
-            <View style={styles.cardContent}>
-                <Text style={styles.mainText}>{worker.firstName} {worker.lastName}</Text>
-                <Text style={styles.subText}>Rola: {worker.role || "Brak"}</Text>
-            </View>
-            <View style={styles.actions}>
-                <TouchableOpacity
-                    style={styles.editButton}
-                    onPress={() => handleEdit(worker)}
-                >
-                    <Text style={styles.buttonText}>Edytuj ✏️</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                    style={styles.deleteButton}
-                    onPress={() => handleDelete(worker)}
-                >
-                    <Text style={styles.buttonText}>Usuń 🗑️</Text>
-                </TouchableOpacity>
-            </View>
-
-        </View>);
-    }
-
-    if(loading) {
+    const renderWorker = ({ item: worker }: { item: Worker }) => {
         return (
-            <View style={styles.centerContainer}>
-                <ActivityIndicator size="large" color="#007AFF" />
-                <Text style={styles.loadingText}>Ładowanie pracowników...</Text>
-            </View>
+            <Card style={styles.card} mode="contained">
+                <View style={styles.cardInner}>
+                    <View style={styles.cardHeaderRow}>
+                        <View style={styles.titleContainer}>
+                            <Text variant="titleMedium" style={styles.titleStyleWrapped}>
+                                {worker.firstName} {worker.lastName}
+                            </Text>
+                        </View>
 
+                        <View style={styles.topRightActions}>
+                            <IconButton
+                                icon="pencil"
+                                size={20}
+                                containerColor={theme.colors.surfaceVariant}
+                                iconColor={theme.colors.primary}
+                                onPress={() => handleEdit(worker)}
+                                style={styles.actionButton}
+                            />
+                            <IconButton
+                                icon="trash-can"
+                                size={20}
+                                containerColor="rgba(207, 102, 121, 0.1)"
+                                iconColor={theme.colors.error}
+                                onPress={() => handleDelete(worker)}
+                                style={styles.actionButton}
+                            />
+                        </View>
+                    </View>
+
+                    <View style={styles.cardBody}>
+                        <View style={styles.infoRow}>
+                            <Text variant="bodyMedium" style={[styles.sectionLabel, { color: theme.colors.onSurfaceVariant }]}>
+                                Rola:
+                            </Text>
+                            <Text variant="bodyMedium" style={{ color: theme.colors.onSurfaceVariant }}>
+                                {worker.role || "Brak"}
+                            </Text>
+                        </View>
+                    </View>
+                </View>
+            </Card>
         );
-    }
+    };
 
-    if(error){
+    if (loading) {
         return (
-            <View style={styles.centerContainer}>
-                <Text style={styles.errorText}>❌ Błąd: {error}</Text>
+            <View style={[styles.container, styles.centerContainer, { backgroundColor: theme.colors.background }]}>
+                <ActivityIndicator size="large" color={theme.colors.primary} />
+                <Text variant="bodySmall" style={styles.loadingText}>Ładowanie...</Text>
             </View>
         );
     }
 
     return (
-        <View style={styles.container}>
-            <View style={styles.header}>
-                <Text style={styles.title}>Pracownicy ({workers.length})</Text>
-                <TouchableOpacity
-                    style={styles.addButton}
-                    onPress={() => navigation.navigate('AddWorker')}
-                >
-                    <Text style={styles.addButtonText}>+ Dodaj</Text>
-                </TouchableOpacity>
-            </View>
+        <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
+            <Surface style={styles.header} elevation={2}>
+                <View>
+                    <Text variant="headlineSmall" style={styles.headerTitle}>Pracownicy</Text>
+                </View>
+                <View style={[styles.badge, { backgroundColor: theme.colors.primary }]}>
+                    <Text variant="titleMedium" style={styles.badgeText}>{workers.length}</Text>
+                </View>
+            </Surface>
 
             <FlatList
                 data={workers}
@@ -100,8 +115,17 @@ function WorkersScreen({ navigation }: Props) {
                 keyExtractor={(worker) => worker.workerId.toString()}
                 contentContainerStyle={styles.listContent}
                 ListEmptyComponent={
-                    <Text style={styles.emptyText}>Brak pracowników</Text>
+                    <View style={styles.centerContainer}>
+                        <Text variant="bodyMedium" style={{ color: theme.colors.onSurfaceVariant }}>Brak pracowników</Text>
+                    </View>
                 }
+            />
+
+            <FAB
+                icon="plus"
+                style={[styles.fab, { backgroundColor: theme.colors.primary }]}
+                color={theme.colors.onPrimary}
+                onPress={() => navigation.navigate('AddWorker')}
             />
         </View>
     );
@@ -109,103 +133,97 @@ function WorkersScreen({ navigation }: Props) {
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
-        backgroundColor: '#f5f5f5',
+        flex: 1
     },
     centerContainer: {
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-    },
-    loadingText: {
-        marginTop: 10,
-        fontSize: 16,
-        color: '#666',
-    },
-    errorText: {
-        fontSize: 16,
-        color: 'red',
-        textAlign: 'center',
+        padding: 16
     },
     header: {
+        paddingTop: 16,
+        paddingHorizontal: 24,
+        paddingBottom: 24,
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        padding: 16,
-        backgroundColor: '#fff',
-        borderBottomWidth: 1,
-        borderBottomColor: '#ddd',
+        borderBottomLeftRadius: 24,
+        borderBottomRightRadius: 24
     },
-    title: {
-        fontSize: 24,
+    headerTitle: {
         fontWeight: 'bold',
-        color: '#333',
+        letterSpacing: 0.5
     },
-    addButton: {
-        backgroundColor: '#007AFF',
+    badge: {
         paddingHorizontal: 16,
-        paddingVertical: 8,
-        borderRadius: 8,
+        paddingVertical: 6,
+        borderRadius: 12,
+        minWidth: 48,
+        alignItems: 'center',
+        justifyContent: 'center'
     },
-    addButtonText: {
-        color: '#fff',
-        fontWeight: '600',
+    badgeText: {
+        color: '#000',
+        fontWeight: 'bold',
+        fontSize: 14
+    },
+    loadingText: {
+        marginTop: 16,
+        opacity: 0.6
     },
     listContent: {
-        padding: 16,
+        padding: 20,
+        paddingBottom: 100
     },
     card: {
-        flexDirection: 'row',
-        backgroundColor: '#fff',
-        padding: 12,
         marginBottom: 12,
-        borderRadius: 8,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 1 },
-        shadowOpacity: 0.1,
-        shadowRadius: 2,
-        elevation: 2,
+        borderRadius: 16,
+        overflow: 'hidden'
     },
-    cardContent: {
-        flex: 1,
-        justifyContent: 'center',
+    cardInner: {
+        padding: 12
     },
-    mainText: {
-        fontSize: 16,
-        fontWeight: '600',
-        color: '#333',
-    },
-    subText: {
-        fontSize: 14,
-        color: '#666',
-        marginTop: 4,
-    },
-    actions: {
+    cardHeaderRow: {
         flexDirection: 'row',
-        columnGap: 8,
+        alignItems: 'flex-start'
+    },
+    titleContainer: {
+        flex: 1,
+        marginRight: 12,
+        justifyContent: 'center',
+        paddingTop: 4
+    },
+    titleStyleWrapped: {
+        fontWeight: 'bold',
+        flexWrap: 'wrap'
+    },
+    topRightActions: {
+        flexDirection: 'row',
+        gap: 4
+    },
+    actionButton: {
+        margin: 0
+    },
+    cardBody: {
+        paddingTop: 12,
+        paddingBottom: 4
+    },
+    infoRow: {
+        flexDirection: 'row',
         alignItems: 'center',
     },
-    editButton: {
-        backgroundColor: '#4CAF50',
-        padding: 10,
-        borderRadius: 6,
-        justifyContent: 'center',
+    sectionLabel: {
+        fontWeight: 'bold',
+        marginRight: 4
     },
-    deleteButton: {
-        backgroundColor: '#F44336',
-        padding: 10,
-        borderRadius: 6,
-        justifyContent: 'center',
-    },
-    buttonText: {
-        fontSize: 18,
-    },
-    emptyText: {
-        textAlign: 'center',
-        fontSize: 16,
-        color: '#999',
-        marginTop: 40,
-    },
+    fab: {
+        position: 'absolute',
+        margin: 16,
+        right: 0,
+        bottom: 16,
+        borderRadius: 16
+    }
 });
 
 export default WorkersScreen;

@@ -1,99 +1,126 @@
-﻿import {NativeStackScreenProps} from "@react-navigation/native-stack";
-import {RootStackParamList} from "../../navigation/types.ts";
-import {RoomType} from "../../types/models.ts";
-import {ActivityIndicator, Alert, FlatList, StyleSheet, Text, TouchableOpacity, View} from "react-native";
-import {useRoomTypes} from "../../context/RoomTypesContext.tsx";
-import {useEffect} from "react";
+﻿import React, { useEffect } from 'react';
+import { Alert, FlatList, StyleSheet, View } from 'react-native';
+import { NativeStackScreenProps } from "@react-navigation/native-stack";
+import { RootStackParamList } from "../../navigation/types.ts";
+import { RoomType } from "../../types/models.ts";
+import { useRoomTypes } from "../../context/RoomTypesContext.tsx";
+import { ActivityIndicator, Card, FAB, IconButton, Surface, Text, useTheme } from 'react-native-paper';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'RoomTypes'>;
 
 function RoomTypesScreen({ navigation }: Props) {
-
-    const { roomTypes, loading, error, refreshRoomTypes, deleteRoomType} = useRoomTypes();
+    const { roomTypes, loading, refreshRoomTypes, deleteRoomType } = useRoomTypes();
+    const theme = useTheme();
 
     useEffect(() => {
         refreshRoomTypes();
     }, []);
-    
-    const handleDelete = (roomType: RoomType)=> {
 
-        Alert.alert("Usuwanie typu pokoju",`Czy napewno usunąć typ pokoju ${roomType.name}?`,
+    const handleDelete = (roomType: RoomType) => {
+        Alert.alert(
+            "Usuwanie typu pokoju",
+            `Czy napewno usunąć typ pokoju ${roomType.name}?`,
             [
-                { text: "Anuluj", style: 'cancel'},
+                { text: "Anuluj", style: 'cancel' },
                 {
-                    text: "Usuń", style: 'destructive',
+                    text: "Usuń",
+                    style: 'destructive',
                     onPress: async () => {
                         try {
                             await deleteRoomType(roomType.roomTypeId);
-                            Alert.alert("Operacja powiodła się.","Usunięto typ pokoju.");
-                        } catch (err){
+                            Alert.alert("Operacja powiodła się.", "Usunięto typ pokoju.");
+                        } catch (err) {
                             const errMessage = err instanceof Error ? err.message : "Unknown error";
-                            Alert.alert("Błąd",errMessage);
+                            Alert.alert("Błąd", errMessage);
                         }
                     }
                 },
-            ]);
-
-    }
+            ]
+        );
+    };
 
     const handleEdit = (roomType: RoomType) => {
-        navigation.navigate('UpdateRoomType',{ roomType });
-    }
+        navigation.navigate('UpdateRoomType', { roomType });
+    };
 
-    const renderRoomType = ({item:roomType } : { item:RoomType }) => {
-        return (<View style={styles.roomCard}>
-            <View style={styles.roomContent}>
-                <Text style={styles.roomNumber}>Nazwa: {roomType.name}</Text>
-                <Text style={styles.roomPrice}>Cena bazowa: {roomType.basePrice.toFixed(2) || "0.00"} zł</Text>
-                <Text>Opis: {roomType.description || "Brak"}</Text>
-            </View>
-            <View style={styles.roomActions}>
-                <TouchableOpacity
-                    style={styles.editButton}
-                    onPress={() => handleEdit(roomType)}
-                >
-                    <Text style={styles.buttonText}>Edytuj ✏️</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                    style={styles.deleteButton}
-                    onPress={() => handleDelete(roomType)}
-                >
-                    <Text style={styles.buttonText}>Usuń 🗑️</Text>
-                </TouchableOpacity>
-            </View>
-
-        </View>);
-    }
-
-    if(loading) {
+    const renderRoomType = ({ item: roomType }: { item: RoomType }) => {
         return (
-            <View style={styles.centerContainer}>
-                <ActivityIndicator size="large" color="#007AFF" />
-                <Text style={styles.loadingText}>Ładowanie typów pokoi...</Text>
-            </View>
+            <Card style={styles.card} mode="contained">
+                <View style={styles.cardInner}>
+                    <View style={styles.cardHeaderRow}>
+                        <View style={styles.titleContainer}>
+                            <Text variant="titleMedium" style={styles.titleStyleWrapped}>
+                                Nazwa: {roomType.name}
+                            </Text>
+                        </View>
 
+                        <View style={styles.topRightActions}>
+                            <IconButton
+                                icon="pencil"
+                                size={20}
+                                containerColor={theme.colors.surfaceVariant}
+                                iconColor={theme.colors.primary}
+                                onPress={() => handleEdit(roomType)}
+                                style={styles.actionButton}
+                            />
+                            <IconButton
+                                icon="trash-can"
+                                size={20}
+                                containerColor="rgba(207, 102, 121, 0.1)"
+                                iconColor={theme.colors.error}
+                                onPress={() => handleDelete(roomType)}
+                                style={styles.actionButton}
+                            />
+                        </View>
+                    </View>
+
+                    <View style={styles.cardBody}>
+                        <View style={styles.descriptionWrapper}>
+                            <Text variant="bodyMedium" style={[styles.sectionLabel, { color: theme.colors.onSurfaceVariant }]}>
+                                Opis:
+                            </Text>
+                            <Text
+                                variant="bodyMedium"
+                                style={{ color: theme.colors.onSurfaceVariant, flex: 1, opacity: roomType.description ? 1 : 0.7 }}
+                                numberOfLines={2}
+                            >
+                                {roomType.description || "Brak"}
+                            </Text>
+                        </View>
+
+                        <View style={styles.priceContainer}>
+                            <Text variant="bodyMedium" style={{ color: theme.colors.onSurfaceVariant, marginRight: 8 }}>
+                                Cena bazowa:
+                            </Text>
+                            <Text variant="titleMedium" style={{ fontWeight: 'bold', color: theme.colors.primary }}>
+                                {roomType.basePrice.toFixed(2) || "0.00"} zł
+                            </Text>
+                        </View>
+                    </View>
+                </View>
+            </Card>
         );
-    }
+    };
 
-    if(error){
+    if (loading) {
         return (
-            <View style={styles.centerContainer}>
-                <Text style={styles.errorText}>❌ Błąd: {error}</Text>
+            <View style={[styles.container, styles.centerContainer, { backgroundColor: theme.colors.background }]}>
+                <ActivityIndicator size="large" color={theme.colors.primary} />
+                <Text variant="bodySmall" style={styles.loadingText}>Ładowanie...</Text>
             </View>
         );
     }
 
     return (
-        <View style={styles.container}>
-            <View style={styles.header}>
-                <Text style={styles.title}>Typy pokoi ({roomTypes.length})</Text>
-                <TouchableOpacity
-                    style={styles.addButton}
-                    onPress={() => navigation.navigate('AddRoomType')}
-                >
-                    <Text style={styles.addButtonText}>+ Dodaj</Text>
-                </TouchableOpacity>
-            </View>
+        <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
+            <Surface style={styles.header} elevation={2}>
+                <View>
+                    <Text variant="headlineSmall" style={styles.headerTitle}>Typy pokoi</Text>
+                </View>
+                <View style={[styles.badge, { backgroundColor: theme.colors.primary }]}>
+                    <Text variant="titleMedium" style={styles.badgeText}>{roomTypes.length}</Text>
+                </View>
+            </Surface>
 
             <FlatList
                 data={roomTypes}
@@ -101,8 +128,17 @@ function RoomTypesScreen({ navigation }: Props) {
                 keyExtractor={(roomType) => roomType.roomTypeId.toString()}
                 contentContainerStyle={styles.listContent}
                 ListEmptyComponent={
-                    <Text style={styles.emptyText}>Brak typów pokoi</Text>
+                    <View style={styles.centerContainer}>
+                        <Text variant="bodyMedium" style={{ color: theme.colors.onSurfaceVariant }}>Brak typów pokoi</Text>
+                    </View>
                 }
+            />
+
+            <FAB
+                icon="plus"
+                style={[styles.fab, { backgroundColor: theme.colors.primary }]}
+                color={theme.colors.onPrimary}
+                onPress={() => navigation.navigate('AddRoomType')}
             />
         </View>
     );
@@ -110,112 +146,104 @@ function RoomTypesScreen({ navigation }: Props) {
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
-        backgroundColor: '#f5f5f5',
+        flex: 1
     },
     centerContainer: {
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-    },
-    loadingText: {
-        marginTop: 10,
-        fontSize: 16,
-        color: '#666',
-    },
-    errorText: {
-        fontSize: 16,
-        color: 'red',
-        textAlign: 'center',
+        padding: 16
     },
     header: {
+        paddingTop: 16,
+        paddingHorizontal: 24,
+        paddingBottom: 24,
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        padding: 16,
-        backgroundColor: '#fff',
-        borderBottomWidth: 1,
-        borderBottomColor: '#ddd',
+        borderBottomLeftRadius: 24,
+        borderBottomRightRadius: 24
     },
-    title: {
-        fontSize: 24,
+    headerTitle: {
         fontWeight: 'bold',
-        color: '#333',
+        letterSpacing: 0.5
     },
-    addButton: {
-        backgroundColor: '#007AFF',
+    badge: {
         paddingHorizontal: 16,
-        paddingVertical: 8,
-        borderRadius: 8,
+        paddingVertical: 6,
+        borderRadius: 12,
+        minWidth: 48,
+        alignItems: 'center',
+        justifyContent: 'center'
     },
-    addButtonText: {
-        color: '#fff',
-        fontWeight: '600',
+    badgeText: {
+        color: '#000',
+        fontWeight: 'bold',
+        fontSize: 14
+    },
+    loadingText: {
+        marginTop: 16,
+        opacity: 0.6
     },
     listContent: {
-        padding: 16,
+        padding: 20,
+        paddingBottom: 100
     },
-    roomCard: {
-        flexDirection: 'row',
-        backgroundColor: '#fff',
-        padding: 12,
+    card: {
         marginBottom: 12,
-        borderRadius: 8,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 1 },
-        shadowOpacity: 0.1,
-        shadowRadius: 2,
-        elevation: 2,
+        borderRadius: 16,
+        overflow: 'hidden'
     },
-    roomContent: {
-        flex: 1,
+    cardInner: {
+        padding: 12
     },
-    roomNumber: {
-        fontSize: 16,
-        fontWeight: '600',
-        color: '#333',
-    },
-    roomPrice: {
-        fontSize: 14,
-        color: '#007AFF',
-        marginTop: 4,
-        fontWeight: '500',
-    },
-    roomType: {
-        fontSize: 12,
-        color: '#666',
-        marginTop: 2,
-    },
-    itemUnit: {
-        fontSize: 12,
-        color: '#666',
-        marginTop: 2,
-    },
-    roomActions: {
+    cardHeaderRow: {
         flexDirection: 'row',
-        columnGap: 8,  // gap wspierany od RN 0.71+
+        alignItems: 'flex-start'
     },
-    editButton: {
-        backgroundColor: '#4CAF50',
-        padding: 10,
-        borderRadius: 6,
+    titleContainer: {
+        flex: 1,
+        marginRight: 12,
         justifyContent: 'center',
+        paddingTop: 4
     },
-    deleteButton: {
-        backgroundColor: '#F44336',
-        padding: 10,
-        borderRadius: 6,
-        justifyContent: 'center',
+    titleStyleWrapped: {
+        fontWeight: 'bold',
+        flexWrap: 'wrap'
     },
-    buttonText: {
-        fontSize: 18,
+    topRightActions: {
+        flexDirection: 'row',
+        gap: 4
     },
-    emptyText: {
-        textAlign: 'center',
-        fontSize: 16,
-        color: '#999',
-        marginTop: 40,
+    actionButton: {
+        margin: 0
     },
+    cardBody: {
+        paddingTop: 12,
+        paddingBottom: 4
+    },
+    descriptionWrapper: {
+        flexDirection: 'row',
+        alignItems: 'flex-start',
+        marginBottom: 8
+    },
+    sectionLabel: {
+        fontWeight: 'bold',
+        marginRight: 4
+    },
+    priceContainer: {
+        marginTop: 16,
+        flexDirection: 'row',
+        justifyContent: 'flex-start',
+        alignItems: 'center'
+    },
+    fab: {
+        position: 'absolute',
+        margin: 16,
+        right: 0,
+        bottom: 16,
+        borderRadius: 16
+    }
 });
 
 export default RoomTypesScreen;
