@@ -25,6 +25,7 @@ import AdditionalOffersScreen from "../screens/additionalOffers/AdditionalOffers
 import UpdateAdditionalOfferScreen from "../screens/additionalOffers/UpdateAdditionalOfferScreen.tsx";
 import ReservationsScreen from "../screens/reservations/ReservationsScreen.tsx";
 import CreateReservationScreen from "../screens/reservations/CreateReservationScreen.tsx";
+import UpdateReservationScreen from "../screens/reservations/UpdateReservationScreen.tsx";
 
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -155,7 +156,11 @@ function RootNavigator(): React.JSX.Element {
                     component={CreateReservationScreen}
                     options={{title: "Dodaj rezerwacje"}}
                 />
-                
+                <Stack.Screen
+                    name="UpdateReservation"
+                    component={UpdateReservationScreen}
+                    options={{title: "Edytuj rezerwacje"}}
+                />
             </Stack.Navigator>
         </NavigationContainer>
         
