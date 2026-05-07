@@ -1,88 +1,68 @@
-﻿import {NativeStackScreenProps} from "@react-navigation/native-stack";
-import {RootStackParamList} from "../../navigation/types.ts";
-import {ActivityIndicator, Alert, Button, ScrollView, StyleSheet, Text, TextInput, View} from "react-native";
-import {useState} from "react";
-import {useAdditionalOffers} from "../../context/AdditionalOffersContext.tsx";
+﻿import React, { useState } from 'react';
+import { View, StyleSheet, ScrollView, Alert } from 'react-native';
+import { NativeStackScreenProps } from "@react-navigation/native-stack";
+import { RootStackParamList } from "../../navigation/types.ts";
+import { useAdditionalOffers } from "../../context/AdditionalOffersContext.tsx";
+import { TextInput, Button, Card, Text, useTheme } from 'react-native-paper';
 
 type Props = NativeStackScreenProps<RootStackParamList, "UpdateAdditionalOffer">;
 
-function UpdateAdditionalOfferScreen({navigation, route} : Props) {
-
+function UpdateAdditionalOfferScreen({ navigation, route }: Props) {
+    const theme = useTheme();
     const { additionalOffer } = route.params;
-
     const { updateAdditionalOffer } = useAdditionalOffers();
-
-    const [name, setName] = useState(additionalOffer.name || "");
-    const [price, setPrice] = useState(additionalOffer.price?.toString() || "");
-
-    const [loading, setLoading] = useState(false);
+    const [name, setName] = useState(additionalOffer.name);
+    const [price, setPrice] = useState(additionalOffer.price.toString());
     const [submitting, setSubmitting] = useState(false);
 
     const handleSubmit = async () => {
-
-        if (!name.trim()){
-            Alert.alert("Błąd", "Podaj nazwę");
-            return;
-        }
-
-        if (!price.trim() || parseFloat(price) < 0) {
-            Alert.alert("Błąd", "Podaj poprawną cenę");
-            return;
-        }
+        if (!name.trim()) return Alert.alert("Błąd", "Podaj nazwę oferty");
+        const parsedPrice = parseFloat(price);
+        if (!price.trim() || parsedPrice < 0) return Alert.alert("Błąd", "Podaj poprawną cenę");
 
         try {
             setSubmitting(true);
-            await updateAdditionalOffer(additionalOffer.additionalOfferId, {
-                additionalOfferId: additionalOffer.additionalOfferId,
-                name: name,
-                price: parseFloat(price),
-            });
-
-            Alert.alert("Sukces", "Oferta dodatkowa została zaaktualizowana", [
-                { text: "OK", onPress: () => navigation.goBack() },
-            ])
+            await updateAdditionalOffer(additionalOffer.additionalOfferId, { additionalOfferId: additionalOffer.additionalOfferId, name: name.trim(), price: parsedPrice });
+            Alert.alert("Sukces", "Oferta została zaktualizowana", [{ text: "OK", onPress: () => navigation.goBack() }]);
         } catch (err) {
             Alert.alert("Błąd", (err as Error).message);
         } finally {
             setSubmitting(false);
         }
-    }
-
-    if (loading) {
-        return (
-            <View style={styles.centerContainer}>
-                <ActivityIndicator size="large" />
-            </View>
-        );
-    }
+    };
 
     return (
-        <ScrollView style={styles.container}>
-            <View style={styles.form}>
-                <Text style={styles.label}>Nazwa *</Text>
-                <TextInput style={styles.input} value={name} onChangeText={setName} editable={!submitting} />
+        <ScrollView style={{ backgroundColor: theme.colors.background }} contentContainerStyle={styles.scrollContent}>
+            <Card style={styles.card} mode="contained">
+                <Card.Content style={styles.form}>
+                    <Text variant="headlineSmall" style={styles.title}>Edycja oferty</Text>
+                    <TextInput label="Nazwa usługi *" mode="outlined" value={name} onChangeText={setName} editable={!submitting} style={styles.input}
+                               outlineColor={theme.colors.outline} activeOutlineColor={theme.colors.primary} />
 
-                <Text style={styles.label}>Cena (PLN) *</Text>
-                <TextInput style={styles.input} value={price} onChangeText={setPrice} editable={!submitting} keyboardType="numeric" />
+                    <TextInput label="Cena (PLN) *" mode="outlined" value={price} onChangeText={setPrice} editable={!submitting} keyboardType="decimal-pad"
+                               style={styles.input} outlineColor={theme.colors.outline} activeOutlineColor={theme.colors.primary} left={<TextInput.Affix text="zł" />} />
 
-                <View style={styles.buttons}>
-                    <Button title="Anuluj" onPress={() => navigation.goBack()} color="#999" disabled={submitting} />
-                    <Button title={submitting ? 'Wysyłanie...' : 'Zapisz'} onPress={handleSubmit} disabled={submitting} />
-                </View>
-            </View>
+                    <View style={styles.buttonWrapper}>
+                        <Button mode="outlined" onPress={() => navigation.goBack()} style={styles.button} disabled={submitting} 
+                                textColor={theme.colors.onSurfaceVariant}>Anuluj</Button>
+                        <Button mode="contained" onPress={handleSubmit} style={styles.button} loading={submitting} disabled={submitting}
+                                buttonColor={theme.colors.primary} textColor={theme.colors.onPrimary}>Zapisz</Button>
+                    </View>
+                </Card.Content>
+            </Card>
         </ScrollView>
     );
-
 }
 
 const styles = StyleSheet.create({
-    container: { flex: 1, backgroundColor: '#f5f5f5' },
-    centerContainer: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-    form: { padding: 16 },
-    label: { fontSize: 14, fontWeight: '600', color: '#333', marginBottom: 8, marginTop: 16 },
-    input: { borderWidth: 1, borderColor: '#ddd', borderRadius: 8, padding: 12, fontSize: 16, backgroundColor: '#fff' },
-    multiline: { height: 80, textAlignVertical: 'top' },
-    buttons: { flexDirection: 'row', columnGap: 10, marginTop: 20, marginBottom: 30 },
+    scrollContent: { padding: 16, marginTop: 50, flexGrow: 1 },
+    card: { borderRadius: 24, paddingVertical: 8 },
+    form: { gap: 16 },
+    title: { fontWeight: 'bold', textAlign: 'center' },
+    subtitle: { textAlign: 'center', opacity: 0.5, marginTop: -8, marginBottom: 8 },
+    input: { backgroundColor: 'transparent' },
+    buttonWrapper: { flexDirection: 'row', gap: 12, marginTop: 16 },
+    button: { flex: 1, borderRadius: 12, paddingVertical: 4 },
 });
 
 export default UpdateAdditionalOfferScreen;
