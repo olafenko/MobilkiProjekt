@@ -1,110 +1,139 @@
-﻿import {NativeStackScreenProps} from "@react-navigation/native-stack";
-import {RootStackParamList} from "../../navigation/types.ts";
-import {Guest} from "../../types/models.ts";
-import {ActivityIndicator, Alert, FlatList, StyleSheet, Text, TouchableOpacity, View} from "react-native";
-import {useEffect} from "react";
-import {useGuests} from "../../context/GuestsContext.tsx";
+﻿import React, { useEffect, useState } from "react";
+import { Alert, FlatList, StyleSheet, View, RefreshControl } from "react-native";
+import { NativeStackScreenProps } from "@react-navigation/native-stack";
+import { RootStackParamList } from "../../navigation/types.ts";
+import { Guest } from "../../types/models.ts";
+import { useGuests } from "../../context/GuestsContext.tsx";
+import { Text, Card, Button, ActivityIndicator, FAB, useTheme, Avatar, IconButton, Surface } from "react-native-paper";
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Guests'>;
 
 function GuestsScreen({ navigation }: Props) {
-
-    const { guests, loading, error, refreshGuests, deleteGuest} = useGuests();
+    const { guests, loading, error, refreshGuests, deleteGuest } = useGuests();
+    const theme = useTheme();
+    const [refreshing, setRefreshing] = useState(false);
 
     useEffect(() => {
         refreshGuests();
     }, []);
 
-    const handleDelete = (guest: Guest)=> {
+    const onRefresh = async () => {
+        setRefreshing(true);
+        await refreshGuests();
+        setRefreshing(false);
+    };
 
-        Alert.alert("Usuwanie gościa",`Czy na pewno usunąć gościa ${guest.firstName} ${guest.lastName}?`,
+    const handleDelete = (guest: Guest) => {
+        Alert.alert(
+            "Usuwanie profilu",
+            `Czy na pewno usunąć gościa ${guest.firstName} ${guest.lastName}?`,
             [
-                { text: "Anuluj", style: 'cancel'},
+                { text: "Anuluj", style: 'cancel' },
                 {
-                    text: "Usuń", style: 'destructive',
+                    text: "Usuń",
+                    style: 'destructive',
                     onPress: async () => {
                         try {
                             await deleteGuest(guest.guestId);
-                            Alert.alert("Operacja powiodła się.","Usunięto gościa.");
-                        } catch (err: any){
-                            const errMessage = err instanceof Error ? err.message : "Unknown error";
-                            Alert.alert("Błąd",errMessage);
+                        } catch (err) {
+                            const errMessage = err instanceof Error ? err.message : "Nieznany błąd";
+                            Alert.alert("Błąd", errMessage);
                         }
                     }
                 },
-            ]);
-
-    }
+            ]
+        );
+    };
 
     const handleEdit = (guest: Guest) => {
-        navigation.navigate('UpdateGuest',{ guest });
-    }
+        navigation.navigate('UpdateGuest', { guest });
+    };
 
-    const renderGuest = ({item: guest } : { item: Guest }) => {
-        return (<View style={styles.card}>
-            <View style={styles.cardContent}>
-                <Text style={styles.mainText}>{guest.firstName} {guest.lastName}</Text>
-                <Text style={styles.subText}>Email: {guest.email || "Brak"}</Text>
-                <Text style={styles.subText}>Nr tel.: {guest.phoneNumber || "Brak"}</Text>
-                <Text style={styles.subText}>Nr dowodu osobistego: {guest.identityCardNumber || "Brak"}</Text>
-            </View>
-            <View style={styles.actions}>
-                <TouchableOpacity
-                    style={styles.editButton}
-                    onPress={() => handleEdit(guest)}
-                >
-                    <Text style={styles.buttonText}>Edytuj ✏️</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                    style={styles.deleteButton}
-                    onPress={() => handleDelete(guest)}
-                >
-                    <Text style={styles.buttonText}>Usuń 🗑️</Text>
-                </TouchableOpacity>
-            </View>
-
-        </View>);
-    }
-
-    if(loading) {
+    const renderGuest = ({ item: guest }: { item: Guest }) => {
         return (
-            <View style={styles.centerContainer}>
-                <ActivityIndicator size="large" color="#007AFF" />
-                <Text style={styles.loadingText}>Ładowanie gości...</Text>
-            </View>
+            <Card style={styles.card} mode="contained">
+                <View style={styles.cardInner}>
+                    <View style={styles.cardHeaderRow}>
+                        <Avatar.Icon icon="account-circle" size={40} color={theme.colors.onPrimary} style={{ backgroundColor: theme.colors.primary, marginTop: 4 }}
+                        />
 
+                        <View style={styles.titleContainer}>
+                            <Text variant="titleMedium" style={styles.titleStyleWrapped}>
+                                {`${guest.firstName} ${guest.lastName}`}
+                            </Text>
+                        </View>
+
+                        <View style={styles.topRightActions}>
+                            <IconButton icon="pencil" size={20} containerColor={theme.colors.surfaceVariant} iconColor={theme.colors.primary}
+                                        onPress={() => handleEdit(guest)} style={styles.actionButton}
+                            />
+                            <IconButton icon="trash-can" size={20} containerColor="rgba(207, 102, 121, 0.1)" iconColor={theme.colors.error}
+                                onPress={() => handleDelete(guest)} style={styles.actionButton}
+                            />
+                        </View>
+                    </View>
+
+                    <View style={styles.cardBody}>
+                        <Text variant="bodyMedium" style={{ color: theme.colors.onSurfaceVariant, marginBottom: 2 }}>
+                            Email: {guest.email || "Brak"}
+                        </Text>
+                        <Text variant="bodyMedium" style={{ color: theme.colors.onSurfaceVariant, marginBottom: 2 }}>
+                            Tel: {guest.phoneNumber || "Brak"}
+                        </Text>
+                        <Text variant="bodyMedium" style={{ color: theme.colors.onSurfaceVariant }}>
+                            ID: {guest.identityCardNumber || "Brak"}
+                        </Text>
+                    </View>
+                </View>
+            </Card>
+        );
+    };
+
+    if (loading && !refreshing) {
+        return (
+            <View style={[styles.container, styles.centerContainer, { backgroundColor: theme.colors.background }]}>
+                <ActivityIndicator size="large" color={theme.colors.primary} />
+                <Text variant="bodySmall" style={styles.loadingText}>Ładowanie...</Text>
+            </View>
         );
     }
 
-    if(error){
+    if (error) {
         return (
-            <View style={styles.centerContainer}>
-                <Text style={styles.errorText}>❌ Błąd: {error}</Text>
+            <View style={[styles.container, styles.centerContainer, { backgroundColor: theme.colors.background }]}>
+                <IconButton icon="wifi-off" iconColor={theme.colors.error} size={48} />
+                <Text variant="titleMedium" style={{ color: theme.colors.error, marginTop: 8 }}>Błąd</Text>
+                <Button mode="text" textColor={theme.colors.primary} onPress={refreshGuests} style={{ marginTop: 12 }}>Ponów próbę</Button>
             </View>
         );
     }
 
     return (
-        <View style={styles.container}>
-            <View style={styles.header}>
-                <Text style={styles.title}>Goście ({guests.length})</Text>
-                <TouchableOpacity
-                    style={styles.addButton}
-                    onPress={() => navigation.navigate('AddGuest')}
-                >
-                    <Text style={styles.addButtonText}>+ Dodaj</Text>
-                </TouchableOpacity>
-            </View>
+        <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
+            <Surface style={styles.header} elevation={2}>
+                <View>
+                    <Text variant="headlineSmall" style={styles.headerTitle}>Baza Gości</Text>
+                </View>
+                <View style={[styles.badge, { backgroundColor: theme.colors.primary }]}>
+                    <Text variant="titleMedium" style={styles.badgeText}>{guests.length}</Text>
+                </View>
+            </Surface>
 
             <FlatList
                 data={guests}
                 renderItem={renderGuest}
                 keyExtractor={(guest) => guest.guestId.toString()}
                 contentContainerStyle={styles.listContent}
+                refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={theme.colors.primary} />}
                 ListEmptyComponent={
-                    <Text style={styles.emptyText}>Brak gości</Text>
+                    <View style={styles.centerContainer}>
+                        <Text variant="bodyMedium" style={{ color: theme.colors.onSurfaceVariant }}>Brak gości w bazie</Text>
+                    </View>
                 }
             />
+
+            <FAB icon="plus" style={[styles.fab, { backgroundColor: theme.colors.primary }]} color={theme.colors.onPrimary}
+                 onPress={() => navigation.navigate('AddGuest')} />
         </View>
     );
 }
@@ -112,101 +141,88 @@ function GuestsScreen({ navigation }: Props) {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#f5f5f5',
     },
     centerContainer: {
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-    },
-    loadingText: {
-        marginTop: 10,
-        fontSize: 16,
-        color: '#666',
-    },
-    errorText: {
-        fontSize: 16,
-        color: 'red',
-        textAlign: 'center',
+        padding: 16,
     },
     header: {
+        paddingTop: 16,
+        paddingHorizontal: 24,
+        paddingBottom: 24,
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        padding: 16,
-        backgroundColor: '#fff',
-        borderBottomWidth: 1,
-        borderBottomColor: '#ddd',
+        borderBottomLeftRadius: 24,
+        borderBottomRightRadius: 24,
     },
-    title: {
-        fontSize: 24,
+    headerTitle: {
         fontWeight: 'bold',
-        color: '#333',
+        letterSpacing: 0.5,
     },
-    addButton: {
-        backgroundColor: '#007AFF',
+    badge: {
         paddingHorizontal: 16,
-        paddingVertical: 8,
-        borderRadius: 8,
+        paddingVertical: 6,
+        borderRadius: 12,
+        minWidth: 48,
+        alignItems: 'center',
+        justifyContent: 'center',
     },
-    addButtonText: {
-        color: '#fff',
-        fontWeight: '600',
+    badgeText: {
+        color: '#000',
+        fontWeight: 'bold',
+        fontSize: 14,
+    },
+    loadingText: {
+        marginTop: 16,
+        opacity: 0.6,
     },
     listContent: {
-        padding: 16,
+        padding: 20,
+        paddingBottom: 100,
     },
     card: {
-        flexDirection: 'row',
-        backgroundColor: '#fff',
-        padding: 12,
         marginBottom: 12,
-        borderRadius: 8,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 1 },
-        shadowOpacity: 0.1,
-        shadowRadius: 2,
-        elevation: 2,
+        borderRadius: 16,
+        overflow: 'hidden',
     },
-    cardContent: {
-        flex: 1,
-        justifyContent: 'center',
+    cardInner: {
+        padding: 12,
     },
-    mainText: {
-        fontSize: 16,
-        fontWeight: '600',
-        color: '#333',
-    },
-    subText: {
-        fontSize: 14,
-        color: '#666',
-        marginTop: 4,
-    },
-    actions: {
+    cardHeaderRow: {
         flexDirection: 'row',
-        columnGap: 8,
-        alignItems: 'center',
+        alignItems: 'flex-start',
     },
-    editButton: {
-        backgroundColor: '#4CAF50',
-        padding: 10,
-        borderRadius: 6,
+    titleContainer: {
+        flex: 1,
+        marginHorizontal: 12,
         justifyContent: 'center',
+        paddingTop: 12,
     },
-    deleteButton: {
-        backgroundColor: '#F44336',
-        padding: 10,
-        borderRadius: 6,
-        justifyContent: 'center',
+    titleStyleWrapped: {
+        fontWeight: 'bold',
+        flexWrap: 'wrap',
     },
-    buttonText: {
-        fontSize: 18,
+    topRightActions: {
+        flexDirection: 'row',
+        gap: 4,
     },
-    emptyText: {
-        textAlign: 'center',
-        fontSize: 16,
-        color: '#999',
-        marginTop: 40,
+    actionButton: {
+        margin: 0,
+    },
+    cardBody: {
+        paddingTop: 8,
+        paddingLeft: 52,
+        paddingBottom: 8,
+    },
+    fab: {
+        position: 'absolute',
+        margin: 16,
+        right: 0,
+        bottom: 16,
+        borderRadius: 16,
     },
 });
 
