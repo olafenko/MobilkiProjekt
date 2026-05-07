@@ -11,17 +11,11 @@ type Props = NativeStackScreenProps<RootStackParamList, 'Guests'>;
 function GuestsScreen({ navigation }: Props) {
     const { guests, loading, error, refreshGuests, deleteGuest } = useGuests();
     const theme = useTheme();
-    const [refreshing, setRefreshing] = useState(false);
+
 
     useEffect(() => {
         refreshGuests();
     }, []);
-
-    const onRefresh = async () => {
-        setRefreshing(true);
-        await refreshGuests();
-        setRefreshing(false);
-    };
 
     const handleDelete = (guest: Guest) => {
         Alert.alert(
@@ -89,7 +83,7 @@ function GuestsScreen({ navigation }: Props) {
         );
     };
 
-    if (loading && !refreshing) {
+    if (loading) {
         return (
             <View style={[styles.container, styles.centerContainer, { backgroundColor: theme.colors.background }]}>
                 <ActivityIndicator size="large" color={theme.colors.primary} />
@@ -124,7 +118,6 @@ function GuestsScreen({ navigation }: Props) {
                 renderItem={renderGuest}
                 keyExtractor={(guest) => guest.guestId.toString()}
                 contentContainerStyle={styles.listContent}
-                refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={theme.colors.primary} />}
                 ListEmptyComponent={
                     <View style={styles.centerContainer}>
                         <Text variant="bodyMedium" style={{ color: theme.colors.onSurfaceVariant }}>Brak gości w bazie</Text>

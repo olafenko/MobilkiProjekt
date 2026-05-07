@@ -130,8 +130,6 @@ function AdditionalOffersScreen({ navigation }: Props) {
                 renderItem={renderOffer}
                 keyExtractor={(item) => item.additionalOfferId.toString()}
                 contentContainerStyle={styles.listContent}
-                onRefresh={refreshAdditionalOffers}
-                refreshing={loading}
                 ListEmptyComponent={
                     <View style={styles.emptyContainer}>
                         <Text variant="bodyMedium" style={{ color: theme.colors.onSurfaceVariant }}>Brak ofert w systemie</Text>

@@ -11,17 +11,11 @@ type Props = NativeStackScreenProps<RootStackParamList, 'Amenities'>;
 function AmenitiesScreen({ navigation }: Props) {
     const { amenities, loading, error, refreshAmenities, deleteAmenity } = useAmenities();
     const theme = useTheme();
-    const [refreshing, setRefreshing] = useState(false);
 
     useEffect(() => {
         refreshAmenities();
     }, []);
-
-    const onRefresh = async () => {
-        setRefreshing(true);
-        await refreshAmenities();
-        setRefreshing(false);
-    };
+    
 
     const handleDelete = (amenity: Amenity) => {
         Alert.alert(
@@ -78,7 +72,7 @@ function AmenitiesScreen({ navigation }: Props) {
         );
     };
 
-    if (loading && !refreshing) {
+    if (loading) {
         return (
             <View style={[styles.container, styles.centerContainer, { backgroundColor: theme.colors.background }]}>
                 <ActivityIndicator size="large" color={theme.colors.primary} />
@@ -112,8 +106,7 @@ function AmenitiesScreen({ navigation }: Props) {
                 data={amenities}
                 renderItem={renderAmenity}
                 keyExtractor={(amenity) => amenity.amenityId.toString()}
-                contentContainerStyle={styles.listContent}
-                refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={theme.colors.primary} />}
+                contentContainerStyle={styles.listContent} 
                 ListEmptyComponent={
                     <View style={styles.centerContainer}>
                         <Text variant="bodyMedium" style={{ color: theme.colors.onSurfaceVariant }}>Brak udogodnień</Text>
