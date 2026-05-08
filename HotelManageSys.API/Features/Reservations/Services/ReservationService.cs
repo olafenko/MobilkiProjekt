@@ -88,7 +88,7 @@ namespace HotelManageSys.API.Features.Reservations.Services
                 else throw new ArgumentException("Do stworzenia rezerwacji muszą zostać podane dane gościa.");
 
                 var room = await _context.Rooms.Include(r => r.RoomType).FirstOrDefaultAsync(r => r.RoomId == request.RoomId && r.IsActive);
-                var nights = (request.CheckOutDate - request.CheckInDate).Days;
+                var nights = (int)Math.Ceiling((request.CheckOutDate - request.CheckInDate).TotalDays);
                 var totalPrice = room.RoomType.BasePrice * nights;
 
                 var reservation = request.Adapt<Reservation>();
@@ -134,8 +134,8 @@ namespace HotelManageSys.API.Features.Reservations.Services
 
             var existingReservation = await _reservationProvider.GetReservationByIdAsync(request.ReservationId, false, cancellationToken);
 
-            var nights = (request.CheckOutDate - request.CheckInDate).Days;
-            if (nights <= 0) throw new ArgumentException("Data wymeldowania musi być późniejsza niż data zameldowania.");
+            var nights = (int)Math.Ceiling((request.CheckOutDate - request.CheckInDate).TotalDays);
+            if (nights < 0) throw new ArgumentException("Data wymeldowania musi być późniejsza niż data zameldowania.");
 
             var isRoomOccupied = await _context.Reservations
                 .AnyAsync(r => r.RoomId == request.RoomId
