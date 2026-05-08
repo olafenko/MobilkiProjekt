@@ -118,8 +118,8 @@ function AdditionalOffersScreen({ navigation }: Props) {
         <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
             <Surface style={styles.header} elevation={2}>
                 <View>
-                    <Text variant="headlineSmall" style={styles.headerTitle}>Katalog Usług</Text>
-                    <Text variant="bodySmall" style={{ color: theme.colors.onSurfaceVariant }}>Zarządzanie ofertami dodatkowymi</Text>
+                    <Text variant="headlineSmall" style={styles.headerTitle}>Oferty dodatkowe</Text>
+                    <Text variant="bodySmall" style={{ color: theme.colors.onSurfaceVariant }}>Zarządzanie usługami</Text>
                 </View>
                 <View style={[styles.badge, { backgroundColor: theme.colors.primary }]}>
                     <Text variant="labelSmall" style={styles.badgeText}>{additionalOffers.length}</Text>

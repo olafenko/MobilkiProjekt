@@ -9,8 +9,8 @@ function HomeScreen({navigation} : Props ) {
 
     return (
         <View style={styles.container}>
-
-            <Text variant="headlineMedium" style={styles.title}>Menu główne</Text>
+            
+            <Text variant="headlineMedium" style={styles.title}>PANEL GŁÓWNY</Text>
 
             <View style={styles.buttonContainer}>
                 <Button icon="star-outline" mode="outlined" style={styles.menuButton} textColor="#C5A059" onPress={() => navigation.navigate('Amenities')}>
@@ -56,7 +56,7 @@ const styles = StyleSheet.create({
     menuButton: {
         paddingVertical: 8,
         borderColor: 'rgba(197, 160, 89, 0.4)',
-        borderWidth: 1,
+        borderWidth: 2,
         borderRadius: 12,
     }
 });
