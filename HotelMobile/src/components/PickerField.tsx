@@ -1,6 +1,6 @@
 ﻿import React from 'react';
-import {StyleSheet, Text, TouchableOpacity, View} from "react-native";
-
+import { StyleSheet, TouchableOpacity, View } from "react-native";
+import { Text, useTheme } from "react-native-paper";
 
 interface PickerFieldProps<T>{
     label: string;
@@ -12,37 +12,85 @@ interface PickerFieldProps<T>{
     required?: boolean;
 }
 
-export function PickerField<T>({label, items, selectedValue,getValue,getLabel,onChange,required = true}: PickerFieldProps<T>) {
-    
-    return (<View>
-        <Text style={styles.label}>{label}{required && <Text style={styles.required}> *</Text>}</Text>
-        <View style={styles.pickerContainer}>
-            {items.map((item) => {
-                const val = getValue(item);
-                const isSelected = selectedValue === val;
-                return (
-                <TouchableOpacity
-                    key={val}
-                    style={[styles.chip, isSelected && styles.chipSelected]}
-                    onPress={() => onChange(val)}
-                >
-                    <Text style={[styles.chipText, isSelected && styles.chipTextSelected]}>{getLabel(item)}</Text>
-                </TouchableOpacity>
-            );
-            })
-            }
+export function PickerField<T>({label, items, selectedValue, getValue, getLabel, onChange, required = true}: PickerFieldProps<T>) {
+
+    const theme = useTheme();
+
+    return (
+        <View style={styles.container}>
+            <Text variant="bodyMedium" style={[styles.label, { color: theme.colors.onSurfaceVariant }]}>
+                {label}{required && <Text style={styles.required}> *</Text>}
+            </Text>
+
+            <View style={styles.pickerContainer}>
+                {items.map((item) => {
+                    const val = getValue(item);
+                    const isSelected = selectedValue === val;
+
+                    return (
+                        <TouchableOpacity
+                            key={val}
+                            style={[
+                                styles.chip,
+                                { borderColor: theme.colors.outlineVariant },
+                                isSelected && styles.chipSelected
+                            ]}
+                            onPress={() => onChange(val)}
+                            activeOpacity={0.7}
+                        >
+                            <Text
+                                variant="labelLarge"
+                                style={[
+                                    styles.chipText,
+                                    { color: theme.colors.onSurfaceVariant },
+                                    isSelected && styles.chipTextSelected
+                                ]}
+                            >
+                                {getLabel(item)}
+                            </Text>
+                        </TouchableOpacity>
+                    );
+                })}
+            </View>
         </View>
-    </View>);
-    
+    );
 }
 
 const styles = StyleSheet.create({
-    label: { fontSize: 14, fontWeight: '600', color: '#333', marginBottom: 8, marginTop: 16 },
-    pickerContainer: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 8 },
-    chip: { paddingHorizontal: 16, paddingVertical: 10, borderRadius: 8, backgroundColor: '#e0e0e0', borderWidth: 2, borderColor: '#e0e0e0' },
-    chipSelected: { backgroundColor: '#007AFF', borderColor: '#007AFF' },
-    chipText: { fontSize: 14, fontWeight: '600', color: '#333' },
-    chipTextSelected: { color: '#fff' },
-    required: { color: '#F44336' },
+    container: {
+        marginBottom: 8,
+        marginTop: 8
+    },
+    label: {
+        marginBottom: 8,
+        fontWeight: 'bold'
+    },
+    pickerContainer: {
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        gap: 8,
+        marginBottom: 8
+    },
+    chip: {
+        paddingHorizontal: 16,
+        paddingVertical: 8,
+        borderRadius: 20,
+        backgroundColor: 'transparent',
+        borderWidth: 1,
+    },
+    chipSelected: {
+        backgroundColor: 'rgba(197, 160, 89, 0.1)',
+        borderColor: '#C5A059',
+        borderWidth: 1
+    },
+    chipText: {
+        fontWeight: '500',
+    },
+    chipTextSelected: {
+        color: '#C5A059',
+        fontWeight: 'bold'
+    },
+    required: {
+        color: '#CF6679'
+    },
 });
-

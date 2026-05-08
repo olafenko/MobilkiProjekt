@@ -1,5 +1,6 @@
-﻿import {StyleSheet, Text, TouchableOpacity, View} from "react-native";
+﻿import { StyleSheet, TouchableOpacity, View } from "react-native";
 import React from "react";
+import { Text, useTheme } from "react-native-paper";
 
 interface MultiPickerFieldProps<T>{
     label: string;
@@ -14,6 +15,8 @@ interface MultiPickerFieldProps<T>{
 
 export function MultiPickerField<T>({label, items, selectedValues,getValue,getLabel,onChange,required = true}: MultiPickerFieldProps<T>) {
     
+    const theme = useTheme();
+    
     const toggleSelect = (item: T) => {
         const value = getValue(item);
         if( selectedValues.includes(value)){
@@ -22,10 +25,13 @@ export function MultiPickerField<T>({label, items, selectedValues,getValue,getLa
             onChange([...selectedValues,value])
         }
     };
-    
+
     return (
-        <View>
-            <Text style={styles.label}>{label}{required && <Text style={styles.required}> *</Text>}</Text>
+        <View style={styles.container}>
+            <Text variant="bodyMedium" style={[styles.label, { color: theme.colors.onSurfaceVariant }]}>
+                {label}{required && <Text style={styles.required}> *</Text>}
+            </Text>
+
             <View style={styles.pickerContainer}>
                 {items.map((item) => {
                     const val = getValue(item);
@@ -33,26 +39,44 @@ export function MultiPickerField<T>({label, items, selectedValues,getValue,getLa
                     return (
                         <TouchableOpacity
                             key={val}
-                            style={[styles.chip, isSelected && styles.chipSelected]}
+                            style={[
+                                styles.chip,
+                                { borderColor: theme.colors.outlineVariant },
+                                isSelected && styles.chipSelected
+                            ]}
                             onPress={() => toggleSelect(item)}
-                            activeOpacity={0.5}
+                            activeOpacity={0.7}
                         >
-                            <Text style={[styles.chipText, isSelected && styles.chipTextSelected]}>{getLabel(item)}</Text>
+                            <Text
+                                variant="labelLarge"
+                                style={[
+                                    styles.chipText,
+                                    { color: theme.colors.onSurfaceVariant },
+                                    isSelected && styles.chipTextSelected 
+                                ]}
+                            >
+                                {getLabel(item)}
+                            </Text>
                         </TouchableOpacity>
                     );
-                })
-                }
-                
+                })}
             </View>
-    </View>
+        </View>
     );
-    
 }
 
 const styles = StyleSheet.create({
-    container: { marginBottom: 16 },
-    label: { fontSize: 14, fontWeight: '600', color: '#333', marginBottom: 8, marginTop: 16 },
-    required: { color: 'red' },
+    container: {
+        marginBottom: 8,
+        marginTop: 8
+    },
+    label: {
+        marginBottom: 8,
+        fontWeight: 'bold'
+    },
+    required: {
+        color: '#CF6679'
+    },
     pickerContainer: {
         flexDirection: 'row',
         flexWrap: 'wrap',
@@ -60,22 +84,21 @@ const styles = StyleSheet.create({
     },
     chip: {
         paddingHorizontal: 16,
-        paddingVertical: 10,
-        borderRadius: 8,
-        backgroundColor: '#e0e0e0',
-        borderWidth: 2,
-        borderColor: '#e0e0e0',
+        paddingVertical: 8,
+        borderRadius: 20,
+        backgroundColor: 'transparent',
+        borderWidth: 1,
     },
     chipSelected: {
-        backgroundColor: '#007AFF',
-        borderColor: '#007AFF',
+        backgroundColor: 'rgba(197, 160, 89, 0.1)',
+        borderColor: '#C5A059',
+        borderWidth: 1,
     },
     chipText: {
-        fontSize: 14,
-        fontWeight: '600',
-        color: '#333',
+        fontWeight: '500',
     },
     chipTextSelected: {
-        color: '#fff',
+        color: '#C5A059',
+        fontWeight: 'bold',
     },
 });

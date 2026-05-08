@@ -165,7 +165,14 @@ function AddReservationScreen({ navigation }: Props) {
 
                     {showPicker && <DateTimePicker value={showPicker === 'in' ? checkIn : checkOut} mode="date" onChange={onDateChange} minimumDate={showPicker === 'out' ? checkIn : new Date()} />}
 
-                    <LargePickerField label="Pokój *" value={selectedRoomId} items={rooms} getValue={r => r.roomId} getLabel={r => `Pokój ${r.number} (${r.roomTypeName}) - ${r.basePrice} zł/doba`} onChange={val => setSelectedRoomId(val as number | null)} required />
+                    <LargePickerField
+                        label="Pokój"
+                        value={selectedRoomId}
+                        items={rooms} getValue={r => r.roomId} 
+                        getLabel={r => `Pokój ${r.number} (${r.roomTypeName}) - ${r.basePrice} zł/doba`}
+                        onChange={val => setSelectedRoomId(val as number | null)}
+                        required
+                    />
 
                     <Divider style={[styles.divider, { backgroundColor: theme.colors.outlineVariant }]} />
 
@@ -209,11 +216,12 @@ function AddReservationScreen({ navigation }: Props) {
 
                     {guestType === 'existing' ? (
                         <LargePickerField
-                            label="Wybierz gościa z systemu *"
+                            label="Wybierz gościa z systemu"
                             value={selectedGuestId} items={guests}
                             getValue={g => g.guestId}
                             getLabel={g => `${g.firstName} ${g.lastName} (${g.identityCardNumber || 'Brak dowodu'})`}
                             onChange={val => setSelectedGuestId(val as number | null)}
+                            required
                         />
                     ) : (
                         <View style={styles.gap}>
@@ -240,7 +248,7 @@ function AddReservationScreen({ navigation }: Props) {
                     <Divider style={[styles.divider, { backgroundColor: theme.colors.outlineVariant }]} />
 
                     <PickerField
-                        label="Status rezerwacji *"
+                        label="Status rezerwacji"
                         selectedValue={status}
                         items={statuses}
                         getValue={s => s}
@@ -264,7 +272,7 @@ function AddReservationScreen({ navigation }: Props) {
                             }
                         <Divider style={{ marginVertical: 8, backgroundColor: theme.colors.outlineVariant }} />
                         <View style={styles.summaryRow}>
-                            <Text variant="titleMedium" style={{ color: theme.colors.primary, fontWeight: 'bold' }}>RAZEM BRUTTO</Text>
+                            <Text variant="titleMedium" style={{ color: theme.colors.primary, fontWeight: 'bold' }}>RAZEM</Text>
                             <Text variant="titleMedium" style={{ color: theme.colors.primary, fontWeight: 'bold' }}>{summary.grandTotal.toFixed(2)} zł</Text>
                         </View>
                     </Surface>

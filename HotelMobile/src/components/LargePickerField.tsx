@@ -1,5 +1,7 @@
-﻿import {StyleSheet, Text, View} from "react-native";
-import {Picker} from "@react-native-picker/picker";
+﻿import { StyleSheet, View } from "react-native";
+import { Picker } from "@react-native-picker/picker";
+import React from "react";
+import { Text, useTheme } from "react-native-paper";
 
 interface PickerFieldProps<T> {
     label: string;
@@ -15,32 +17,41 @@ interface PickerFieldProps<T> {
 }
 
 export function LargePickerField<T>({
-                                   label,
-                                   value,
-                                   items,
-                                   getValue,
-                                   getLabel,
-                                   onChange,
-                                   placeholder = 'Wybierz...',
-                                   required = false,
-                                   disabled = false,
-                                   error,
-                               }: PickerFieldProps<T>) {
+                                        label,
+                                        value,
+                                        items,
+                                        getValue,
+                                        getLabel,
+                                        onChange,
+                                        placeholder = 'Wybierz...',
+                                        required = false,
+                                        disabled = false,
+                                        error,
+                                    }: PickerFieldProps<T>) {
+    const theme = useTheme();
+
     return (
         <View style={styles.container}>
-            <Text style={styles.label}>
+            <Text variant="bodyMedium" style={[styles.label, { color: theme.colors.onSurfaceVariant }]}>
                 {label}
                 {required && <Text style={styles.required}> *</Text>}
             </Text>
             <View style={[
                 styles.pickerContainer,
+                { borderColor: theme.colors.outline },
                 disabled && styles.disabled,
                 error && styles.errorBorder,
             ]}>
                 <Picker
                     selectedValue={value}
                     onValueChange={onChange}
-                    style={styles.picker}
+                    style={[
+                        styles.picker,
+                        {
+                            color: theme.colors.onSurface,
+                        }
+                    ]}
+                    dropdownIconColor={theme.colors.onSurface}
                     enabled={!disabled}
                 >
                     <Picker.Item label={placeholder} value={null} />
@@ -59,17 +70,34 @@ export function LargePickerField<T>({
 }
 
 const styles = StyleSheet.create({
-    container: { marginBottom: 16 },
-    label: { fontWeight: '600', marginBottom: 8, color: '#333' },
-    required: { color: '#F44336' },
-    pickerContainer: {
-        backgroundColor: '#fff',
-        borderRadius: 4,
-        borderWidth: 1,
-        borderColor: '#ddd',
+    container: {
+        marginVertical: 20
     },
-    picker: { height: 50 },
-    disabled: { backgroundColor: '#f5f5f5', opacity: 0.7 },
-    errorBorder: { borderColor: '#F44336' },
-    errorText: { color: '#F44336', fontSize: 12, marginTop: 4 },
+    label: {
+        fontWeight: 'bold',
+        marginBottom: 8
+    },
+    required: {
+        color: '#CF6679'
+    },
+    pickerContainer: {
+        backgroundColor: 'transparent',
+        borderRadius: 8,
+        borderWidth: 1,
+        overflow: 'hidden'
+    },
+    picker: {
+        height: 50
+    },
+    disabled: {
+        opacity: 0.5
+    },
+    errorBorder: {
+        borderColor: '#CF6679'
+    },
+    errorText: {
+        color: '#CF6679',
+        fontSize: 12,
+        marginTop: 4
+    },
 });
