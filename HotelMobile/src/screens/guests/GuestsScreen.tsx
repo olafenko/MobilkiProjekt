@@ -1,12 +1,13 @@
 ﻿import React, { useEffect, useState } from "react";
 import { Alert, FlatList, StyleSheet, View, RefreshControl } from "react-native";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { RootStackParamList } from "../../navigation/types.ts";
+import {HomePageStackParamList, RootStackParamList} from "../../navigation/types.ts";
 import { Guest } from "../../types/models.ts";
 import { useGuests } from "../../context/GuestsContext.tsx";
 import { Text, Card, Button, ActivityIndicator, FAB, useTheme, Avatar, IconButton, Surface } from "react-native-paper";
+import {CompositeScreenProps} from "@react-navigation/native";
 
-type Props = NativeStackScreenProps<RootStackParamList, 'Guests'>;
+type Props = CompositeScreenProps<NativeStackScreenProps<HomePageStackParamList, 'Guests'>,NativeStackScreenProps<RootStackParamList>>;
 
 function GuestsScreen({ navigation }: Props) {
     const { guests, loading, error, refreshGuests, deleteGuest } = useGuests();
@@ -88,16 +89,6 @@ function GuestsScreen({ navigation }: Props) {
             <View style={[styles.container, styles.centerContainer, { backgroundColor: theme.colors.background }]}>
                 <ActivityIndicator size="large" color={theme.colors.primary} />
                 <Text variant="bodySmall" style={styles.loadingText}>Ładowanie...</Text>
-            </View>
-        );
-    }
-
-    if (error) {
-        return (
-            <View style={[styles.container, styles.centerContainer, { backgroundColor: theme.colors.background }]}>
-                <IconButton icon="wifi-off" iconColor={theme.colors.error} size={48} />
-                <Text variant="titleMedium" style={{ color: theme.colors.error, marginTop: 8 }}>Błąd</Text>
-                <Button mode="text" textColor={theme.colors.primary} onPress={refreshGuests} style={{ marginTop: 12 }}>Ponów próbę</Button>
             </View>
         );
     }

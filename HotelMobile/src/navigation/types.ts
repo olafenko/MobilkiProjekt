@@ -3,37 +3,49 @@
 
 export type RootStackParamList = {
     
-    Home: undefined;
+    BottomNavigator:  undefined;
     
-    Rooms: undefined;
     AddRoom: undefined;
     UpdateRoom: { room: Room};
     
-    RoomTypes: undefined;
     AddRoomType: undefined;
     UpdateRoomType: { roomType: RoomType};
     
-    Amenities: undefined;
     AddAmenity: undefined;
     UpdateAmenity: { amenity: Amenity};
     
-    Reservations: undefined;
     AddReservation: undefined;
     UpdateReservation: { reservation: Reservation};
     
-    Workers: undefined;
     AddWorker: undefined;
     UpdateWorker: { worker: Worker};
     
-    Guests: undefined;
     AddGuest: undefined;
     UpdateGuest: { guest: Guest};
-
-    Payments: undefined;
+    
     AddPayment: undefined;
     
-    AdditionalOffers: undefined;
     AddAdditionalOffer: undefined;
     UpdateAdditionalOffer: { additionalOffer: AdditionalOffer};
     
+}
+
+export type BottomNavigationParamList = {
+    
+        HomePage: undefined;
+        Rooms: undefined;
+        Reservations: undefined;
+        RoomTypes: undefined;
+        
+}
+
+export type HomePageStackParamList = {
+    
+    Home: undefined;
+    Amenities: undefined;
+    Workers: undefined;
+    Guests: undefined;
+    Payments: undefined;
+    AdditionalOffers: undefined;
+
 }

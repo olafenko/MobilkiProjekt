@@ -16,7 +16,7 @@ namespace HotelManageSys.API.Features.Reservations.Mappings
                 .Map(d => d.RoomTypeName, src => src.Room != null ? src.Room.RoomType.Name : null)
                 .Map(d => d.WorkerFullName, src => src.Worker != null ? $"{src.Worker.FirstName} {src.Worker.LastName}" : null)
                 .Map(d => d.ReservationStatus, src => src.ReservationStatus.ToString())
-                .Map(d => d.NightCount, src => (src.CheckOutDate - src.CheckInDate).Days)
+                .Map(d => d.NightCount, src => (int)Math.Ceiling((src.CheckOutDate - src.CheckInDate).TotalDays))
                 .Map(d => d.AmountPaid, src => src.Payments != null ? src.Payments.Where(p => p.PaymentStatus == PaymentStatus.PAID).Sum(p => p.Price) : 0)
                 .Map(d => d.AmountRemaining, src => src.Payments != null ? src.TotalPrice - src.Payments.Where(p => p.PaymentStatus == PaymentStatus.PAID).Sum(p => p.Price) : 0)
                 .Map(d => d.AdditionalOffers, src => src.ReservationAdditionalOffers != null ? src.ReservationAdditionalOffers.Where(rao => rao.IsActive) : new List<ReservationAdditionalOffer>());

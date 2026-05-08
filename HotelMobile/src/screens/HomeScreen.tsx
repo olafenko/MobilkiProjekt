@@ -1,48 +1,40 @@
 ﻿import {StyleSheet, View} from "react-native";
 import {NativeStackScreenProps} from "@react-navigation/native-stack";
-import {RootStackParamList} from "../navigation/types.ts";
-import { Button, Text } from "react-native-paper";
+import {HomePageStackParamList} from "../navigation/types.ts";
+import {Button, Text} from "react-native-paper";
 
-type Props = NativeStackScreenProps<RootStackParamList, 'Home'>;
+type Props = NativeStackScreenProps<HomePageStackParamList, 'Home'>;
 
 function HomeScreen({navigation} : Props ) {
-   
-    
+
     return (
         <View style={styles.container}>
-            
+
             <Text variant="headlineMedium" style={styles.title}>Menu główne</Text>
-            
+
             <View style={styles.buttonContainer}>
-                <Button icon="calendar-month-outline" mode="outlined" style={styles.menuButton}   onPress={() => navigation.navigate('Reservations')}>
-                    Rezerwacje
-                </Button>
-                <Button icon="door" mode="outlined" style={styles.menuButton}  onPress={() => navigation.navigate('Rooms')}>
-                    Pokoje
-                </Button>
-                <Button icon="format-list-bulleted-type" mode="outlined" style={styles.menuButton}   onPress={() => navigation.navigate('RoomTypes')}>
-                    Typy pokoi
-                </Button>
-                <Button icon="star-outline" mode="outlined" style={styles.menuButton}   onPress={() => navigation.navigate('Amenities')}>
+                <Button icon="star-outline" mode="outlined" style={styles.menuButton} textColor="#C5A059" onPress={() => navigation.navigate('Amenities')}>
                     Udogodnienia
                 </Button>
-                <Button icon="account-group" mode="outlined" style={styles.menuButton}   onPress={() => navigation.navigate('Guests')}>
+
+                <Button icon="account-group" mode="outlined" style={styles.menuButton} textColor="#C5A059" onPress={() => navigation.navigate('Guests')}>
                     Baza gości
                 </Button>
-                <Button icon="account-tie" mode="outlined" style={styles.menuButton}   onPress={() => navigation.navigate('Workers')}>
+
+                <Button icon="account-tie" mode="outlined" style={styles.menuButton} textColor="#C5A059" onPress={() => navigation.navigate('Workers')}>
                     Baza pracowników
                 </Button>
-                <Button icon="credit-card-outline" mode="outlined" style={styles.menuButton}   onPress={() => navigation.navigate('Payments')}>
+
+                <Button icon="credit-card-outline" mode="outlined" style={styles.menuButton} textColor="#C5A059" onPress={() => navigation.navigate('Payments')}>
                     Płatności
                 </Button>
-                <Button icon="room-service-outline" mode="outlined" style={styles.menuButton}   onPress={() => navigation.navigate('AdditionalOffers')}>
+
+                <Button icon="room-service-outline" mode="outlined" style={styles.menuButton} textColor="#C5A059" onPress={() => navigation.navigate('AdditionalOffers')}>
                     Oferty dodatkowe
                 </Button>
             </View>
         </View>
-        
     );
-    
 }
 
 const styles = StyleSheet.create({
@@ -50,20 +42,23 @@ const styles = StyleSheet.create({
         flex: 1,
         padding: 16,
         justifyContent: 'center',
+        backgroundColor: '#1e1e26',
     },
     title: {
         textAlign: 'center',
         marginBottom: 32,
         fontWeight: 'bold',
+        color: '#C5A059',
     },
     buttonContainer: {
-        gap: 12,
+        gap: 16,
     },
     menuButton: {
-        paddingVertical: 6,
+        paddingVertical: 8,
+        borderColor: 'rgba(197, 160, 89, 0.4)',
+        borderWidth: 1,
+        borderRadius: 12,
     }
-    
 });
-
 
 export default HomeScreen;

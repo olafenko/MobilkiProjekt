@@ -1,12 +1,13 @@
 ﻿import React, { useEffect } from 'react';
 import { Alert, FlatList, StyleSheet, View } from 'react-native';
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { RootStackParamList } from "../../navigation/types.ts";
+import {HomePageStackParamList, RootStackParamList} from "../../navigation/types.ts";
 import { Worker } from "../../types/models.ts";
 import { useWorkers } from "../../context/WorkersContext.tsx";
 import { ActivityIndicator, Card, FAB, IconButton, Surface, Text, useTheme } from 'react-native-paper';
+import {CompositeScreenProps} from "@react-navigation/native";
 
-type Props = NativeStackScreenProps<RootStackParamList, 'Workers'>;
+type Props = CompositeScreenProps<NativeStackScreenProps<HomePageStackParamList, 'Workers'>,NativeStackScreenProps<RootStackParamList>>;
 
 function WorkersScreen({ navigation }: Props) {
     const { workers, loading, refreshWorkers, deleteWorker } = useWorkers();

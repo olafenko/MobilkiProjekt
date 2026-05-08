@@ -1,12 +1,13 @@
 ﻿import React, { useEffect } from 'react';
 import { View, FlatList, StyleSheet, Alert } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { RootStackParamList } from '../../navigation/types.ts';
+import {BottomNavigationParamList, HomePageStackParamList, RootStackParamList} from '../../navigation/types.ts';
 import { useReservations } from '../../context/ReservationsContext.tsx';
 import { Reservation } from '../../types/models.ts';
 import { Text, Card, Button, ActivityIndicator, FAB, Chip, useTheme, Avatar, IconButton, Surface } from 'react-native-paper';
+import {CompositeScreenProps} from "@react-navigation/native";
 
-type Props = NativeStackScreenProps<RootStackParamList, 'Reservations'>;
+type Props = CompositeScreenProps<NativeStackScreenProps<BottomNavigationParamList, 'Reservations'>,NativeStackScreenProps<RootStackParamList>>;
 
 function ReservationsScreen({ navigation }: Props) {
     const { reservations, loading, deleteReservation, refreshReservations } = useReservations();

@@ -1,12 +1,13 @@
 ﻿import React, { useEffect } from 'react';
 import { Alert, FlatList, StyleSheet, View } from 'react-native';
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { RootStackParamList } from "../../navigation/types.ts";
+import {BottomNavigationParamList, RootStackParamList} from "../../navigation/types.ts";
 import { RoomType } from "../../types/models.ts";
 import { useRoomTypes } from "../../context/RoomTypesContext.tsx";
 import { ActivityIndicator, Card, FAB, IconButton, Surface, Text, useTheme } from 'react-native-paper';
+import {CompositeScreenProps} from "@react-navigation/native";
 
-type Props = NativeStackScreenProps<RootStackParamList, 'RoomTypes'>;
+type Props = CompositeScreenProps<NativeStackScreenProps<BottomNavigationParamList, 'RoomTypes'>,NativeStackScreenProps<RootStackParamList>>;
 
 function RoomTypesScreen({ navigation }: Props) {
     const { roomTypes, loading, refreshRoomTypes, deleteRoomType } = useRoomTypes();

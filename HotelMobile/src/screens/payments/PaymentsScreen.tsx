@@ -1,12 +1,13 @@
 ﻿import React, { useEffect } from "react";
 import { Alert, FlatList, StyleSheet, View } from "react-native";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { RootStackParamList } from "../../navigation/types.ts";
+import {HomePageStackParamList, RootStackParamList} from "../../navigation/types.ts";
 import { Payment } from "../../types/models.ts";
 import { usePayments } from "../../context/PaymentsContext.tsx";
 import { Text, Card, Button, ActivityIndicator, FAB, useTheme, Avatar, IconButton, Surface } from "react-native-paper";
+import {CompositeScreenProps} from "@react-navigation/native";
 
-type Props = NativeStackScreenProps<RootStackParamList, 'Payments'>;
+type Props = CompositeScreenProps<NativeStackScreenProps<HomePageStackParamList, 'Payments'>,NativeStackScreenProps<RootStackParamList>>;
 
 function PaymentsScreen({ navigation }: Props) {
     const { payments, loading, error, refreshPayments, deletePayment } = usePayments();
@@ -77,17 +78,7 @@ function PaymentsScreen({ navigation }: Props) {
             </View>
         );
     }
-
-    if (error) {
-        return (
-            <View style={[styles.container, styles.centerContainer, { backgroundColor: theme.colors.background }]}>
-                <IconButton icon="wifi-off" iconColor={theme.colors.error} size={48} />
-                <Text variant="titleMedium" style={{ color: theme.colors.error, marginTop: 8 }}>Błąd połączenia</Text>
-                <Button mode="text" textColor={theme.colors.primary} onPress={refreshPayments} style={{ marginTop: 12 }}>Ponów próbę</Button>
-            </View>
-        );
-    }
-
+    
     return (
         <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
             <Surface style={styles.header} elevation={2}>

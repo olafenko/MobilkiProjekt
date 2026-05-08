@@ -1,7 +1,7 @@
 ﻿import React, { useEffect } from 'react';
 import { View, StyleSheet, FlatList, Alert } from 'react-native';
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { RootStackParamList } from "../../navigation/types.ts";
+import {HomePageStackParamList, RootStackParamList} from "../../navigation/types.ts";
 import { useAdditionalOffers } from "../../context/AdditionalOffersContext.tsx";
 import { AdditionalOffer } from "../../types/models.ts";
 
@@ -15,8 +15,9 @@ import {
     Surface,
     Button,
 } from 'react-native-paper';
+import {CompositeScreenProps} from "@react-navigation/native";
 
-type Props = NativeStackScreenProps<RootStackParamList, 'AdditionalOffers'>;
+type Props = CompositeScreenProps<NativeStackScreenProps<HomePageStackParamList, 'AdditionalOffers'>,NativeStackScreenProps<RootStackParamList>>;
 
 function AdditionalOffersScreen({ navigation }: Props) {
     const theme = useTheme();
