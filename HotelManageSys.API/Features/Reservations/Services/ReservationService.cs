@@ -30,8 +30,8 @@ namespace HotelManageSys.API.Features.Reservations.Services
         {
 
             var workerExists = await _context.Workers.AnyAsync(w => w.WorkerId == request.WorkerId && w.IsActive, cancellationToken);
-            if(!workerExists) throw new ArgumentException($"Pracownik o ID {request.WorkerId} nie istnieje.");
-
+            if (!workerExists) throw new ArgumentException($"Nie znaleziono pracownika o ID{request.WorkerId}");
+           
             if (request.CheckInDate > request.CheckOutDate) throw new ArgumentException("Data zameldowania musi być wcześniej niż data wymeldowania.");
 
             var isRoomOccupied = await _context.Reservations.AnyAsync(r => r.RoomId == request.RoomId && r.IsActive

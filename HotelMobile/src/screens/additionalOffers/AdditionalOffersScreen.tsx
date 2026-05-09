@@ -96,24 +96,7 @@ function AdditionalOffersScreen({ navigation }: Props) {
             </View>
         );
     }
-
-    if (error) {
-        return (
-            <View style={[styles.container, styles.centerContainer, { backgroundColor: theme.colors.background }]}>
-                <IconButton icon="wifi-off" iconColor={theme.colors.error} size={48} />
-                <Text variant="titleMedium" style={{ color: theme.colors.error, marginTop: 8 }}>Błąd połączenia</Text>
-                <Button
-                    mode="text"
-                    textColor={theme.colors.primary}
-                    onPress={refreshAdditionalOffers}
-                    style={styles.retryButton}
-                >
-                    Ponów próbę
-                </Button>
-            </View>
-        );
-    }
-
+    
     return (
         <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
             <Surface style={styles.header} elevation={2}>

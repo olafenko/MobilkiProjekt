@@ -76,8 +76,8 @@ function AddReservationScreen({ navigation }: Props) {
 
         const offersTotal = selectedOffers.reduce((sum, item) => {
             const offerObj = additionalOffers.find(o => o.additionalOfferId === item.additionalOfferId);
-            const qty = parseFloat(item.quantity) || 0;
-            return sum + (offerObj ? offerObj.price * qty : 0);
+            const quantity = parseFloat(item.quantity) || 0;
+            return sum + (offerObj ? offerObj.price * quantity : 0);
         }, 0);
 
         return { nights, roomPricePerNight, roomCostTotal, offersTotal, grandTotal: roomCostTotal + offersTotal };

@@ -1,10 +1,10 @@
-﻿import React, { useEffect } from 'react';
-import { View, FlatList, StyleSheet, Alert } from 'react-native';
-import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import {BottomNavigationParamList, HomePageStackParamList, RootStackParamList} from '../../navigation/types.ts';
-import { useReservations } from '../../context/ReservationsContext.tsx';
-import { Reservation } from '../../types/models.ts';
-import { Text, Card, Button, ActivityIndicator, FAB, Chip, useTheme, Avatar, IconButton, Surface } from 'react-native-paper';
+﻿import React, {useEffect} from 'react';
+import {Alert, FlatList, StyleSheet, View} from 'react-native';
+import {NativeStackScreenProps} from '@react-navigation/native-stack';
+import {BottomNavigationParamList, RootStackParamList} from '../../navigation/types.ts';
+import {useReservations} from '../../context/ReservationsContext.tsx';
+import {Reservation} from '../../types/models.ts';
+import {ActivityIndicator, Avatar, Card, Chip, FAB, IconButton, Surface, Text, useTheme} from 'react-native-paper';
 import {CompositeScreenProps} from "@react-navigation/native";
 
 type Props = CompositeScreenProps<NativeStackScreenProps<BottomNavigationParamList, 'Reservations'>,NativeStackScreenProps<RootStackParamList>>;
@@ -45,15 +45,16 @@ function ReservationsScreen({ navigation }: Props) {
 
     const formatDate = (dateString: string) => {
         const date = new Date(dateString);
-        return date.toLocaleDateString('pl-PL', { day: '2-digit', month: '2-digit', year: 'numeric' });
+        return date.toLocaleDateString('pl-PL', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit'});
     };
 
     const getStatusIcon = (status: string | null) => {
         if (!status) return 'help-circle-outline';
-        const s = status.toLowerCase();
-        if (s.includes('confirm') || s.includes('paid')) return 'check-circle-outline';
-        if (s.includes('pending')) return 'clock-outline';
-        if (s.includes('cancel')) return 'close-circle-outline';
+        
+        if (status.includes('CONFIRMED')) return 'check-circle-outline';
+        if (status.includes('COMPLETED')) return 'check-circle';
+        if (status.includes('PENDING')) return 'clock-outline';
+        if (status.includes('CANCELLED')) return 'close-circle-outline';
         return 'information-outline';
     };
 

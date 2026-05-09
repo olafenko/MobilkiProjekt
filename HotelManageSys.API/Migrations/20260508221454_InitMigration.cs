@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace HotelManageSys.API.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialMigration : Migration
+    public partial class InitMigration : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -153,6 +153,7 @@ namespace HotelManageSys.API.Migrations
                     ReservationDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     CheckInDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     CheckOutDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Notes = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     IsActive = table.Column<bool>(type: "bit", nullable: false),
                     ReservationStatus = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     GuestId = table.Column<int>(type: "int", nullable: false),
@@ -215,7 +216,7 @@ namespace HotelManageSys.API.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     ReservationId = table.Column<int>(type: "int", nullable: false),
                     AdditionalOfferId = table.Column<int>(type: "int", nullable: false),
-                    PurchasePrice = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    OfferPrice = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     Quantity = table.Column<int>(type: "int", nullable: false),
                     Notes = table.Column<string>(type: "nvarchar(300)", maxLength: 300, nullable: true),
                     IsActive = table.Column<bool>(type: "bit", nullable: false)
@@ -242,8 +243,10 @@ namespace HotelManageSys.API.Migrations
                 columns: new[] { "AdditionalOfferId", "IsActive", "Name", "Price" },
                 values: new object[,]
                 {
-                    { 1, true, "Śniadanie", 40m },
-                    { 2, true, "Parking", 25m }
+                    { 1, true, "Śniadanie (Bufet)", 45m },
+                    { 2, true, "Miejsce parkingowe", 30m },
+                    { 3, true, "Szampan", 150m },
+                    { 4, true, "Przedłużone wymeldowanie", 100m }
                 });
 
             migrationBuilder.InsertData(
@@ -251,28 +254,41 @@ namespace HotelManageSys.API.Migrations
                 columns: new[] { "AmenityId", "Description", "IsActive", "Name" },
                 values: new object[,]
                 {
-                    { 1, "Darmowe wifi", true, "WiFi" },
-                    { 2, "Klimatyzacja", true, "AC" }
+                    { 1, "Darmowy szybki internet", true, "WiFi" },
+                    { 2, "Klimatyzacja sterowana z pokoju", true, "Klimatyzacja" },
+                    { 3, "Kibel", true, "Kibel" },
+                    { 4, "Schłodzone napoje", true, "Minibar" }
                 });
 
             migrationBuilder.InsertData(
                 table: "Guests",
                 columns: new[] { "GuestId", "Email", "FirstName", "IdentityCardNumber", "IsActive", "LastName", "PhoneNumber" },
-                values: new object[] { 1, "pudzian@test.pl", "Mariusz", "ID123", true, "Pudzianowski", "123567345" });
+                values: new object[,]
+                {
+                    { 1, "pudzian@test.pl", "Mariusz", "ID123", true, "Pudzianowski", "123567345" },
+                    { 2, "robert@lewy.pl", "Robert", "PASS987", true, "Lewandowski", "987654321" },
+                    { 3, "iga@tennis.pl", "Iga", "ID456", true, "Świątek", "555666777" }
+                });
 
             migrationBuilder.InsertData(
                 table: "RoomTypes",
                 columns: new[] { "RoomTypeId", "BasePrice", "Description", "IsActive", "Name" },
                 values: new object[,]
                 {
-                    { 1, 180m, "Pokój standardowy", true, "Standard" },
-                    { 2, 350m, "Pokój luksusowy", true, "Deluxe" }
+                    { 1, 180m, "Wygodny pokój standardowy 1-2 os.", true, "Standard" },
+                    { 2, 350m, "Pokój o podwyższonym standardzie z widokiem", true, "Deluxe" },
+                    { 3, 700m, "Przestronny apartament z aneksem kuchennym", true, "Apartament VIP" },
+                    { 4, 450m, "Idealny pokój dla rodziny 2+2", true, "Rodzinny" }
                 });
 
             migrationBuilder.InsertData(
                 table: "Workers",
                 columns: new[] { "WorkerId", "FirstName", "IsActive", "LastName", "Login", "Password", "Role" },
-                values: new object[] { 1, "Adam", true, "Kowalski", "admin", "admin123", "ADMIN" });
+                values: new object[,]
+                {
+                    { 1, "Adam", true, "Kowalski", "admin", "admin123", "ADMIN" },
+                    { 2, "Anna", true, "Nowak", "anowak", "user123", "WORKER" }
+                });
 
             migrationBuilder.InsertData(
                 table: "Rooms",
@@ -280,7 +296,41 @@ namespace HotelManageSys.API.Migrations
                 values: new object[,]
                 {
                     { 1, null, 1, true, "101", 1, "AVAILABLE" },
-                    { 2, null, 2, true, "201", 2, "AVAILABLE" }
+                    { 2, null, 1, true, "102", 1, "OCCUPIED" },
+                    { 3, null, 1, true, "103", 4, "OCCUPIED" },
+                    { 4, null, 2, true, "201", 2, "AVAILABLE" },
+                    { 5, null, 2, true, "202", 2, "AVAILABLE" },
+                    { 6, null, 3, true, "301", 3, "AVAILABLE" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "Reservations",
+                columns: new[] { "ReservationId", "CheckInDate", "CheckOutDate", "GuestId", "IsActive", "Notes", "ReservationDate", "ReservationStatus", "RoomId", "TotalPrice", "WorkerId" },
+                values: new object[,]
+                {
+                    { 1, new DateTime(2024, 1, 10, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2024, 1, 12, 0, 0, 0, 0, DateTimeKind.Unspecified), 1, true, "Jakieś tam uwagi", new DateTime(2024, 1, 5, 0, 0, 0, 0, DateTimeKind.Unspecified), "COMPLETED", 4, 820m, 1 },
+                    { 2, new DateTime(2024, 3, 15, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2024, 3, 20, 0, 0, 0, 0, DateTimeKind.Unspecified), 2, true, "Testowa notatka", new DateTime(2024, 3, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "CONFIRMED", 2, 945m, 2 },
+                    { 3, new DateTime(2024, 5, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2024, 5, 5, 0, 0, 0, 0, DateTimeKind.Unspecified), 3, true, "VIP", new DateTime(2024, 4, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "PENDING", 6, 2800m, 2 }
+                });
+
+            migrationBuilder.InsertData(
+                table: "Payments",
+                columns: new[] { "PaymentId", "IsActive", "PaymentDate", "PaymentMethod", "PaymentStatus", "Price", "ReservationId", "Title" },
+                values: new object[,]
+                {
+                    { 1, true, new DateTime(2024, 1, 10, 0, 0, 0, 0, DateTimeKind.Unspecified), "CARD", "PAID", 820m, 1, "Opłata za pobyt (ID: 1)" },
+                    { 2, true, new DateTime(2024, 3, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "MONEY", "PAID", 200m, 2, "Zaliczka rezerwacyjna" },
+                    { 3, true, new DateTime(2024, 4, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "TRANSFER", "PENDING", 2800m, 3, "Pełna opłata" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "ReservationAdditionalOffers",
+                columns: new[] { "ReservationAdditionalOfferId", "AdditionalOfferId", "IsActive", "Notes", "OfferPrice", "Quantity", "ReservationId" },
+                values: new object[,]
+                {
+                    { 1, 1, true, "", 45m, 2, 1 },
+                    { 2, 2, true, "Nr rej. WA12345", 30m, 1, 1 },
+                    { 3, 1, true, "", 45m, 1, 2 }
                 });
 
             migrationBuilder.CreateIndex(

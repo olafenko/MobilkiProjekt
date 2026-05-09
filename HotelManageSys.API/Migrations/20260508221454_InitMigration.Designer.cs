@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HotelManageSys.API.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260504200812_ReservationRefactor-2")]
-    partial class ReservationRefactor2
+    [Migration("20260508221454_InitMigration")]
+    partial class InitMigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -68,15 +68,29 @@ namespace HotelManageSys.API.Migrations
                         {
                             AdditionalOfferId = 1,
                             IsActive = true,
-                            Name = "Śniadanie",
-                            Price = 40m
+                            Name = "Śniadanie (Bufet)",
+                            Price = 45m
                         },
                         new
                         {
                             AdditionalOfferId = 2,
                             IsActive = true,
-                            Name = "Parking",
-                            Price = 25m
+                            Name = "Miejsce parkingowe",
+                            Price = 30m
+                        },
+                        new
+                        {
+                            AdditionalOfferId = 3,
+                            IsActive = true,
+                            Name = "Szampan",
+                            Price = 150m
+                        },
+                        new
+                        {
+                            AdditionalOfferId = 4,
+                            IsActive = true,
+                            Name = "Przedłużone wymeldowanie",
+                            Price = 100m
                         });
                 });
 
@@ -108,16 +122,30 @@ namespace HotelManageSys.API.Migrations
                         new
                         {
                             AmenityId = 1,
-                            Description = "Darmowe wifi",
+                            Description = "Darmowy szybki internet",
                             IsActive = true,
                             Name = "WiFi"
                         },
                         new
                         {
                             AmenityId = 2,
-                            Description = "Klimatyzacja",
+                            Description = "Klimatyzacja sterowana z pokoju",
                             IsActive = true,
-                            Name = "AC"
+                            Name = "Klimatyzacja"
+                        },
+                        new
+                        {
+                            AmenityId = 3,
+                            Description = "Kibel",
+                            IsActive = true,
+                            Name = "Kibel"
+                        },
+                        new
+                        {
+                            AmenityId = 4,
+                            Description = "Schłodzone napoje",
+                            IsActive = true,
+                            Name = "Minibar"
                         });
                 });
 
@@ -170,6 +198,26 @@ namespace HotelManageSys.API.Migrations
                             IsActive = true,
                             LastName = "Pudzianowski",
                             PhoneNumber = "123567345"
+                        },
+                        new
+                        {
+                            GuestId = 2,
+                            Email = "robert@lewy.pl",
+                            FirstName = "Robert",
+                            IdentityCardNumber = "PASS987",
+                            IsActive = true,
+                            LastName = "Lewandowski",
+                            PhoneNumber = "987654321"
+                        },
+                        new
+                        {
+                            GuestId = 3,
+                            Email = "iga@tennis.pl",
+                            FirstName = "Iga",
+                            IdentityCardNumber = "ID456",
+                            IsActive = true,
+                            LastName = "Świątek",
+                            PhoneNumber = "555666777"
                         });
                 });
 
@@ -211,6 +259,41 @@ namespace HotelManageSys.API.Migrations
                     b.HasIndex("ReservationId");
 
                     b.ToTable("Payments");
+
+                    b.HasData(
+                        new
+                        {
+                            PaymentId = 1,
+                            IsActive = true,
+                            PaymentDate = new DateTime(2024, 1, 10, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            PaymentMethod = "CARD",
+                            PaymentStatus = "PAID",
+                            Price = 820m,
+                            ReservationId = 1,
+                            Title = "Opłata za pobyt (ID: 1)"
+                        },
+                        new
+                        {
+                            PaymentId = 2,
+                            IsActive = true,
+                            PaymentDate = new DateTime(2024, 3, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            PaymentMethod = "MONEY",
+                            PaymentStatus = "PAID",
+                            Price = 200m,
+                            ReservationId = 2,
+                            Title = "Zaliczka rezerwacyjna"
+                        },
+                        new
+                        {
+                            PaymentId = 3,
+                            IsActive = true,
+                            PaymentDate = new DateTime(2024, 4, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            PaymentMethod = "TRANSFER",
+                            PaymentStatus = "PENDING",
+                            Price = 2800m,
+                            ReservationId = 3,
+                            Title = "Pełna opłata"
+                        });
                 });
 
             modelBuilder.Entity("HotelManageSys.API.Models.Reservation", b =>
@@ -261,6 +344,50 @@ namespace HotelManageSys.API.Migrations
                     b.HasIndex("WorkerId");
 
                     b.ToTable("Reservations");
+
+                    b.HasData(
+                        new
+                        {
+                            ReservationId = 1,
+                            CheckInDate = new DateTime(2024, 1, 10, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            CheckOutDate = new DateTime(2024, 1, 12, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            GuestId = 1,
+                            IsActive = true,
+                            Notes = "Jakieś tam uwagi",
+                            ReservationDate = new DateTime(2024, 1, 5, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            ReservationStatus = "COMPLETED",
+                            RoomId = 4,
+                            TotalPrice = 820m,
+                            WorkerId = 1
+                        },
+                        new
+                        {
+                            ReservationId = 2,
+                            CheckInDate = new DateTime(2024, 3, 15, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            CheckOutDate = new DateTime(2024, 3, 20, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            GuestId = 2,
+                            IsActive = true,
+                            Notes = "Testowa notatka",
+                            ReservationDate = new DateTime(2024, 3, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            ReservationStatus = "CONFIRMED",
+                            RoomId = 2,
+                            TotalPrice = 945m,
+                            WorkerId = 2
+                        },
+                        new
+                        {
+                            ReservationId = 3,
+                            CheckInDate = new DateTime(2024, 5, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            CheckOutDate = new DateTime(2024, 5, 5, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            GuestId = 3,
+                            IsActive = true,
+                            Notes = "VIP",
+                            ReservationDate = new DateTime(2024, 4, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            ReservationStatus = "PENDING",
+                            RoomId = 6,
+                            TotalPrice = 2800m,
+                            WorkerId = 2
+                        });
                 });
 
             modelBuilder.Entity("HotelManageSys.API.Models.ReservationAdditionalOffer", b =>
@@ -297,6 +424,38 @@ namespace HotelManageSys.API.Migrations
                     b.HasIndex("ReservationId");
 
                     b.ToTable("ReservationAdditionalOffers");
+
+                    b.HasData(
+                        new
+                        {
+                            ReservationAdditionalOfferId = 1,
+                            AdditionalOfferId = 1,
+                            IsActive = true,
+                            Notes = "",
+                            OfferPrice = 45m,
+                            Quantity = 2,
+                            ReservationId = 1
+                        },
+                        new
+                        {
+                            ReservationAdditionalOfferId = 2,
+                            AdditionalOfferId = 2,
+                            IsActive = true,
+                            Notes = "Nr rej. WA12345",
+                            OfferPrice = 30m,
+                            Quantity = 1,
+                            ReservationId = 1
+                        },
+                        new
+                        {
+                            ReservationAdditionalOfferId = 3,
+                            AdditionalOfferId = 1,
+                            IsActive = true,
+                            Notes = "",
+                            OfferPrice = 45m,
+                            Quantity = 1,
+                            ReservationId = 2
+                        });
                 });
 
             modelBuilder.Entity("HotelManageSys.API.Models.Room", b =>
@@ -347,10 +506,46 @@ namespace HotelManageSys.API.Migrations
                         new
                         {
                             RoomId = 2,
+                            Floor = 1,
+                            IsActive = true,
+                            Number = "102",
+                            RoomTypeId = 1,
+                            Status = "OCCUPIED"
+                        },
+                        new
+                        {
+                            RoomId = 3,
+                            Floor = 1,
+                            IsActive = true,
+                            Number = "103",
+                            RoomTypeId = 4,
+                            Status = "OCCUPIED"
+                        },
+                        new
+                        {
+                            RoomId = 4,
                             Floor = 2,
                             IsActive = true,
                             Number = "201",
                             RoomTypeId = 2,
+                            Status = "AVAILABLE"
+                        },
+                        new
+                        {
+                            RoomId = 5,
+                            Floor = 2,
+                            IsActive = true,
+                            Number = "202",
+                            RoomTypeId = 2,
+                            Status = "AVAILABLE"
+                        },
+                        new
+                        {
+                            RoomId = 6,
+                            Floor = 3,
+                            IsActive = true,
+                            Number = "301",
+                            RoomTypeId = 3,
                             Status = "AVAILABLE"
                         });
                 });
@@ -387,7 +582,7 @@ namespace HotelManageSys.API.Migrations
                         {
                             RoomTypeId = 1,
                             BasePrice = 180m,
-                            Description = "Pokój standardowy",
+                            Description = "Wygodny pokój standardowy 1-2 os.",
                             IsActive = true,
                             Name = "Standard"
                         },
@@ -395,9 +590,25 @@ namespace HotelManageSys.API.Migrations
                         {
                             RoomTypeId = 2,
                             BasePrice = 350m,
-                            Description = "Pokój luksusowy",
+                            Description = "Pokój o podwyższonym standardzie z widokiem",
                             IsActive = true,
                             Name = "Deluxe"
+                        },
+                        new
+                        {
+                            RoomTypeId = 3,
+                            BasePrice = 700m,
+                            Description = "Przestronny apartament z aneksem kuchennym",
+                            IsActive = true,
+                            Name = "Apartament VIP"
+                        },
+                        new
+                        {
+                            RoomTypeId = 4,
+                            BasePrice = 450m,
+                            Description = "Idealny pokój dla rodziny 2+2",
+                            IsActive = true,
+                            Name = "Rodzinny"
                         });
                 });
 
@@ -449,6 +660,16 @@ namespace HotelManageSys.API.Migrations
                             Login = "admin",
                             Password = "admin123",
                             Role = "ADMIN"
+                        },
+                        new
+                        {
+                            WorkerId = 2,
+                            FirstName = "Anna",
+                            IsActive = true,
+                            LastName = "Nowak",
+                            Login = "anowak",
+                            Password = "user123",
+                            Role = "WORKER"
                         });
                 });
 
