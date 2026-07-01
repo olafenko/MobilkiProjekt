@@ -26,7 +26,6 @@ using MediatR;
 
 using HotelManageSys.API.Behaviors;
 
-
 namespace HotelManageSys.API
 {
     public class Program

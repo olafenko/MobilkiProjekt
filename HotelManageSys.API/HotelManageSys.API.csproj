@@ -9,6 +9,8 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="FluentValidation" Version="12.1.1" />
+    <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="12.1.1" />
     <PackageReference Include="Mapster" Version="10.0.6" />
     <PackageReference Include="MediatR" Version="14.1.0" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.2" />
@@ -36,6 +38,7 @@
     <Folder Include="Features\RoomTypes\Validators\Commands\" />
     <Folder Include="Features\RoomTypes\Validators\Queries\" />
     <Folder Include="Features\Workers\" />
+    <Folder Include="Exceptions\" />
   </ItemGroup>
 
 </Project>
