@@ -20,6 +20,7 @@ import {
     UpdateWorkerRequest,
     Worker
 } from "../types/models.ts";
+import {ApiError} from "../types/errors.ts";
 
 class ApiService {
     
@@ -33,43 +34,55 @@ class ApiService {
         
         const url = `${this.baseUrl}${endpoint}`;
 
-        const HeadersCtor = (globalThis as any).Headers;
-        let headers: any;
-        if (HeadersCtor) {
-            headers = new HeadersCtor(options.headers as any);
-            if (!headers.has('Content-Type')) {
-                headers.set('Content-Type', 'application/json');
-            }
-        } else {
-            headers = {
+        const config: RequestInit = {
+            headers: {
                 'Content-Type': 'application/json',
-                ...(options.headers as any),
-            };
-        }
+                ...options.headers,
+            },
+            ...options,
+        };
         
         try {
-            console.log(`API Request: ${options.method || 'GET'} ${url}`);
             
-            const response = await fetch(url, {
-                ...options,
-                headers,
-            });
+            const response = await fetch(url,config);
+            
+            const data = await response.json().catch(() => null);
             
             if(!response.ok){
-                const errorText = await response.text();
-                throw new Error(`HTTP ${response.status}: ${errorText || response.statusText}`);
+                if(data && data.type && data.title){
+                    throw data as ApiError;
+                }
+                
+                throw {
+                    type: 'Error',
+                    title: data?.message || `HTTP ERROR ${response.status}`,
+                    status: response.status,
+                } as ApiError;
+                
             }
-            
-            if(response.status === 204){
-                return {} as T;
-            }
-            
-            const data = await response.json();
-            console.log("API Response: ",data);
-            return data;
+
+            return data as T;
         } catch(error) {
-            console.error("API Error: ", error);
-            throw error;
+            
+            if(error instanceof TypeError && error.message === "Network request failed"){
+                throw {
+                    type: 'NetworkError',
+                    title: 'Brak połączenia z serwerem',
+                    status: 0,
+                    detail: 'Sprawdz połączenie internetowe i spróbuj ponownie'
+                } as ApiError
+            }
+            
+            if(typeof error === 'object' && error !== null && 'type' in error){
+                throw error;
+            }
+            
+            throw {
+                type: 'UnknownError',
+                title: error instanceof Error ? error.message : "Nieznany błąd",
+                status: 500,
+            } as ApiError
+            
         }
     }
     
