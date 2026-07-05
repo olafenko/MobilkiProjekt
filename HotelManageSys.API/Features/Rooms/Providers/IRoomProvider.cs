@@ -23,5 +23,7 @@ namespace HotelManageSys.API.Features.Rooms.Providers
         /// <returns></returns>
         Task<Room> GetRoomByIdAsync(int roomId, bool asNoTracking = true, CancellationToken cancellationToken = default);
 
+        Task<bool> RoomExistsByNumber(string roomNumber, CancellationToken cancellationToken = default);
+
     }
 }

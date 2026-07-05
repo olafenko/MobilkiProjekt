@@ -42,5 +42,10 @@ namespace HotelManageSys.API.Features.Rooms.Providers
 
             return room ?? throw new KeyNotFoundException($"Nie znaleziono pokoju o ID {roomId}");
         }
+
+        public async Task<bool> RoomExistsByNumber(string roomNumber, CancellationToken cancellationToken = default)
+        {
+            return await _dbContext.Rooms.AnyAsync(r => r.Number == roomNumber, cancellationToken);
+        }
     }
 }
