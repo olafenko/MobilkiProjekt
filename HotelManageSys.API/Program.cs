@@ -25,6 +25,7 @@ using Microsoft.AspNetCore.Mvc;
 using MediatR;
 
 using HotelManageSys.API.Behaviors;
+using HotelManageSys.API.Middleware;
 
 namespace HotelManageSys.API
 {
@@ -70,16 +71,16 @@ namespace HotelManageSys.API
 
             var app = builder.Build();
 
-            ConfigureDevelompent(app);
-
+            app.UseMiddleware<ExceptionMiddleware>();
+            
+            ConfigureDevelopment(app);
+            
             app.UseHttpsRedirection();
 
             app.UseAuthorization();
 
             app.MapControllers();
-
-
-
+            
             app.Run();
         }
 
@@ -107,7 +108,6 @@ namespace HotelManageSys.API
             builder.Services.AddScoped<IWorkerService, WorkerService>();
             builder.Services.AddScoped<IPaymentService, PaymentService>();
             builder.Services.AddScoped<IReservationService, ReservationService>();
-
             
         }
 
@@ -123,7 +123,7 @@ namespace HotelManageSys.API
             });
         }
 
-        private static void ConfigureDevelompent(WebApplication app)
+        private static void ConfigureDevelopment(WebApplication app)
         {
             if (app.Environment.IsDevelopment())
             {

@@ -25,7 +25,7 @@ namespace HotelManageSys.API.Behaviors
             }
 
             var requestName = typeof(TRequest).Name;
-            _logger.LogDebug($"Walidacja {requestName}");
+            _logger.LogDebug("Walidacja {requestName}",requestName);
             
             var context = new ValidationContext<TRequest>(request);
 
@@ -45,7 +45,7 @@ namespace HotelManageSys.API.Behaviors
             }
             
             
-            _logger.LogDebug($"Walidacja {requestName} przebiegła pomyślnie");
+            _logger.LogDebug("Walidacja {requestName} przebiegła pomyślnie",requestName);
             
             return await next();
 
