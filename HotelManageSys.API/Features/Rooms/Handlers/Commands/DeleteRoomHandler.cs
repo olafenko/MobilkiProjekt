@@ -1,4 +1,5 @@
-﻿using HotelManageSys.API.Features.Rooms.Messages.Commands;
+﻿using HotelManageSys.API.Exceptions;
+using HotelManageSys.API.Features.Rooms.Messages.Commands;
 using HotelManageSys.API.Features.Rooms.Providers;
 using HotelManageSys.API.Features.Rooms.Services;
 using MediatR;
@@ -22,9 +23,13 @@ namespace HotelManageSys.API.Features.Rooms.Handlers.Commands
 
         public async Task<Unit> Handle(DeleteRoomCommand request, CancellationToken cancellationToken)
         {
-
             var room = await _roomProvider.GetRoomByIdAsync(request.Id,false, cancellationToken);
 
+            if (room == null)
+            {
+                throw new NotFoundException("Room", request.Id);
+            }
+            
             _logger.LogInformation("Usuwanie pokoju ID: {RoomId}", request.Id);
 
             await _roomService.DeleteRoom(room, cancellationToken);

@@ -44,6 +44,7 @@ class ApiService {
         
         try {
             
+            //DO OGARNIECIA RZUCANIE TYCH WYJATKOW
             const response = await fetch(url,config);
             
             const data = await response.json().catch(() => null);

@@ -21,9 +21,10 @@ namespace HotelManageSys.API.Features.Rooms.Providers
         /// <param name="asNoTracking"> declare if no tracking by EF should be enabled or not. Default value is true</param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        Task<Room> GetRoomByIdAsync(int roomId, bool asNoTracking = true, CancellationToken cancellationToken = default);
-
+        Task<Room?> GetRoomByIdAsync(int roomId, bool asNoTracking = true, CancellationToken cancellationToken = default);
+        Task<bool> RoomExistsByIdAsync(int roomId, CancellationToken cancellationToken = default);
         Task<bool> RoomExistsByNumber(string roomNumber, CancellationToken cancellationToken = default);
+        
 
     }
 }
