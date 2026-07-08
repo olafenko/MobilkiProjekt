@@ -42,12 +42,12 @@ namespace HotelManageSys.API.Features.Rooms.Providers
         
         public async Task<bool> RoomExistsByIdAsync(int roomId, CancellationToken cancellationToken = default)
         {
-            return await _dbContext.Rooms.AnyAsync(r => r.RoomId == roomId, cancellationToken);
+            return await _dbContext.Rooms.AnyAsync(r => r.RoomId == roomId && r.IsActive, cancellationToken);
         }
 
         public async Task<bool> RoomExistsByNumber(string roomNumber, CancellationToken cancellationToken = default)
         {
-            return await _dbContext.Rooms.AnyAsync(r => r.Number == roomNumber, cancellationToken);
+            return await _dbContext.Rooms.AnyAsync(r => r.Number == roomNumber && r.IsActive, cancellationToken);
         }
     }
 }

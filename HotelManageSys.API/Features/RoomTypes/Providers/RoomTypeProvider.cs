@@ -38,5 +38,10 @@ namespace HotelManageSys.API.Features.RoomTypes.Providers
 
             return roomType ?? throw new KeyNotFoundException($"Nie znaleziono typu pokoju o ID {roomId}");
         }
+
+        public async Task<bool> RoomTypeExistsByName(string name, CancellationToken cancellationToken = default)
+        {
+            return await _dbContext.RoomTypes.AnyAsync(rt => rt.Name == name && rt.IsActive, cancellationToken);
+        }
     }
 }
