@@ -25,10 +25,7 @@ namespace HotelManageSys.API.Features.Rooms.Handlers.Commands
         {
             var room = await _roomProvider.GetRoomByIdAsync(request.Id,false, cancellationToken);
 
-            if (room == null)
-            {
-                throw new NotFoundException("Room", request.Id);
-            }
+            if (room == null) throw new NotFoundException("Room", request.Id);
             
             _logger.LogInformation("Usuwanie pokoju ID: {RoomId}", request.Id);
 

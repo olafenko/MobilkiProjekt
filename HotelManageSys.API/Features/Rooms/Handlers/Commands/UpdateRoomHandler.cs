@@ -1,4 +1,5 @@
-﻿using HotelManageSys.API.Features.Amenities.Providers;
+﻿using HotelManageSys.API.Exceptions;
+using HotelManageSys.API.Features.Amenities.Providers;
 using HotelManageSys.API.Features.Rooms.Messages.Commands;
 using HotelManageSys.API.Features.Rooms.Providers;
 using HotelManageSys.API.Features.Rooms.Services;
@@ -27,11 +28,13 @@ namespace HotelManageSys.API.Features.Rooms.Handlers.Commands
         {
 
             var room = await _roomProvider.GetRoomByIdAsync(request.RoomId,false, cancellationToken);
+            
+            if (room == null) throw new NotFoundException("Room", request.RoomId);
 
             _logger.LogInformation("Aktualizowanie pokoju ID: {RoomId}", request.RoomId);
 
             request.Adapt(room);
-
+            
             var newAmenities = await _amenityProvider.GetAmenitiesByIdsAsync(request.AmenitiesIds,false,cancellationToken);
 
             room.Amenities = newAmenities;

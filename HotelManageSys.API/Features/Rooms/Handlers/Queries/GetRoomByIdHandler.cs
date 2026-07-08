@@ -1,4 +1,5 @@
-﻿using HotelManageSys.API.Features.Rooms.Messages.Queries;
+﻿using HotelManageSys.API.Exceptions;
+using HotelManageSys.API.Features.Rooms.Messages.Queries;
 using HotelManageSys.API.Features.Rooms.Providers;
 using Mapster;
 using MediatR;
@@ -15,10 +16,14 @@ namespace HotelManageSys.API.Features.Rooms.Handlers.Queries
             _roomProvider = roomProvider;
         }
 
-    public async Task<RoomDTO?> Handle(GetRoomByIdQuery request, CancellationToken cancellationToken)
+    public async Task<RoomDTO> Handle(GetRoomByIdQuery request, CancellationToken cancellationToken)
     {
 
-        return (await _roomProvider.GetRoomByIdAsync(request.Id, true, cancellationToken))?.Adapt<RoomDTO>();
+        var room = await _roomProvider.GetRoomByIdAsync(request.Id, true, cancellationToken);
+
+        if (room == null) throw new NotFoundException("Room", request.Id);
+        
+        return room.Adapt<RoomDTO>();
 
     }
 }
