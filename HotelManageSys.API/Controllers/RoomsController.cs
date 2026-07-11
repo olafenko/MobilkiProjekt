@@ -46,10 +46,8 @@ namespace HotelManageSys.API.Controllers
         {
 
             var query = new GetRoomByIdQuery(id);
-
-            var result = await _mediator.Send(query);
-
-            return result != null ? Ok(result) : NotFound($"Pokój o ID {id} nie istnieje");
+            
+            return  Ok(await _mediator.Send(query));
 
         }
 
@@ -63,17 +61,10 @@ namespace HotelManageSys.API.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> CreateRoom([FromBody] CreateRoomCommand createCommand)
         {
-
             int roomId;
-            try
-            {
-                roomId = await _mediator.Send(createCommand);
-            }
-            catch (KeyNotFoundException ex)
-            {
-                return BadRequest(ex.Message);
-            }
-
+            
+            roomId = await _mediator.Send(createCommand);
+            
             return CreatedAtAction(
                 nameof(GetRoomById),
                 new { id = roomId},
@@ -94,17 +85,8 @@ namespace HotelManageSys.API.Controllers
                 return BadRequest("Id w URL nie jest takie samo jak w body");
             }
 
-            try
-            {
-                await _mediator.Send(updateCommand);
-                return NoContent();
-
-            } catch (KeyNotFoundException ex)
-            {
-                return NotFound(ex.Message);
-            } 
-
-
+            await _mediator.Send(updateCommand);
+            return NoContent();
         }
 
         [HttpDelete("{id}")]
@@ -114,17 +96,9 @@ namespace HotelManageSys.API.Controllers
         {
 
             var deleteCommand = new DeleteRoomCommand(id);
-
-            try
-            {
-                await _mediator.Send(deleteCommand);
-                return NoContent();
-            }
-            catch (KeyNotFoundException ex)
-            {
-                return NotFound(ex.Message);
-            }
-
+            
+            await _mediator.Send(deleteCommand);
+            return NoContent();
         }
 
     }

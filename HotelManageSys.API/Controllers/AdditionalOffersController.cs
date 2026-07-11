@@ -2,7 +2,6 @@ using HotelManageSys.API.Features.AdditionalOffers.DTO_s;
 using HotelManageSys.API.Features.AdditionalOffers.Messages.Commands;
 using HotelManageSys.API.Features.AdditionalOffers.Messages.Queries;
 using MediatR;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HotelManageSys.API.Controllers
@@ -32,10 +31,8 @@ namespace HotelManageSys.API.Controllers
         public async Task<IActionResult> GetAdditionalOfferById(int id)
         {
             var query = new GetAdditionalOfferByIdQuery(id);
-
-            var result = await _mediator.Send(query);
-
-            return result != null ? Ok(result) : NotFound($"Oferta dodatkowa o ID {id} nie istnieje");
+            
+            return Ok(await _mediator.Send(query));
         }
 
         [HttpPost]
@@ -61,16 +58,10 @@ namespace HotelManageSys.API.Controllers
             {
                 return BadRequest("Id w URL nie jest takie samo jak w body");
             }
-
-            try
-            {
-                await _mediator.Send(updateCommand);
-                return NoContent();
-            }
-            catch (KeyNotFoundException ex)
-            {
-                return NotFound(ex.Message);
-            }
+            
+            await _mediator.Send(updateCommand);
+            return NoContent();
+            
         }
 
         [HttpDelete("{id}")]
@@ -79,16 +70,9 @@ namespace HotelManageSys.API.Controllers
         public async Task<IActionResult> DeleteAdditionalOffer(int id)
         {
             var deleteCommand = new DeleteAdditionalOfferCommand(id);
-
-            try
-            {
-                await _mediator.Send(deleteCommand);
-                return NoContent();
-            }
-            catch (KeyNotFoundException ex)
-            {
-                return NotFound(ex.Message);
-            }
+            
+            await _mediator.Send(deleteCommand);
+            return NoContent();
         }
     }
 }
