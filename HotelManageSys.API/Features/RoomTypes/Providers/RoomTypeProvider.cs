@@ -24,7 +24,7 @@ namespace HotelManageSys.API.Features.RoomTypes.Providers
                 .ToListAsync(cancellationToken);
         }
 
-        public async Task<RoomType> GetRoomTypeByIdAsync(int roomId, bool asNoTracking = true, CancellationToken cancellationToken = default)
+        public async Task<RoomType?> GetRoomTypeById(int roomId, bool asNoTracking = true, CancellationToken cancellationToken = default)
         {
             IQueryable<RoomType> query = _dbContext.RoomTypes
                 .Include(rt => rt.Rooms);
@@ -33,10 +33,8 @@ namespace HotelManageSys.API.Features.RoomTypes.Providers
             {
                 query = query.AsNoTracking();
             }
-
-            var roomType = await query.FirstOrDefaultAsync(rt => rt.IsActive && rt.RoomTypeId == roomId, cancellationToken);
-
-            return roomType ?? throw new KeyNotFoundException($"Nie znaleziono typu pokoju o ID {roomId}");
+            
+            return await query.FirstOrDefaultAsync(rt => rt.IsActive && rt.RoomTypeId == roomId, cancellationToken);
         }
 
         public async Task<bool> RoomTypeExistsByName(string name, CancellationToken cancellationToken = default)

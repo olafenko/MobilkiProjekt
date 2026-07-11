@@ -34,7 +34,6 @@
     <Folder Include="Features\Guests\" />
     <Folder Include="Features\Payments\" />
     <Folder Include="Features\RoomTypes\Services\" />
-    <Folder Include="Features\RoomTypes\Validators\Queries\" />
     <Folder Include="Features\Workers\" />
   </ItemGroup>
 

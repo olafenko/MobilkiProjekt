@@ -1,4 +1,5 @@
-﻿using HotelManageSys.API.Features.RoomTypes.DTO_s;
+﻿using HotelManageSys.API.Exceptions;
+using HotelManageSys.API.Features.RoomTypes.DTO_s;
 using HotelManageSys.API.Features.RoomTypes.Messages.Queries;
 using HotelManageSys.API.Features.RoomTypes.Providers;
 using Mapster;
@@ -6,7 +7,7 @@ using MediatR;
 
 namespace HotelManageSys.API.Features.RoomTypes.Handlers.Queries
 {
-    public class GetRoomTypeByIdHandler : IRequestHandler<GetRoomTypeByIdQuery, RoomTypeDTO?>
+    public class GetRoomTypeByIdHandler : IRequestHandler<GetRoomTypeByIdQuery, RoomTypeDTO>
     {
         private readonly IRoomTypeProvider _roomTypeProvider;
 
@@ -15,9 +16,14 @@ namespace HotelManageSys.API.Features.RoomTypes.Handlers.Queries
             _roomTypeProvider = roomTypeProvider;
         }
 
-        public async Task<RoomTypeDTO?> Handle(GetRoomTypeByIdQuery request, CancellationToken cancellationToken)
+        public async Task<RoomTypeDTO> Handle(GetRoomTypeByIdQuery request, CancellationToken cancellationToken)
         {
-            return (await _roomTypeProvider.GetRoomTypeByIdAsync(request.Id, true, cancellationToken))?.Adapt<RoomTypeDTO>();
+
+            var roomType = await _roomTypeProvider.GetRoomTypeById(request.Id, true, cancellationToken);
+            
+            if (roomType == null) throw new NotFoundException("RoomType", request.Id);
+            
+            return roomType.Adapt<RoomTypeDTO>();
         }
     }
 }

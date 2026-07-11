@@ -1,4 +1,5 @@
-﻿using HotelManageSys.API.Features.RoomTypes.Messages.Commands;
+﻿using HotelManageSys.API.Exceptions;
+using HotelManageSys.API.Features.RoomTypes.Messages.Commands;
 using HotelManageSys.API.Features.RoomTypes.Providers;
 using HotelManageSys.API.Features.RoomTypes.Services;
 using MediatR;
@@ -20,7 +21,9 @@ namespace HotelManageSys.API.Features.RoomTypes.Handlers.Commands
 
         public async Task<Unit> Handle(DeleteRoomTypeCommand request, CancellationToken cancellationToken)
         {
-            var roomType = await _roomTypeProvider.GetRoomTypeByIdAsync(request.Id, false, cancellationToken);
+            var roomType = await _roomTypeProvider.GetRoomTypeById(request.Id, false, cancellationToken);
+            
+            if (roomType == null) throw new NotFoundException("RoomType", request.Id);
 
             _logger.LogInformation("Usuwanie typu pokoju ID: {RoomTypeId}", request.Id);
 

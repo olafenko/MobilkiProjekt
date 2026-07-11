@@ -6,7 +6,7 @@ using MediatR;
 
 namespace HotelManageSys.API.Features.Rooms.Handlers.Queries
 {
-    public class GetRoomByIdHandler : IRequestHandler<GetRoomByIdQuery, RoomDTO?>
+    public class GetRoomByIdHandler : IRequestHandler<GetRoomByIdQuery, RoomDTO>
     {
 
         private readonly IRoomProvider _roomProvider;
