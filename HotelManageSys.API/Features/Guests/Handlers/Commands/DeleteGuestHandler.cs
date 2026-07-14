@@ -1,3 +1,4 @@
+using HotelManageSys.API.Exceptions;
 using HotelManageSys.API.Features.Guests.Messages.Commands;
 using HotelManageSys.API.Features.Guests.Providers;
 using HotelManageSys.API.Features.Guests.Services;
@@ -21,7 +22,9 @@ namespace HotelManageSys.API.Features.Guests.Handlers.Commands
         public async Task<Unit> Handle(DeleteGuestCommand request, CancellationToken cancellationToken)
         {
             var guest = await _guestProvider.GetGuestByIdAsync(request.Id, false, cancellationToken);
-
+            
+            if (guest == null) throw new NotFoundException("Guest", request.Id);
+            
             _logger.LogInformation("Usuwanie gościa ID: {GuestId}", request.Id);
 
             await _guestService.DeleteGuest(guest, cancellationToken);

@@ -77,6 +77,13 @@ public class ExceptionMiddleware
                     response.Status = 403;
                     break;
                 
+                case UniqueConstraintException uniqConstrEx:
+                    context.Response.StatusCode = (int)HttpStatusCode.Conflict;
+                    response.Type = "Conflict";
+                    response.Title = uniqConstrEx.Message;
+                    response.Status = 409;
+                    break;
+                
                 default:
                     context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
                     response.Type = "InternalError";

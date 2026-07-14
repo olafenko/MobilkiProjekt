@@ -24,7 +24,7 @@ namespace HotelManageSys.API.Features.Guests.Providers
                 .ToListAsync(cancellationToken);
         }
 
-        public async Task<Guest> GetGuestByIdAsync(int guestId, bool asNoTracking = true, CancellationToken cancellationToken = default)
+        public async Task<Guest?> GetGuestByIdAsync(int guestId, bool asNoTracking = true, CancellationToken cancellationToken = default)
         {
             IQueryable<Guest> query = _dbContext.Guests
                 .Include(g => g.Reservations);
@@ -36,7 +36,22 @@ namespace HotelManageSys.API.Features.Guests.Providers
 
             var guest = await query.FirstOrDefaultAsync(g => g.IsActive && g.GuestId == guestId, cancellationToken);
 
-            return guest ?? throw new KeyNotFoundException($"Nie znaleziono gościa o ID {guestId}");
+            return guest;
+        }
+
+        public async Task<bool> GuestExistsByEmail(string email, CancellationToken cancellationToken = default)
+        {
+            return await _dbContext.Guests.AnyAsync(g => g.Email == email && g.IsActive,cancellationToken);
+        }
+
+        public async Task<bool> GuestExistsByPhoneNumber(string phoneNumber, CancellationToken cancellationToken = default)
+        {
+            return await _dbContext.Guests.AnyAsync(g => g.PhoneNumber == phoneNumber && g.IsActive,cancellationToken);
+        }
+
+        public async Task<bool> GuestExistsByIdentityCardNumber(string identityCardNumber, CancellationToken cancellationToken = default)
+        {
+            return await _dbContext.Guests.AnyAsync(g => g.IdentityCardNumber == identityCardNumber && g.IsActive,cancellationToken);
         }
     }
 }
