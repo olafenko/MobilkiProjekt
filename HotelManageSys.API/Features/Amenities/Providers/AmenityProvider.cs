@@ -23,7 +23,7 @@ namespace HotelManageSys.API.Features.Amenities.Providers
                 .ToListAsync(cancellationToken);
         }
 
-        public async Task<Amenity> GetAmenityByIdAsync(int amenityId, bool asNoTracking = true, CancellationToken cancellationToken = default)
+        public async Task<Amenity?> GetAmenityByIdAsync(int amenityId, bool asNoTracking = true, CancellationToken cancellationToken = default)
         {
             IQueryable<Amenity> query = _dbContext.Amenities;
 
@@ -35,7 +35,7 @@ namespace HotelManageSys.API.Features.Amenities.Providers
             var amenity = await  query.FirstOrDefaultAsync(a => a.IsActive && a.AmenityId == amenityId,cancellationToken);
 
 
-            return amenity ?? throw new KeyNotFoundException($"Nie znaleziono udogodnienia o ID {amenityId}");
+            return amenity;
         }
 
         public async Task<List<Amenity>> GetAmenitiesByIdsAsync(IEnumerable<int> amenityIds, bool asNoTracking = true, CancellationToken cancellationToken = default)
@@ -72,6 +72,9 @@ namespace HotelManageSys.API.Features.Amenities.Providers
             return amenities;
         }
 
-        
+        public async Task<bool> AmenityExistsByName(string name, CancellationToken cancellationToken = default)
+        {
+            return await _dbContext.Amenities.AnyAsync(a => a.Name == name && a.IsActive, cancellationToken);
+        }
     }
 }

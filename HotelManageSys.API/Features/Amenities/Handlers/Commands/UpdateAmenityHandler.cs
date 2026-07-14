@@ -1,3 +1,4 @@
+using HotelManageSys.API.Exceptions;
 using HotelManageSys.API.Features.Amenities.Messages.Commands;
 using HotelManageSys.API.Features.Amenities.Providers;
 using HotelManageSys.API.Features.Amenities.Services;
@@ -23,6 +24,8 @@ namespace HotelManageSys.API.Features.Amenities.Handlers.Commands
         {
             var amenity = await _amenityProvider.GetAmenityByIdAsync(request.AmenityId, false, cancellationToken);
 
+            if (amenity == null) throw new NotFoundException("Amenity",request.AmenityId);
+            
             _logger.LogInformation("Aktualizowanie udogodnienia ID: {AmenityId}", request.AmenityId);
 
             request.Adapt(amenity);

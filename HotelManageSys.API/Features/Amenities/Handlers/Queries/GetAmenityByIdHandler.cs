@@ -1,3 +1,4 @@
+using HotelManageSys.API.Exceptions;
 using HotelManageSys.API.Features.Amenities.DTO_s;
 using HotelManageSys.API.Features.Amenities.Messages.Queries;
 using HotelManageSys.API.Features.Amenities.Providers;
@@ -17,7 +18,11 @@ namespace HotelManageSys.API.Features.Amenities.Handlers.Queries
 
         public async Task<AmenityDTO?> Handle(GetAmenityByIdQuery request, CancellationToken cancellationToken)
         {
-            return (await _amenityProvider.GetAmenityByIdAsync(request.Id, true, cancellationToken))?.Adapt<AmenityDTO>();
+            var amenity = await _amenityProvider.GetAmenityByIdAsync(request.Id, true, cancellationToken);
+            
+            if (amenity == null) throw new NotFoundException("Amenity",request.Id);
+
+            return amenity.Adapt<AmenityDTO>();
         }
     }
 }

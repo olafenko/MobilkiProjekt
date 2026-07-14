@@ -29,8 +29,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Features\Amenities\" />
-    <Folder Include="Features\Guests\" />
     <Folder Include="Features\Payments\" />
     <Folder Include="Features\RoomTypes\Services\" />
     <Folder Include="Features\Workers\" />
