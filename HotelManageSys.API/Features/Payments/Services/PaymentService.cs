@@ -23,13 +23,7 @@ namespace HotelManageSys.API.Features.Payments.Services
         {
             await _context.SaveChangesAsync(cancellationToken);
         }
-
-        public async Task DeletePayment(Payment payment, CancellationToken cancellationToken = default)
-        {
-            payment.IsActive = false;
-            payment.PaymentStatus = PaymentStatus.CANCELLED;
-            await _context.SaveChangesAsync(cancellationToken);
-        }
+        
     }
 }
 

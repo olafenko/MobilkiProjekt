@@ -1,3 +1,4 @@
+using HotelManageSys.API.Exceptions;
 using HotelManageSys.API.Features.Payments.Messages.Commands;
 using HotelManageSys.API.Features.Payments.Providers;
 using HotelManageSys.API.Features.Payments.Services;
@@ -22,6 +23,8 @@ namespace HotelManageSys.API.Features.Payments.Handlers.Commands
         public async Task<Unit> Handle(UpdatePaymentCommand request, CancellationToken cancellationToken)
         {
             var payment = await _paymentProvider.GetPaymentByIdAsync(request.PaymentId, false, cancellationToken);
+
+            if (payment == null) throw new NotFoundException("Payment", request.PaymentId);
 
             _logger.LogInformation("Aktualizowanie płatności ID: {PaymentId}", request.PaymentId);
 

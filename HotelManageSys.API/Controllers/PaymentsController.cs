@@ -34,7 +34,7 @@ namespace HotelManageSys.API.Controllers
 
             var result = await _mediator.Send(query);
 
-            return result != null ? Ok(result) : NotFound($"Płatność o ID {id} nie istnieje");
+            return Ok(result);
         }
 
         [HttpPost]
@@ -71,24 +71,7 @@ namespace HotelManageSys.API.Controllers
                 return NotFound(ex.Message);
             }
         }
-
-        [HttpDelete("{id}")]
-        [ProducesResponseType(StatusCodes.Status204NoContent)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> DeletePayment(int id)
-        {
-            var deleteCommand = new DeletePaymentCommand(id);
-
-            try
-            {
-                await _mediator.Send(deleteCommand);
-                return NoContent();
-            }
-            catch (KeyNotFoundException ex)
-            {
-                return NotFound(ex.Message);
-            }
-        }
+        
     }
 }
 

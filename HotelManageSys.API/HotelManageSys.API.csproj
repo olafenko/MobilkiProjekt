@@ -29,9 +29,13 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Features\Payments\" />
+    <Folder Include="Features\ReservationAdditionalOffers\Validators\Commands\" />
+    <Folder Include="Features\ReservationAdditionalOffers\Validators\Queries\" />
+    <Folder Include="Features\Reservations\Validators\Commands\" />
+    <Folder Include="Features\Reservations\Validators\Queries\" />
     <Folder Include="Features\RoomTypes\Services\" />
-    <Folder Include="Features\Workers\" />
+    <Folder Include="Features\Workers\Validators\Commands\" />
+    <Folder Include="Features\Workers\Validators\Queries\" />
   </ItemGroup>
 
 </Project>

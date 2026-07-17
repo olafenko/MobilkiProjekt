@@ -33,7 +33,7 @@ namespace HotelManageSys.API.Features.Rooms.Validators.Commands
                     .WithErrorCode("STATUS_REQUIRED")
                 .IsInEnum()
                     .WithMessage("Podany status jest nieprawidłowy")
-                    .WithErrorCode("STATUS_UNDENTIFIED");
+                    .WithErrorCode("STATUS_UNIDENTIFIED");
 
             RuleFor(x => x.RoomTypeId)
                 .GreaterThan(0)

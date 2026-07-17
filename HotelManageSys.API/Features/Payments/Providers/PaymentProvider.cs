@@ -23,7 +23,7 @@ namespace HotelManageSys.API.Features.Payments.Providers
                 .ToListAsync(cancellationToken);
         }
 
-        public async Task<Payment> GetPaymentByIdAsync(int paymentId, bool asNoTracking = true, CancellationToken cancellationToken = default)
+        public async Task<Payment?> GetPaymentByIdAsync(int paymentId, bool asNoTracking = true, CancellationToken cancellationToken = default)
         {
             IQueryable<Payment> query = _dbContext.Payments
                 .Include(p => p.Reservation);
@@ -33,9 +33,7 @@ namespace HotelManageSys.API.Features.Payments.Providers
                 query = query.AsNoTracking();
             }
 
-            var payment = await query.FirstOrDefaultAsync(p => p.IsActive && p.PaymentId == paymentId, cancellationToken);
-
-            return payment ?? throw new KeyNotFoundException($"Nie znaleziono płatności o ID {paymentId}");
+            return await query.FirstOrDefaultAsync(p => p.IsActive && p.PaymentId == paymentId, cancellationToken);
         }
     }
 }

@@ -6,7 +6,6 @@ namespace HotelManageSys.API.Features.Payments.Services
     {
         Task CreatePayment(Payment payment, CancellationToken cancellationToken = default);
         Task UpdatePayment(Payment payment, CancellationToken cancellationToken = default);
-        Task DeletePayment(Payment payment, CancellationToken cancellationToken = default);
     }
 }
 
