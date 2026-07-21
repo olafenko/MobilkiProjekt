@@ -31,9 +31,7 @@ namespace HotelManageSys.API.Features.Reservations.Services
 
             var workerExists = await _context.Workers.AnyAsync(w => w.WorkerId == request.WorkerId && w.IsActive, cancellationToken);
             if (!workerExists) throw new ArgumentException($"Nie znaleziono pracownika o ID{request.WorkerId}");
-           
-            if (request.CheckInDate > request.CheckOutDate) throw new ArgumentException("Data zameldowania musi być wcześniej niż data wymeldowania.");
-
+            
             var isRoomOccupied = await _context.Reservations.AnyAsync(r => r.RoomId == request.RoomId && r.IsActive
                     && request.CheckInDate > r.CheckInDate && request.CheckInDate < r.CheckOutDate
                     && request.CheckOutDate > r.CheckInDate && request.CheckOutDate < r.CheckOutDate, cancellationToken);
@@ -57,7 +55,7 @@ namespace HotelManageSys.API.Features.Reservations.Services
                         throw new ArgumentException($"Oferta dodatkowa o ID {additionalOffers[additionalOfferDTO.AdditionalOfferId].Name} jest nie aktywna.");
 
                     if (additionalOfferDTO.Quantity < 0)
-                        throw new ArgumentException($"Ilość oferty musi być większa niż 0");
+                        throw new ArgumentException("Ilość oferty musi być większa niż 0");
 
                 }
 

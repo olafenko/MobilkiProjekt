@@ -33,7 +33,7 @@ public class CreatePaymentValidator : AbstractValidator<CreatePaymentCommand>
             .WithErrorCode("PAYMENT_STATUS_UNIDENTIFIED");
 
         RuleFor(x => x.PaymentDate)
-            .GreaterThanOrEqualTo(DateTime.Today)
+            .GreaterThanOrEqualTo(DateTime.Now.Date)
             .WithMessage("Data płatności nie może być wcześniej niż dzisiejsza data")
             .WithErrorCode("PAYMENT_DATE_INVALID");
 

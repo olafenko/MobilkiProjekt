@@ -1,7 +1,5 @@
 using HotelManageSys.API.Features.Reservations.Messages.Commands;
 using HotelManageSys.API.Features.Reservations.Services;
-using HotelManageSys.API.Models;
-using Mapster;
 using MediatR;
 
 namespace HotelManageSys.API.Features.Reservations.Handlers.Commands
