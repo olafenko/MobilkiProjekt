@@ -1,3 +1,4 @@
+using HotelManageSys.API.Exceptions;
 using HotelManageSys.API.Features.Payments.DTO_s;
 using HotelManageSys.API.Features.Payments.Messages.Queries;
 using HotelManageSys.API.Features.Payments.Providers;
@@ -6,7 +7,7 @@ using MediatR;
 
 namespace HotelManageSys.API.Features.Payments.Handlers.Queries
 {
-    public class GetPaymentByIdHandler : IRequestHandler<GetPaymentByIdQuery, PaymentDTO?>
+    public class GetPaymentByIdHandler : IRequestHandler<GetPaymentByIdQuery, PaymentDTO>
     {
         private readonly IPaymentProvider _paymentProvider;
 
@@ -15,9 +16,13 @@ namespace HotelManageSys.API.Features.Payments.Handlers.Queries
             _paymentProvider = paymentProvider;
         }
 
-        public async Task<PaymentDTO?> Handle(GetPaymentByIdQuery request, CancellationToken cancellationToken)
+        public async Task<PaymentDTO> Handle(GetPaymentByIdQuery request, CancellationToken cancellationToken)
         {
-            return (await _paymentProvider.GetPaymentByIdAsync(request.Id, true, cancellationToken))?.Adapt<PaymentDTO>();
+            var payment = await _paymentProvider.GetPaymentByIdAsync(request.Id, true, cancellationToken);
+            
+            if (payment == null) throw new NotFoundException("Payment", request.Id);
+            
+            return payment.Adapt<PaymentDTO>();
         }
     }
 }

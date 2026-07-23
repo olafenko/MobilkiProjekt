@@ -1,3 +1,4 @@
+using HotelManageSys.API.Exceptions;
 using HotelManageSys.API.Features.Guests.DTO_s;
 using HotelManageSys.API.Features.Guests.Messages.Queries;
 using HotelManageSys.API.Features.Guests.Providers;
@@ -6,7 +7,7 @@ using MediatR;
 
 namespace HotelManageSys.API.Features.Guests.Handlers.Queries
 {
-    public class GetGuestByIdHandler : IRequestHandler<GetGuestByIdQuery, GuestDTO?>
+    public class GetGuestByIdHandler : IRequestHandler<GetGuestByIdQuery, GuestDTO>
     {
         private readonly IGuestProvider _guestProvider;
 
@@ -15,9 +16,13 @@ namespace HotelManageSys.API.Features.Guests.Handlers.Queries
             _guestProvider = guestProvider;
         }
 
-        public async Task<GuestDTO?> Handle(GetGuestByIdQuery request, CancellationToken cancellationToken)
+        public async Task<GuestDTO> Handle(GetGuestByIdQuery request, CancellationToken cancellationToken)
         {
-            return (await _guestProvider.GetGuestByIdAsync(request.Id, true, cancellationToken))?.Adapt<GuestDTO>();
+            var guest = await _guestProvider.GetGuestByIdAsync(request.Id, true, cancellationToken);
+            
+            if (guest == null) throw new NotFoundException("Guest", request.Id);
+            
+            return guest.Adapt<GuestDTO>();
         }
     }
 }

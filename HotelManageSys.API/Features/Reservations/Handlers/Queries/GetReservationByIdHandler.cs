@@ -1,3 +1,4 @@
+using HotelManageSys.API.Exceptions;
 using HotelManageSys.API.Features.Reservations.DTO_s;
 using HotelManageSys.API.Features.Reservations.Messages.Queries;
 using HotelManageSys.API.Features.Reservations.Providers;
@@ -17,7 +18,11 @@ namespace HotelManageSys.API.Features.Reservations.Handlers.Queries
 
         public async Task<ReservationDTO?> Handle(GetReservationByIdQuery request, CancellationToken cancellationToken)
         {
-            return (await _reservationProvider.GetReservationByIdAsync(request.Id, true, cancellationToken))?.Adapt<ReservationDTO>();
+            var reservation = await _reservationProvider.GetReservationByIdAsync(request.Id, true, cancellationToken);
+
+            if (reservation == null) throw new NotFoundException("Reservation", request.Id);
+            
+            return reservation.Adapt<ReservationDTO>();
         }
     }
 }

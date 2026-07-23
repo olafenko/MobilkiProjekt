@@ -1,5 +1,4 @@
-﻿using Azure.Core;
-using HotelManageSys.API.Models;
+﻿using HotelManageSys.API.Models;
 using HotelManageSys.API.Models.Data;
 using Microsoft.EntityFrameworkCore;
 
@@ -27,7 +26,7 @@ namespace HotelManageSys.API.Features.Rooms.Providers
                 .ToListAsync(cancellationToken);
         }
 
-        public async Task<Room> GetRoomByIdAsync(int roomId,bool asNoTracking = true, CancellationToken cancellationToken = default)
+        public async Task<Room?> GetRoomByIdAsync(int roomId,bool asNoTracking = true, CancellationToken cancellationToken = default)
         {
             IQueryable<Room> query = _dbContext.Rooms
                 .Include(r => r.RoomType)
@@ -37,10 +36,18 @@ namespace HotelManageSys.API.Features.Rooms.Providers
             {
                 query = query.AsNoTracking();
             }
+            
+            return await query.FirstOrDefaultAsync(r => r.IsActive && r.RoomId == roomId, cancellationToken);
+        }
+        
+        public async Task<bool> RoomExistsByIdAsync(int roomId, CancellationToken cancellationToken = default)
+        {
+            return await _dbContext.Rooms.AnyAsync(r => r.RoomId == roomId && r.IsActive, cancellationToken);
+        }
 
-            var room = await query.FirstOrDefaultAsync(r => r.IsActive && r.RoomId == roomId, cancellationToken);
-
-            return room ?? throw new KeyNotFoundException($"Nie znaleziono pokoju o ID {roomId}");
+        public async Task<bool> RoomExistsByNumber(string roomNumber, CancellationToken cancellationToken = default)
+        {
+            return await _dbContext.Rooms.AnyAsync(r => r.Number == roomNumber && r.IsActive, cancellationToken);
         }
     }
 }

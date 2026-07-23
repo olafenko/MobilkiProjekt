@@ -4,9 +4,9 @@ const getBaseUrl = (): string => {
     if (__DEV__) {
 
         if (Platform.OS === 'android') {
-            return 'http://192.168.100.137:5000/api';  // TWOJE IP!
+            return 'http://192.168.100.137:5000/api';
         } else if (Platform.OS === 'ios') {
-            return 'http://192.168.100.137:5000/api';  // TWOJE IP!
+            return 'http://192.168.100.137:5000/api';  
         }
     }
 

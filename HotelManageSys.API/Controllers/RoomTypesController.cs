@@ -1,9 +1,7 @@
-﻿using HotelManageSys.API.Features.Rooms.Messages.Queries;
-using HotelManageSys.API.Features.RoomTypes.DTO_s;
+﻿using HotelManageSys.API.Features.RoomTypes.DTO_s;
 using HotelManageSys.API.Features.RoomTypes.Messages.Commands;
 using HotelManageSys.API.Features.RoomTypes.Messages.Queries;
 using MediatR;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HotelManageSys.API.Controllers
@@ -34,10 +32,9 @@ namespace HotelManageSys.API.Controllers
         public async Task<IActionResult> GetRoomTypeById(int id)
         {
             var query = new GetRoomTypeByIdQuery(id);
+            
 
-            var result = await _mediator.Send(query);
-
-            return result != null ? Ok(result) : NotFound($"Typ pokoju o {id} nie istnieje");
+            return Ok(await _mediator.Send(query));
         }
 
         [HttpPost]
@@ -64,15 +61,10 @@ namespace HotelManageSys.API.Controllers
                 return BadRequest("Id w URL nie jest takie samo jak w body");
             }
 
-            try
-            {
-                await _mediator.Send(updateCommand);
-                return NoContent();
-            }
-            catch (KeyNotFoundException ex)
-            {
-                return NotFound(ex.Message);
-            }
+           
+            await _mediator.Send(updateCommand);
+            return NoContent();
+          
         }
 
         [HttpDelete("{id}")]
@@ -82,19 +74,9 @@ namespace HotelManageSys.API.Controllers
         public async Task<IActionResult> DeleteRoomType(int id)
         {
             var deleteCommand = new DeleteRoomTypeCommand(id);
-
-            try
-            {
-                await _mediator.Send(deleteCommand);
-                return NoContent();
-            }
-            catch (KeyNotFoundException ex)
-            {
-                return NotFound(ex.Message);
-            } catch (InvalidOperationException ex)
-            {
-                return Conflict(ex.Message);
-            }
+            
+            await _mediator.Send(deleteCommand);
+            return NoContent();
         }
     }
 }

@@ -6,7 +6,7 @@ namespace HotelManageSys.API.Features.Payments.Providers
     {
         Task<IEnumerable<Payment>> GetAllPaymentsAsync(CancellationToken cancellationToken = default);
 
-        Task<Payment> GetPaymentByIdAsync(int paymentId, bool asNoTracking = true, CancellationToken cancellationToken = default);
+        Task<Payment?> GetPaymentByIdAsync(int paymentId, bool asNoTracking = true, CancellationToken cancellationToken = default);
     }
 }
 

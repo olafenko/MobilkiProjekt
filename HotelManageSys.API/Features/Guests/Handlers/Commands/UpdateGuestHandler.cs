@@ -1,3 +1,4 @@
+using HotelManageSys.API.Exceptions;
 using HotelManageSys.API.Features.Guests.Messages.Commands;
 using HotelManageSys.API.Features.Guests.Providers;
 using HotelManageSys.API.Features.Guests.Services;
@@ -23,8 +24,19 @@ namespace HotelManageSys.API.Features.Guests.Handlers.Commands
         {
             var guest = await _guestProvider.GetGuestByIdAsync(request.GuestId, false, cancellationToken);
 
+            if (guest == null) throw new NotFoundException("Guest", request.GuestId);
+
             _logger.LogInformation("Aktualizowanie gościa ID: {GuestId}", request.GuestId);
 
+            if (await _guestProvider.GuestExistsByEmail(request.Email,cancellationToken))
+                throw new UniqueConstraintException("Email",$"Email {request.Email} jest już przypisany do innego gościa.");
+            
+            if (await _guestProvider.GuestExistsByPhoneNumber(request.PhoneNumber,cancellationToken))
+                throw new UniqueConstraintException("PhoneNumber",$"Numer telefonu {request.PhoneNumber} jest już przypisany do innego gościa.");
+            
+            if (await _guestProvider.GuestExistsByIdentityCardNumber(request.IdentityCardNumber,cancellationToken))
+                throw new UniqueConstraintException("IdentityCardNumber",$"Numer dokumentu tożsamości {request.IdentityCardNumber} jest już przypisany do innego gościa.");
+            
             request.Adapt(guest);
 
             await _guestService.UpdateGuest(guest, cancellationToken);

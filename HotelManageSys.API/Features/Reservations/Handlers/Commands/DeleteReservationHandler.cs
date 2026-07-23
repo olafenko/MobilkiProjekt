@@ -1,3 +1,4 @@
+using HotelManageSys.API.Exceptions;
 using HotelManageSys.API.Features.Reservations.Messages.Commands;
 using HotelManageSys.API.Features.Reservations.Providers;
 using HotelManageSys.API.Features.Reservations.Services;
@@ -21,6 +22,7 @@ namespace HotelManageSys.API.Features.Reservations.Handlers.Commands
         public async Task<Unit> Handle(DeleteReservationCommand request, CancellationToken cancellationToken)
         {
             var reservation = await _reservationProvider.GetReservationByIdAsync(request.Id, false, cancellationToken);
+            if (reservation == null) throw new NotFoundException("Reservation", request.Id);
 
             _logger.LogInformation("Usuwanie rezerwacji ID: {ReservationId}", request.Id);
 

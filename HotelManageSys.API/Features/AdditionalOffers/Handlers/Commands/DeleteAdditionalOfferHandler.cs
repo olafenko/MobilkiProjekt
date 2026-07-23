@@ -1,3 +1,4 @@
+using HotelManageSys.API.Exceptions;
 using HotelManageSys.API.Features.AdditionalOffers.Messages.Commands;
 using HotelManageSys.API.Features.AdditionalOffers.Providers;
 using HotelManageSys.API.Features.AdditionalOffers.Services;
@@ -25,6 +26,8 @@ namespace HotelManageSys.API.Features.AdditionalOffers.Handlers.Commands
         {
             var additionalOffer = await _additionalOfferProvider.GetAdditionalOfferByIdAsync(request.Id, false, cancellationToken);
 
+            if (additionalOffer == null) throw new NotFoundException("AdditionalOffer", request.Id);
+            
             _logger.LogInformation("Usuwanie oferty dodatkowej ID: {AdditionalOfferId}", request.Id);
 
             await _additionalOfferService.DeleteAdditionalOffer(additionalOffer, cancellationToken);

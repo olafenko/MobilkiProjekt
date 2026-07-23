@@ -1,3 +1,4 @@
+using HotelManageSys.API.Exceptions;
 using HotelManageSys.API.Features.Amenities.Messages.Commands;
 using HotelManageSys.API.Features.Amenities.Providers;
 using HotelManageSys.API.Features.Amenities.Services;
@@ -22,6 +23,8 @@ namespace HotelManageSys.API.Features.Amenities.Handlers.Commands
         {
             var amenity = await _amenityProvider.GetAmenityByIdAsync(request.Id, false, cancellationToken);
 
+            if (amenity == null) throw new NotFoundException("Amenity",request.Id);
+            
             _logger.LogInformation("Usuwanie udogodnienia ID: {AmenityId}", request.Id);
 
             await _amenityService.DeleteAmenity(amenity, cancellationToken);

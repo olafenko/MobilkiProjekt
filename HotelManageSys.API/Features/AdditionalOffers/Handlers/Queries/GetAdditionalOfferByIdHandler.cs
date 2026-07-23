@@ -1,3 +1,4 @@
+using HotelManageSys.API.Exceptions;
 using HotelManageSys.API.Features.AdditionalOffers.DTO_s;
 using HotelManageSys.API.Features.AdditionalOffers.Messages.Queries;
 using HotelManageSys.API.Features.AdditionalOffers.Providers;
@@ -17,7 +18,12 @@ namespace HotelManageSys.API.Features.AdditionalOffers.Handlers.Queries
 
         public async Task<AdditionalOfferDTO?> Handle(GetAdditionalOfferByIdQuery request, CancellationToken cancellationToken)
         {
-            return (await _additionalOfferProvider.GetAdditionalOfferByIdAsync(request.Id, true, cancellationToken))?.Adapt<AdditionalOfferDTO>();
+            var additionalOffer =
+                await _additionalOfferProvider.GetAdditionalOfferByIdAsync(request.Id, true, cancellationToken);
+            
+            if (additionalOffer == null) throw new NotFoundException("AdditionalOffer", request.Id);
+            
+            return additionalOffer.Adapt<AdditionalOfferDTO>();
         }
     }
 }

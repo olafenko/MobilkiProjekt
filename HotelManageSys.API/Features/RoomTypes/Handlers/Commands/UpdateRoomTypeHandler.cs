@@ -1,4 +1,5 @@
-﻿using HotelManageSys.API.Features.RoomTypes.Messages.Commands;
+﻿using HotelManageSys.API.Exceptions;
+using HotelManageSys.API.Features.RoomTypes.Messages.Commands;
 using HotelManageSys.API.Features.RoomTypes.Providers;
 using HotelManageSys.API.Features.RoomTypes.Services;
 using Mapster;
@@ -21,7 +22,9 @@ namespace HotelManageSys.API.Features.RoomTypes.Handlers.Commands
 
         public async Task<Unit> Handle(UpdateRoomTypeCommand request, CancellationToken cancellationToken)
         {
-            var roomType = await _roomTypeProvider.GetRoomTypeByIdAsync(request.RoomTypeId, false, cancellationToken);
+            var roomType = await _roomTypeProvider.GetRoomTypeById(request.RoomTypeId, false, cancellationToken);
+
+            if (roomType == null) throw new NotFoundException("RoomType", request.RoomTypeId);
 
             _logger.LogInformation("Aktualizowanie typu pokoju ID: {RoomTypeId}", request.RoomTypeId);
 
