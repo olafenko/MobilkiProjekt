@@ -39,9 +39,9 @@ namespace HotelManageSys.API.Features.Reservations.Providers
 
             }
 
-                return await query
-                    .OrderByDescending(r => r.ReservationDate)
-                    .ToListAsync(cancellationToken);
+            return await query
+                .OrderByDescending(r => r.ReservationDate)
+                .ToListAsync(cancellationToken);
         }
 
         public async Task<Reservation?> GetReservationByIdAsync(int reservationId, bool asNoTracking = true, CancellationToken cancellationToken = default)
@@ -66,6 +66,13 @@ namespace HotelManageSys.API.Features.Reservations.Providers
         public async Task<bool> IsRoomOccupiedForDate(int roomId, DateTime checkIn, DateTime checkOut, CancellationToken cancellationToken = default)
         {
             return await _dbContext.Reservations.AnyAsync(r => r.RoomId == roomId && r.IsActive
+                && checkIn > r.CheckInDate && checkIn < r.CheckOutDate
+                && checkOut > r.CheckInDate && checkOut < r.CheckOutDate, cancellationToken);
+        }
+        
+        public async Task<bool> IsRoomOccupiedForDate(int roomId,int reservationId, DateTime checkIn, DateTime checkOut, CancellationToken cancellationToken = default)
+        {
+            return await _dbContext.Reservations.AnyAsync(r => r.RoomId == roomId && r.IsActive && r.ReservationId != reservationId
                 && checkIn > r.CheckInDate && checkIn < r.CheckOutDate
                 && checkOut > r.CheckInDate && checkOut < r.CheckOutDate, cancellationToken);
         }
