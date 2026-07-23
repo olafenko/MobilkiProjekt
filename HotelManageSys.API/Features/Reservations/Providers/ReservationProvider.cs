@@ -40,11 +40,11 @@ namespace HotelManageSys.API.Features.Reservations.Providers
             }
 
                 return await query
-                .OrderByDescending(r => r.ReservationDate)
-                .ToListAsync(cancellationToken);
+                    .OrderByDescending(r => r.ReservationDate)
+                    .ToListAsync(cancellationToken);
         }
 
-        public async Task<Reservation> GetReservationByIdAsync(int reservationId, bool asNoTracking = true, CancellationToken cancellationToken = default)
+        public async Task<Reservation?> GetReservationByIdAsync(int reservationId, bool asNoTracking = true, CancellationToken cancellationToken = default)
         {
             IQueryable<Reservation> query = _dbContext.Reservations
                 .Include(r => r.Guest)
@@ -60,9 +60,14 @@ namespace HotelManageSys.API.Features.Reservations.Providers
                 query = query.AsNoTracking();
             }
 
-            var reservation = await query.FirstOrDefaultAsync(r => r.IsActive && r.ReservationId == reservationId, cancellationToken);
+            return await query.FirstOrDefaultAsync(r => r.IsActive && r.ReservationId == reservationId, cancellationToken);
+        }
 
-            return reservation ?? throw new KeyNotFoundException($"Nie znaleziono rezerwacji o ID {reservationId}");
+        public async Task<bool> IsRoomOccupiedForDate(int roomId, DateTime checkIn, DateTime checkOut, CancellationToken cancellationToken = default)
+        {
+            return await _dbContext.Reservations.AnyAsync(r => r.RoomId == roomId && r.IsActive
+                && checkIn > r.CheckInDate && checkIn < r.CheckOutDate
+                && checkOut > r.CheckInDate && checkOut < r.CheckOutDate, cancellationToken);
         }
     }
 }

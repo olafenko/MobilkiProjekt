@@ -24,7 +24,7 @@ namespace HotelManageSys.API.Features.Reservations.Handlers.Commands
 
             _logger.LogInformation("Aktualizowanie rezerwacji ID: {ReservationId}", request.ReservationId);
 
-            await _reservationService.UpdateReservation(request, cancellationToken);
+            
 
             return Unit.Value;
         }

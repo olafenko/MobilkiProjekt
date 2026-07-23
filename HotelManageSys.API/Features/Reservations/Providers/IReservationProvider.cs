@@ -8,6 +8,8 @@ namespace HotelManageSys.API.Features.Reservations.Providers
         Task<IEnumerable<Reservation>> GetAllReservationsAsync(PaymentStatus? paymentStatus = null, CancellationToken cancellationToken = default);
 
         Task<Reservation> GetReservationByIdAsync(int reservationId, bool asNoTracking = true, CancellationToken cancellationToken = default);
+
+        Task<bool> IsRoomOccupiedForDate(int roomId, DateTime checkIn, DateTime checkOut,CancellationToken cancellationToken = default);
     }
 }
 

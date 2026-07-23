@@ -38,6 +38,12 @@ namespace HotelManageSys.API.Features.AdditionalOffers.Providers
             return additionalOffer;
         }
 
+        public async Task<IDictionary<int,AdditionalOffer>> GetAdditionalOffersByIdsAsync(List<int> additionalOffersIds, bool asNoTracking = true, CancellationToken cancellationToken = default)
+        {
+            return await _dbContext.AdditionalOffers.Where(o => o.IsActive && additionalOffersIds.Contains(o.AdditionalOfferId))
+                .ToDictionaryAsync(o => o.AdditionalOfferId, cancellationToken);
+        }
+
         public async Task<bool> AdditionalOfferExistsByName(string name, CancellationToken cancellationToken = default)
         {
             return await _dbContext.AdditionalOffers.AnyAsync(ao => ao.Name == name && ao.IsActive, cancellationToken);

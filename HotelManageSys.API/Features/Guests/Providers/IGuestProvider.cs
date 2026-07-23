@@ -10,6 +10,7 @@ namespace HotelManageSys.API.Features.Guests.Providers
         Task<bool> GuestExistsByEmail(string email, CancellationToken cancellationToken = default);
         Task<bool> GuestExistsByPhoneNumber(string phoneNumber, CancellationToken cancellationToken = default);
         Task<bool> GuestExistsByIdentityCardNumber(string identityCardNumber, CancellationToken cancellationToken = default);
+        Task<bool> GuestExistsById(int? guestId, CancellationToken cancellationToken = default);
 
     }
 }

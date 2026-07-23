@@ -53,6 +53,11 @@ namespace HotelManageSys.API.Features.Guests.Providers
         {
             return await _dbContext.Guests.AnyAsync(g => g.IdentityCardNumber == identityCardNumber && g.IsActive,cancellationToken);
         }
+
+        public async Task<bool> GuestExistsById(int? guestId, CancellationToken cancellationToken = default)
+        {
+            return await _dbContext.Guests.AnyAsync(g => g.GuestId == guestId && g.IsActive,cancellationToken);
+        }
     }
 }
 

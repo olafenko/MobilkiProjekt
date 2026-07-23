@@ -24,7 +24,7 @@ namespace HotelManageSys.API.Features.Workers.Providers
                 .ToListAsync(cancellationToken);
         }
 
-        public async Task<Worker> GetWorkerByIdAsync(int workerId, bool asNoTracking = true, CancellationToken cancellationToken = default)
+        public async Task<Worker?> GetWorkerByIdAsync(int workerId, bool asNoTracking = true, CancellationToken cancellationToken = default)
         {
             IQueryable<Worker> query = _dbContext.Workers
                 .Include(w => w.Reservations);
@@ -33,10 +33,8 @@ namespace HotelManageSys.API.Features.Workers.Providers
             {
                 query = query.AsNoTracking();
             }
-
-            var worker = await query.FirstOrDefaultAsync(w => w.IsActive && w.WorkerId == workerId, cancellationToken);
-
-            return worker ?? throw new KeyNotFoundException($"Nie znaleziono pracownika o ID {workerId}");
+            
+            return await query.FirstOrDefaultAsync(w => w.IsActive && w.WorkerId == workerId, cancellationToken);
         }
     }
 }
