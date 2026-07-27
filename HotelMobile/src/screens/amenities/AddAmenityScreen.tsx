@@ -1,9 +1,13 @@
-import React, { useState } from 'react';
-import { View, StyleSheet, ScrollView, Alert } from 'react-native';
-import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { RootStackParamList } from "../../navigation/types.ts";
-import { useAmenities } from "../../context/AmenitiesContext.tsx";
-import { TextInput, Button, Card, Text, useTheme } from 'react-native-paper';
+import React, {useState} from 'react';
+import {Alert, ScrollView, StyleSheet, View} from 'react-native';
+import {NativeStackScreenProps} from "@react-navigation/native-stack";
+import {RootStackParamList} from "../../navigation/types.ts";
+import {useAmenities} from "../../context/AmenitiesContext.tsx";
+import {Button, Card, Text, useTheme} from 'react-native-paper';
+import {useFormErrors} from "../../hooks/useFormErrors.ts";
+import {ApiError} from "../../types/errors.ts";
+import {ErrorBanner} from "../../components/ErrorBanner.tsx";
+import {FormField} from "../../components/FormField.tsx";
 
 type Props = NativeStackScreenProps<RootStackParamList, "AddAmenity">;
 
@@ -15,9 +19,28 @@ function AddAmenityScreen({ navigation }: Props) {
     const [description, setDescription] = useState("");
     const [submitting, setSubmitting] = useState(false);
 
+    const {
+        errors,
+        generalError,
+        clearFieldError,
+        clearAllErrors,
+        handleApiError
+    } = useFormErrors();
+    
     const handleSubmit = async () => {
-        if (!name.trim()) return Alert.alert("Błąd", "Podaj nazwę udogodnienia");
-
+        
+        clearAllErrors();
+        
+        if (!name.trim()) {
+            handleApiError({
+                type: 'ValidationError',
+                title: 'Błędy walidacji',
+                status: 400,
+                errors: {name: ['Nazwa udogodnienia jest wymagana']},
+            })
+            return;
+        }
+        
         try {
             setSubmitting(true);
             await addAmenity({
@@ -26,7 +49,7 @@ function AddAmenityScreen({ navigation }: Props) {
             });
             Alert.alert("Sukces", "Udogodnienie zostało dodane pomyślnie", [{ text: "OK", onPress: () => navigation.goBack() }]);
         } catch (err) {
-            Alert.alert("Błąd", (err as Error).message);
+            handleApiError(err as ApiError);
         } finally {
             setSubmitting(false);
         }
@@ -36,14 +59,43 @@ function AddAmenityScreen({ navigation }: Props) {
         <ScrollView style={{ backgroundColor: theme.colors.background }} contentContainerStyle={styles.scrollContent}>
             <Card style={styles.card} mode="contained">
                 <Card.Content style={styles.form}>
+                    {generalError && (
+                        <ErrorBanner
+                        message={generalError}
+                        onDismiss={clearAllErrors}
+                        />
+                    )}
+                    
                     <Text variant="headlineSmall" style={styles.title}>Nowe udogodnienie</Text>
+                    
+                    <FormField 
+                        label="Nazwa"
+                        required
+                        value={name}
+                        onChangeText={(text) => {
+                            setName(text);
+                            clearFieldError('name');
+                        }}
+                        placeholder="np. Klimatyzacja"
+                        error={errors.name}
+                        editable={!submitting}
+                    />
 
-                    <TextInput label="Nazwa *" mode="outlined" value={name} onChangeText={setName} editable={!submitting} placeholder="np. Klimatyzacja"
-                               style={styles.input} outlineColor={theme.colors.outline} activeOutlineColor={theme.colors.primary} />
-
-                    <TextInput label="Opis" mode="outlined" value={description} onChangeText={setDescription} editable={!submitting} multiline numberOfLines={3}
-                               placeholder="Opcjonalny opis..." style={[styles.input, styles.multiline]} outlineColor={theme.colors.outline} activeOutlineColor={theme.colors.primary} />
-
+                    <FormField
+                        label="Opis"
+                        value={description}
+                        onChangeText={(text) => {
+                            setDescription(text);
+                            clearFieldError('description');
+                        }}
+                        placeholder="Opcjonalny opis..."
+                        error={errors.description}
+                        editable={!submitting}
+                        style={[styles.multiline]}
+                        multiline
+                        numberOfLines={3}
+                    />
+                    
                     <View style={styles.buttonWrapper}>
                         <Button mode="outlined" onPress={() => navigation.goBack()} style={styles.button} disabled={submitting}
                                 textColor={theme.colors.onSurfaceVariant}>Anuluj</Button>
@@ -74,9 +126,7 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         marginBottom: 8
     },
-    input: {
-        backgroundColor: 'transparent'
-    },
+    
     multiline: {
         minHeight: 80,
         textAlignVertical: 'top',
