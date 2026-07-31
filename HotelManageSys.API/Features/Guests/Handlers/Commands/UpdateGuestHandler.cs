@@ -28,13 +28,13 @@ namespace HotelManageSys.API.Features.Guests.Handlers.Commands
 
             _logger.LogInformation("Aktualizowanie gościa ID: {GuestId}", request.GuestId);
 
-            if (await _guestProvider.GuestExistsByEmail(request.Email,cancellationToken))
+            if (await _guestProvider.GuestExistsByEmail(request.Email,request.GuestId,cancellationToken))
                 throw new UniqueConstraintException("Email",$"Email {request.Email} jest już przypisany do innego gościa.");
             
-            if (await _guestProvider.GuestExistsByPhoneNumber(request.PhoneNumber,cancellationToken))
+            if (await _guestProvider.GuestExistsByPhoneNumber(request.PhoneNumber,request.GuestId,cancellationToken))
                 throw new UniqueConstraintException("PhoneNumber",$"Numer telefonu {request.PhoneNumber} jest już przypisany do innego gościa.");
             
-            if (await _guestProvider.GuestExistsByIdentityCardNumber(request.IdentityCardNumber,cancellationToken))
+            if (await _guestProvider.GuestExistsByIdentityCardNumber(request.IdentityCardNumber,request.GuestId,cancellationToken))
                 throw new UniqueConstraintException("IdentityCardNumber",$"Numer dokumentu tożsamości {request.IdentityCardNumber} jest już przypisany do innego gościa.");
             
             request.Adapt(guest);
