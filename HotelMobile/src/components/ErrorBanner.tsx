@@ -16,16 +16,15 @@ export const ErrorBanner: React.FC<ErrorBannerProps> = ({
 
 
     const colors = {
-        error: { bg: '#FFEBEE', border: '#E53935', text: '#C62828', icon: '❌' },
-        warning: { bg: '#FFF3E0', border: '#FF9800', text: '#E65100', icon: '⚠️' },
-        info: { bg: '#E3F2FD', border: '#2196F3', text: '#1565C0', icon: 'ℹ️' },
+        error: { bg: '#FFEBEE', border: '#E53935', text: '#C62828' },
+        warning: { bg: '#FFF3E0', border: '#FF9800', text: '#E65100' },
+        info: { bg: '#E3F2FD', border: '#2196F3', text: '#1565C0', },
     };
 
     const color = colors[type];
 
     return (
         <View style={[styles.container, { backgroundColor: color.bg, borderColor: color.border }]}>
-            <Text style={styles.icon}>{color.icon}</Text>
             <Text style={[styles.message, { color: color.text }]}>{message}</Text>
             {onDismiss && (
                 <TouchableOpacity onPress={onDismiss} style={styles.dismissButton}>

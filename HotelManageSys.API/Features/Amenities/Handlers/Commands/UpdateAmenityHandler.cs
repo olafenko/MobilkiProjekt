@@ -26,6 +26,9 @@ namespace HotelManageSys.API.Features.Amenities.Handlers.Commands
 
             if (amenity == null) throw new NotFoundException("Amenity",request.AmenityId);
             
+            if (await _amenityProvider.AmenityExistsByName(request.Name,cancellationToken))
+                throw new ValidationException("Name",$"Udogodnienie o nazwie {request.Name} już istnieje.");
+            
             _logger.LogInformation("Aktualizowanie udogodnienia ID: {AmenityId}", request.AmenityId);
 
             request.Adapt(amenity);
