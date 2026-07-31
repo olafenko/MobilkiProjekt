@@ -27,7 +27,7 @@ namespace HotelManageSys.API.Features.Workers.Handlers.Commands
         {
             
             if (await _workerProvider.WorkerExistsByLogin(request.Login, cancellationToken))
-                throw new ValidationException("Login",$"Pracownik o loginie {request.Login} już istnieje");
+                throw new UniqueConstraintException("Login",$"Pracownik o loginie {request.Login} już istnieje");
             
             _logger.LogInformation("Dodawanie nowego pracownika: {FirstName} {LastName}", request.FirstName, request.LastName);
             

@@ -32,7 +32,7 @@ namespace HotelManageSys.API.Features.Rooms.Handlers.Commands
             if (room == null) throw new NotFoundException("Room", request.RoomId);
 
             if (await _roomProvider.RoomExistsByNumber(request.Number, cancellationToken))
-                throw new ValidationException("Number",$"Pokój o numerze {request.Number} już istnieje");
+                throw new UniqueConstraintException("Number",$"Pokój o numerze {request.Number} już istnieje");
 
             _logger.LogInformation("Aktualizowanie pokoju ID: {RoomId}", request.RoomId);
 

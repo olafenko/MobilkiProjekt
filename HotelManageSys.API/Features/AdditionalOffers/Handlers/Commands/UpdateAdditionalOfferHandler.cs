@@ -30,7 +30,7 @@ namespace HotelManageSys.API.Features.AdditionalOffers.Handlers.Commands
             if (additionalOffer == null) throw new NotFoundException("AdditionalOffer", request.AdditionalOfferId);
             
             if (await _additionalOfferProvider.AdditionalOfferExistsByName(request.Name))
-                throw new ValidationException("Name",$"Oferta dodatkowa o nazwie {request.Name} już istnieje");
+                throw new UniqueConstraintException("Name",$"Oferta dodatkowa o nazwie {request.Name} już istnieje");
             
             _logger.LogInformation("Aktualizowanie oferty dodatkowej ID: {AdditionalOfferId}", request.AdditionalOfferId);
 

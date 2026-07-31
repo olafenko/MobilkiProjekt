@@ -27,7 +27,7 @@ namespace HotelManageSys.API.Features.RoomTypes.Handlers.Commands
             if (roomType == null) throw new NotFoundException("RoomType", request.RoomTypeId);
 
             if (await _roomTypeProvider.RoomTypeExistsByName(request.Name, cancellationToken))
-                throw new ValidationException("Name",$"Typ pokoju o nazwie {request.Name} już istnieje");
+                throw new UniqueConstraintException("Name",$"Typ pokoju o nazwie {request.Name} już istnieje");
 
             _logger.LogInformation("Aktualizowanie typu pokoju ID: {RoomTypeId}", request.RoomTypeId);
 
