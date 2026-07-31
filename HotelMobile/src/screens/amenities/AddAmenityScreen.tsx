@@ -36,7 +36,9 @@ function AddAmenityScreen({ navigation }: Props) {
                 type: 'ValidationError',
                 title: 'Błędy walidacji',
                 status: 400,
-                errors: {name: ['Nazwa udogodnienia jest wymagana']},
+                errors: {
+                    name: ['Nazwa udogodnienia jest wymagana']
+                },
             })
             return;
         }
