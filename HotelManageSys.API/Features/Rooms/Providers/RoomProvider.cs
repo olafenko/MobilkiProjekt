@@ -49,5 +49,10 @@ namespace HotelManageSys.API.Features.Rooms.Providers
         {
             return await _dbContext.Rooms.AnyAsync(r => r.Number == roomNumber && r.IsActive, cancellationToken);
         }
+
+        public async Task<bool> RoomExistsByNumber(string roomNumber, int roomId, CancellationToken cancellationToken = default)
+        {
+            return await _dbContext.Rooms.AnyAsync(r => r.Number == roomNumber && r.RoomId != roomId && r.IsActive, cancellationToken);
+        }
     }
 }

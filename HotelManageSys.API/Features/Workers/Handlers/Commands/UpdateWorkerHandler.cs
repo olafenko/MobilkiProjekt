@@ -26,7 +26,7 @@ namespace HotelManageSys.API.Features.Workers.Handlers.Commands
 
             if (worker == null) throw new NotFoundException("Worker", request.WorkerId);
 
-            if (await _workerProvider.WorkerExistsByLogin(request.Login, cancellationToken))
+            if (await _workerProvider.WorkerExistsByLogin(request.Login, request.WorkerId, cancellationToken))
                 throw new UniqueConstraintException("Login",$"Pracownik o loginie {request.Login} już istnieje");
 
             _logger.LogInformation("Aktualizowanie pracownika ID: {WorkerId}", request.WorkerId);
