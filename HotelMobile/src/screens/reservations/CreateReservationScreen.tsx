@@ -33,6 +33,9 @@ function AddReservationScreen({ navigation }: Props) {
 
     const [checkIn, setCheckIn] = useState(new Date());
     const [checkOut, setCheckOut] = useState(new Date(Date.now() + 86400000));
+    const [openCheckIn, setOpenCheckIn] = useState(false);
+    const [openCheckOut, setOpenCheckOut] = useState(false);
+
     const [showPicker, setShowPicker] = useState<'in' | 'out' | null>(null);
 
     const [status, setStatus] = useState<ReservationStatus>(ReservationStatus.PENDING);
@@ -163,6 +166,8 @@ function AddReservationScreen({ navigation }: Props) {
                             Do: {checkOut.toLocaleDateString()}</Button>
                     </View>
 
+                    <Button onPress={() => setOpenCheckIn(true)}></Button>
+                    
                     {showPicker && <DateTimePicker value={showPicker === 'in' ? checkIn : checkOut} mode="date" onChange={onDateChange} minimumDate={showPicker === 'out' ? checkIn : new Date()} />}
 
                     <LargePickerField
