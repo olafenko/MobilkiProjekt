@@ -166,7 +166,7 @@ function AddReservationScreen({ navigation }: Props) {
                             Do: {checkOut.toLocaleDateString()}</Button>
                     </View>
 
-                    <Button onPress={() => setOpenCheckIn(true)}></Button>
+                    {/*<Button onPress={() => setOpenCheckIn(true)}></Button>*/}
                     
                     {showPicker && <DateTimePicker value={showPicker === 'in' ? checkIn : checkOut} mode="date" onChange={onDateChange} minimumDate={showPicker === 'out' ? checkIn : new Date()} />}
 

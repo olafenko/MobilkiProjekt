@@ -7,7 +7,11 @@ import apiService from "../../api/apiService.ts";
 import {Alert, ScrollView, StyleSheet, View} from "react-native";
 import {PickerField} from "../../components/PickerField.tsx";
 import {MultiPickerField} from "../../components/MultiPickerField.tsx";
-import {ActivityIndicator, Button, Card, TextInput, useTheme} from "react-native-paper";
+import {ActivityIndicator, Button, Card, HelperText, useTheme} from "react-native-paper";
+import {useFormErrors} from "../../hooks/useFormErrors.ts";
+import {ApiError} from "../../types/errors.ts";
+import {ErrorBanner} from "../../components/ErrorBanner.tsx";
+import {FormField} from "../../components/FormField.tsx";
 
 type Props = NativeStackScreenProps<RootStackParamList, 'UpdateRoom'>;
 
@@ -29,6 +33,14 @@ function UpdateRoomScreen({navigation, route}: Props) {
     const [statuses, setStatuses] = useState<RoomStatus[]>([]);
     const [loading, setLoading] = useState(true);
     const [submitting, setSubmitting] = useState(false);
+
+    const {
+        errors,
+        generalError,
+        clearFieldError,
+        clearAllErrors,
+        handleApiError
+    } = useFormErrors();
 
     useEffect(() => {
         if (roomTypeId) {
@@ -59,7 +71,7 @@ function UpdateRoomScreen({navigation, route}: Props) {
                 }
 
             } catch (err) {
-                Alert.alert("Błąd", "Nie udało się załadować danych.");
+                Alert.alert('Błąd', 'Nie udało się załadować danych');
             } finally {
                 setLoading(false);
             }
@@ -68,29 +80,65 @@ function UpdateRoomScreen({navigation, route}: Props) {
     }, []);
 
     const handleSubmit = async () => {
+        clearAllErrors();
+
+        const parsedFloor = parseInt(floor, 10);
+        
         if (!number.trim()) {
-            Alert.alert("Błąd", "Podaj numer pokoju");
+            handleApiError({
+                type: 'ValidationError',
+                title: 'Błędy walidacji',
+                status: 400,
+                errors: {
+                    name: ['Numer pokoju jest wymagany'],
+                },
+            });
             return;
         }
-        if (!floor) {
-            Alert.alert("Błąd", "Podaj piętro");
+
+        if (!floor.trim() || Number.isNaN(parsedFloor)) {
+            handleApiError({
+                type: 'ValidationError',
+                title: 'Błędy walidacji',
+                status: 400,
+                errors: {
+                    name: ['Podaj poprawne piętro'],
+                },
+            });
             return;
         }
-        if (!status) {
-            Alert.alert("Błąd", "Wybierz status");
-            return;
-        }
+
         if (!roomTypeId) {
-            Alert.alert("Błąd", "Wybierz typ pokoju");
+            handleApiError({
+                type: 'ValidationError',
+                title: 'Błędy walidacji',
+                status: 400,
+                errors: {
+                    name: ['Wybierz typ pokoju'],
+                },
+            });
             return;
         }
+
+        if (!status) {
+            handleApiError({
+                type: 'ValidationError',
+                title: 'Błędy walidacji',
+                status: 400,
+                errors: {
+                    name: ['Wybierz status'],
+                },
+            });
+            return;
+        }
+
         try {
             setSubmitting(true);
             await updateRoom(room.roomId, {
                 roomId: room.roomId,
                 number: number.trim(),
                 description: description || "",
-                floor: parseInt(floor) || 0,
+                floor: parsedFloor,
                 status: status,
                 roomTypeId: roomTypeId,
                 amenitiesIds: selectedAmenities
@@ -100,7 +148,7 @@ function UpdateRoomScreen({navigation, route}: Props) {
                 { text: "OK", onPress: () => navigation.goBack() },
             ]);
         } catch (err) {
-            Alert.alert("Błąd", (err as Error).message);
+            handleApiError(err as ApiError);
         } finally {
             setSubmitting(false);
         }
@@ -118,50 +166,51 @@ function UpdateRoomScreen({navigation, route}: Props) {
         <ScrollView style={{ backgroundColor: theme.colors.background }} contentContainerStyle={styles.scrollContent}>
             <Card style={styles.card} mode="contained">
                 <Card.Content style={styles.gap}>
-                    <TextInput
-                        label="Numer pokoju *"
-                        mode="outlined"
+                    {generalError && (
+                        <ErrorBanner
+                            message={generalError}
+                            onDismiss={clearAllErrors}
+                        />
+                    )}
+
+                    <FormField
+                        label="Numer pokoju"
+                        required
                         value={number}
-                        onChangeText={setNumber}
+                        onChangeText={(text) => {
+                            setNumber(text);
+                            clearFieldError('number');
+                        }}
                         editable={!submitting}
-                        style={styles.input}
-                        outlineColor={theme.colors.outline}
-                        activeOutlineColor={theme.colors.primary}
+                        error={errors.number}
                     />
 
-                    <TextInput
-                        label="Piętro *"
-                        mode="outlined"
+                    <FormField
+                        label="Piętro"
+                        required
                         value={floor}
-                        onChangeText={setFloor}
+                        onChangeText={(text) => {
+                            setFloor(text);
+                            clearFieldError('floor');
+                        }}
                         keyboardType="numeric"
                         editable={!submitting}
-                        style={styles.input}
-                        outlineColor={theme.colors.outline}
-                        activeOutlineColor={theme.colors.primary}
+                        error={errors.floor}
                     />
 
-                    <TextInput
+                    <FormField
                         label="Opis"
-                        mode="outlined"
                         value={description}
                         onChangeText={setDescription}
                         multiline
                         numberOfLines={3}
                         editable={!submitting}
-                        style={styles.input}
-                        outlineColor={theme.colors.outline}
-                        activeOutlineColor={theme.colors.primary}
                     />
 
-                    <TextInput
+                    <FormField
                         label="Cena"
-                        mode="outlined"
                         value={basePrice}
                         editable={false}
-                        style={styles.input}
-                        outlineColor={theme.colors.outline}
-                        activeOutlineColor={theme.colors.primary}
                     />
 
                     <PickerField
@@ -170,9 +219,15 @@ function UpdateRoomScreen({navigation, route}: Props) {
                         items={roomTypes}
                         getValue={r => r.roomTypeId}
                         getLabel={r => r.name}
-                        onChange={val => setRoomTypeId(val as number)}
+                        onChange={val => {
+                            setRoomTypeId(val as number);
+                            clearFieldError('roomTypeId');
+                        }}
                         required
                     />
+                    <HelperText type="error" visible={!!errors.roomTypeId}>
+                        {errors.roomTypeId}
+                    </HelperText>
 
                     <MultiPickerField
                         label="Udogodnienia"
@@ -190,9 +245,15 @@ function UpdateRoomScreen({navigation, route}: Props) {
                         items={statuses}
                         getValue={s => s}
                         getLabel={s => s}
-                        onChange={val => setStatus(val as RoomStatus)}
+                        onChange={val => {
+                            setStatus(val as RoomStatus);
+                            clearFieldError('status');
+                        }}
                         required
                     />
+                    <HelperText type="error" visible={!!errors.status}>
+                        {errors.status}
+                    </HelperText>
 
                     <View style={styles.buttons}>
                         <Button
