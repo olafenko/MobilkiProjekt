@@ -9,6 +9,9 @@ import { ActivityIndicator, Button, Card, Divider, IconButton, SegmentedButtons,
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { PickerField } from "../../components/PickerField.tsx";
 import { LargePickerField } from "../../components/LargePickerField.tsx";
+import DatePicker from "react-native-date-picker";
+import {ErrorBanner} from "../../components/ErrorBanner.tsx";
+import {useFormErrors} from "../../hooks/useFormErrors.ts";
 
 type Props = NativeStackScreenProps<RootStackParamList, "AddReservation">;
 
@@ -46,6 +49,14 @@ function AddReservationScreen({ navigation }: Props) {
     const [selectedRoomId, setSelectedRoomId] = useState<number | null>(null);
     const [reservationNotes, setReservationNotes] = useState('');
     const [selectedOffers, setSelectedOffers] = useState<OfferReservationTemp[]>([]);
+
+    const {
+        errors,
+        generalError,
+        clearFieldError,
+        clearAllErrors,
+        handleApiError
+    } = useFormErrors();
 
     useEffect(() => {
         const loadData = async () => {
@@ -156,20 +167,60 @@ function AddReservationScreen({ navigation }: Props) {
         <ScrollView style={{ backgroundColor: theme.colors.background }} contentContainerStyle={styles.scrollContent}>
             <Card style={styles.card} mode="contained">
                 <Card.Content>
+
+                    {generalError && (
+                        <ErrorBanner
+                            message={generalError}
+                            onDismiss={clearAllErrors}
+                        />
+                    )}
                     
                     <Text variant="titleMedium" style={styles.sectionTitle}>Termin pobytu</Text>
                     <View style={styles.row}>
-                        <Button mode="outlined" onPress={() => setShowPicker('in')} style={styles.flex1} textColor={theme.colors.onSurface}>
+                        <Button mode="outlined" onPress={() => setOpenCheckIn(true)} style={styles.flex1} textColor={theme.colors.onSurface}>
                             Od: {checkIn.toLocaleDateString()}</Button>
                         <View style={{ width: 8 }} />
-                        <Button mode="outlined" onPress={() => setShowPicker('out')} style={styles.flex1} textColor={theme.colors.onSurface}>
+                        <Button mode="outlined" onPress={() => setOpenCheckOut(true)} style={styles.flex1} textColor={theme.colors.onSurface}>
                             Do: {checkOut.toLocaleDateString()}</Button>
                     </View>
-
-                    {/*<Button onPress={() => setOpenCheckIn(true)}></Button>*/}
                     
-                    {showPicker && <DateTimePicker value={showPicker === 'in' ? checkIn : checkOut} mode="date" onChange={onDateChange} minimumDate={showPicker === 'out' ? checkIn : new Date()} />}
-
+                    <DatePicker 
+                        modal
+                        open={openCheckIn}
+                        date={checkIn}
+                        onConfirm={(date) => {
+                            setOpenCheckIn(false);
+                            
+                            if(date >= checkOut) setCheckOut(new Date(date.getTime() + 86400000));
+                            
+                            setCheckIn(date)
+                        }}
+                        onCancel={() => {
+                            setOpenCheckIn(false)
+                        }}
+                        minimumDate={checkIn}
+                        theme="dark"
+                        dividerColor={theme.colors.outline}
+                        buttonColor={theme.colors.primary}
+                    />
+                    
+                    <DatePicker
+                        modal
+                        open={openCheckOut}
+                        date={checkOut}
+                        onConfirm={(date) => {
+                            setOpenCheckOut(false);
+                            setCheckOut(date)
+                        }}
+                        onCancel={() => {
+                            setOpenCheckOut(false)
+                        }}
+                        minimumDate={checkIn}
+                        theme="dark"
+                        dividerColor={theme.colors.outline}
+                        buttonColor={theme.colors.primary}
+                    />
+                    
                     <LargePickerField
                         label="Pokój"
                         value={selectedRoomId}
