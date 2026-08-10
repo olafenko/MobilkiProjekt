@@ -1,14 +1,24 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import { Alert, ScrollView, StyleSheet, View } from 'react-native';
-import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { RootStackParamList } from "../../navigation/types.ts";
-import { useReservations } from "../../context/ReservationsContext.tsx";
-import { AdditionalOffer, CreateReservationRequest, Guest, ReservationStatus, Room } from "../../types/models.ts";
+import React, {useEffect, useMemo, useState} from 'react';
+import {Alert, ScrollView, StyleSheet, View} from 'react-native';
+import {NativeStackScreenProps} from "@react-navigation/native-stack";
+import {RootStackParamList} from "../../navigation/types.ts";
+import {useReservations} from "../../context/ReservationsContext.tsx";
+import {AdditionalOffer, CreateReservationRequest, Guest, ReservationStatus, Room} from "../../types/models.ts";
 import apiService from "../../api/apiService.ts";
-import { ActivityIndicator, Button, Card, Divider, IconButton, SegmentedButtons, Surface, Text, TextInput, useTheme } from 'react-native-paper';
-import DateTimePicker from '@react-native-community/datetimepicker';
-import { PickerField } from "../../components/PickerField.tsx";
-import { LargePickerField } from "../../components/LargePickerField.tsx";
+import {
+    ActivityIndicator,
+    Button,
+    Card,
+    Divider,
+    IconButton,
+    SegmentedButtons,
+    Surface,
+    Text,
+    TextInput,
+    useTheme
+} from 'react-native-paper';
+import {PickerField} from "../../components/PickerField.tsx";
+import {LargePickerField} from "../../components/LargePickerField.tsx";
 import DatePicker from "react-native-date-picker";
 import {ErrorBanner} from "../../components/ErrorBanner.tsx";
 import {useFormErrors} from "../../hooks/useFormErrors.ts";
@@ -35,7 +45,7 @@ function AddReservationScreen({ navigation }: Props) {
     const [statuses, setStatuses] = useState<ReservationStatus[]>([]);
 
     const [checkIn, setCheckIn] = useState(new Date());
-    const [checkOut, setCheckOut] = useState(new Date(Date.now() + 86400000));
+    const [checkOut, setCheckOut] = useState(new Date(Date.now() + (1000 * 60 * 60 * 24)));
     const [openCheckIn, setOpenCheckIn] = useState(false);
     const [openCheckOut, setOpenCheckOut] = useState(false);
 
@@ -96,17 +106,7 @@ function AddReservationScreen({ navigation }: Props) {
 
         return { nights, roomPricePerNight, roomCostTotal, offersTotal, grandTotal: roomCostTotal + offersTotal };
     }, [checkIn, checkOut, selectedRoomId, selectedOffers, rooms, additionalOffers]);
-
-    const onDateChange = (event: any, date?: Date) => {
-        setShowPicker(null);
-        if (date) {
-            if (showPicker === 'in') {
-                setCheckIn(date);
-                if (date >= checkOut) setCheckOut(new Date(date.getTime() + 86400000));
-            } else setCheckOut(date);
-        }
-    };
-
+    
     const addOfferReservation = () => setSelectedOffers([...selectedOffers, { id: Date.now().toString(), additionalOfferId: null, quantity: '1', notes: '' }]);
     
     const removeOfferItem = (id: string) => setSelectedOffers(selectedOffers.filter(item => item.id !== id));
@@ -186,12 +186,14 @@ function AddReservationScreen({ navigation }: Props) {
                     
                     <DatePicker 
                         modal
+                        title="Wybierz datę zameldowania"
+                        mode="date"
                         open={openCheckIn}
                         date={checkIn}
                         onConfirm={(date) => {
                             setOpenCheckIn(false);
                             
-                            if(date >= checkOut) setCheckOut(new Date(date.getTime() + 86400000));
+                            if(date >= checkOut) setCheckOut(new Date(date.getTime() + (1000 * 60 * 60 * 24)));
                             
                             setCheckIn(date)
                         }}
@@ -206,6 +208,8 @@ function AddReservationScreen({ navigation }: Props) {
                     
                     <DatePicker
                         modal
+                        title="Wybierz datę wymeldowania"
+                        mode="date"
                         open={openCheckOut}
                         date={checkOut}
                         onConfirm={(date) => {
@@ -216,6 +220,7 @@ function AddReservationScreen({ navigation }: Props) {
                             setOpenCheckOut(false)
                         }}
                         minimumDate={checkIn}
+                        maximumDate={new Date(checkIn.getTime() + (1000 * 60 * 60 * 24 * 30))}
                         theme="dark"
                         dividerColor={theme.colors.outline}
                         buttonColor={theme.colors.primary}
