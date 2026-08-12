@@ -1,6 +1,7 @@
 ﻿import React from 'react';
 import { StyleSheet, TouchableOpacity, View } from "react-native";
-import { Text, useTheme } from "react-native-paper";
+import { HelperText, Text, useTheme } from "react-native-paper";
+import MaterialDesignIcons from "@react-native-vector-icons/material-design-icons";
 
 interface PickerFieldProps<T>{
     label: string;
@@ -10,9 +11,10 @@ interface PickerFieldProps<T>{
     getLabel: (item: T) => string;
     onChange: (value: string | number) => void;
     required?: boolean;
+    error?: string;
 }
 
-export function PickerField<T>({label, items, selectedValue, getValue, getLabel, onChange, required = true}: PickerFieldProps<T>) {
+export function PickerField<T>({label, items, selectedValue, getValue, getLabel, onChange, required = true, error}: PickerFieldProps<T>) {
 
     const theme = useTheme();
 
@@ -49,9 +51,13 @@ export function PickerField<T>({label, items, selectedValue, getValue, getLabel,
                                 {getLabel(item)}
                             </Text>
                         </TouchableOpacity>
+                        
                     );
                 })}
             </View>
+            <HelperText type="error" visible={!!error} style={styles.errorText}>
+                <MaterialDesignIcons name="alert-circle-outline" color="#E53935" /> {error}
+            </HelperText>
         </View>
     );
 }
@@ -92,5 +98,11 @@ const styles = StyleSheet.create({
     },
     required: {
         color: '#CF6679'
+    },
+    
+    errorText: {
+        color: '#E53935',
+        fontSize: 12,
+        fontWeight: '500',
     },
 });

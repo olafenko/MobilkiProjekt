@@ -1,7 +1,6 @@
 import {StyleSheet, View} from "react-native";
 import React from "react";
 import {HelperText, TextInput, TextInputProps, useTheme} from "react-native-paper";
-import {theme} from "../theme/theme.ts";
 import MaterialDesignIcons from "@react-native-vector-icons/material-design-icons";
 
 
@@ -32,7 +31,7 @@ export const FormField: React.FC<FormFieldProps> = ({
             
                 label={required ? `${label} *` : label}
                 mode="outlined"
-                style={[styles.input]}
+                style={[styles.input, style]}
                 error={!!error}
                 theme={theme}
                 outlineColor={theme.colors.outline}

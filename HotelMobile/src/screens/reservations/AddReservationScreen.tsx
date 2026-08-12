@@ -10,18 +10,20 @@ import {
     Button,
     Card,
     Divider,
+    HelperText,
     IconButton,
     SegmentedButtons,
     Surface,
     Text,
-    TextInput,
     useTheme
 } from 'react-native-paper';
 import {PickerField} from "../../components/PickerField.tsx";
 import {LargePickerField} from "../../components/LargePickerField.tsx";
+import {FormField} from "../../components/FormField.tsx";
 import DatePicker from "react-native-date-picker";
 import {ErrorBanner} from "../../components/ErrorBanner.tsx";
 import {useFormErrors} from "../../hooks/useFormErrors.ts";
+import {ApiError} from "../../types/errors.ts";
 
 type Props = NativeStackScreenProps<RootStackParamList, "AddReservation">;
 
@@ -115,14 +117,116 @@ function AddReservationScreen({ navigation }: Props) {
         setSelectedOffers(selectedOffers.map(item => item.id === id ? { ...item, [field]: value } : item));
 
     const handleSubmit = async () => {
+        clearAllErrors();
         
-        if (!selectedRoomId) return Alert.alert("Błąd", "Wybierz pokój.");
-        if (guestType === 'existing' && !selectedGuestId) return Alert.alert("Błąd", "Wybierz gościa.");
+        if (!selectedRoomId) {
+            handleApiError({
+                type: 'ValidationError',
+                title: 'Błędy walidacji',
+                status: 400,
+                errors: {
+                    roomId: ['Wybierz pokój'],
+                },
+            });
+            return;
+        }
+        if (guestType === 'existing' && !selectedGuestId) {
+            handleApiError({
+                type: 'ValidationError',
+                title: 'Błędy walidacji',
+                status: 400,
+                errors: {
+                    guestId: ['Gość jest wymagany'],
+                },
+            });
+            return;
+        }
 
         if (guestType === 'new') {
-            if (!newGuest.firstName.trim() || !newGuest.lastName.trim()) return Alert.alert("Błąd", "Wypełnij imię i nazwisko nowego gościa.");
-            if (!newGuest.identityCardNumber.trim()) return Alert.alert("Błąd", "Numer dowodu osobistego jest wymagany.");
-            if (!newGuest.phoneNumber.trim()) return Alert.alert("Błąd", "Numer telefonu jest wymagany.");
+            if (!newGuest.firstName.trim()) {
+                handleApiError({
+                    type: 'ValidationError',
+                    title: 'Błędy walidacji',
+                    status: 400,
+                    errors: {
+                        firstName: ['Imie gościa jest wymagane'],
+                    },
+                });
+                return;
+            }
+            if(!newGuest.lastName.trim()) {
+                handleApiError({
+                    type: 'ValidationError',
+                    title: 'Błędy walidacji',
+                    status: 400,
+                    errors: {
+                        lastName: ['Nazwisko gościa jest wymagane'],
+                    },
+                });
+                return;
+            }
+            if (!newGuest.identityCardNumber.trim()) {
+                handleApiError({
+                    type: 'ValidationError',
+                    title: 'Błędy walidacji',
+                    status: 400,
+                    errors: {
+                        identityCardNumber: ['Numer dowodu tożsamości jest wymagany'],
+                    },
+                });
+                return;
+            }
+            if (!newGuest.phoneNumber.trim()) {
+                handleApiError({
+                    type: 'ValidationError',
+                    title: 'Błędy walidacji',
+                    status: 400,
+                    errors: {
+                        phoneNumber: ['Numer kontaktowy gościa jest wymagany'],
+                    },
+                });
+                return;
+            }
+        }
+
+        for (const offer of selectedOffers) {
+            const quantity = parseFloat(offer.quantity);
+
+            if (!offer.additionalOfferId) {
+                handleApiError({
+                    type: 'ValidationError',
+                    title: 'Błędy walidacji',
+                    status: 400,
+                    errors: {
+                        additionalOfferId: ['Wybierz usługę dodatkową'],
+                    },
+                });
+                return;
+            }
+
+            if (!offer.quantity.trim() || Number.isNaN(quantity) || quantity <= 0) {
+                handleApiError({
+                    type: 'ValidationError',
+                    title: 'Błędy walidacji',
+                    status: 400,
+                    errors: {
+                        quantity: ['Podaj poprawną ilość'],
+                    },
+                });
+                return;
+            }
+        }
+
+        if (!status) {
+            handleApiError({
+                type: 'ValidationError',
+                title: 'Błędy walidacji',
+                status: 400,
+                errors: {
+                    reservationStatus: ['Wybierz status rezerwacji'],
+                },
+            });
+            return;
         }
 
         const validOffers = selectedOffers
@@ -148,7 +252,7 @@ function AddReservationScreen({ navigation }: Props) {
             await addReservation(reservationData);
             Alert.alert("Sukces", "Rezerwacja została utworzona pomyślnie.", [{ text: "OK", onPress: () => navigation.goBack() }]);
         } catch (err) {
-            Alert.alert("Błąd", (err as Error).message);
+            handleApiError(err as ApiError)
         } finally {
             setSubmitting(false);
         }
@@ -183,6 +287,9 @@ function AddReservationScreen({ navigation }: Props) {
                         <Button mode="outlined" onPress={() => setOpenCheckOut(true)} style={styles.flex1} textColor={theme.colors.onSurface}>
                             Do: {checkOut.toLocaleDateString()}</Button>
                     </View>
+                    <HelperText type="error" visible={!!errors.checkOutDate}>
+                        {errors.checkOutDate}
+                    </HelperText>
                     
                     <DatePicker 
                         modal
@@ -194,8 +301,9 @@ function AddReservationScreen({ navigation }: Props) {
                             setOpenCheckIn(false);
                             
                             if(date >= checkOut) setCheckOut(new Date(date.getTime() + (1000 * 60 * 60 * 24)));
-                            
                             setCheckIn(date)
+                            clearFieldError("checkInDate")
+                            clearFieldError("checkOutDate")
                         }}
                         onCancel={() => {
                             setOpenCheckIn(false)
@@ -214,7 +322,8 @@ function AddReservationScreen({ navigation }: Props) {
                         date={checkOut}
                         onConfirm={(date) => {
                             setOpenCheckOut(false);
-                            setCheckOut(date)
+                            setCheckOut(date);
+                            clearFieldError("checkOutDate");
                         }}
                         onCancel={() => {
                             setOpenCheckOut(false)
@@ -231,7 +340,11 @@ function AddReservationScreen({ navigation }: Props) {
                         value={selectedRoomId}
                         items={rooms} getValue={r => r.roomId} 
                         getLabel={r => `Pokój ${r.number} (${r.roomTypeName}) - ${r.basePrice} zł/doba`}
-                        onChange={val => setSelectedRoomId(val as number | null)}
+                        onChange={(val) => {
+                            setSelectedRoomId(val as number | null)
+                            clearFieldError("roomId")
+                        }}
+                        error={errors.roomId}
                         required
                     />
 
@@ -255,16 +368,29 @@ function AddReservationScreen({ navigation }: Props) {
                                 items={additionalOffers}
                                 getValue={o => o.additionalOfferId}
                                 getLabel={o => `${o.name} (${o.price} zł)`}
-                                onChange={val => updateOfferItem(item.id, 'additionalOfferId', val)}
+                                onChange={(val) => {
+                                    updateOfferItem(item.id, 'additionalOfferId', val)
+                                    clearFieldError("additionalOfferId")
+                                }}
+                                error={errors.additionalOfferId}
                             />
                             <View style={[styles.row, { marginTop: 8, gap: 8 }]}>
                                 
-                                <TextInput label="Ilość" mode="outlined" keyboardType="numeric" value={item.quantity}
-                                           onChangeText={t => updateOfferItem(item.id, 'quantity', t)} style={[styles.input, { flex: 1 }]}
-                                           outlineColor={theme.colors.outline} activeOutlineColor={theme.colors.primary} />
+                                <FormField label="Ilość" required keyboardType="numeric" value={item.quantity}
+                                           onChangeText={(t) => {
+                                               updateOfferItem(item.id, 'quantity', t)
+                                               clearFieldError("quantity")
+                                           }}
+                                           style={styles.input}
+                                           error={errors.quantity} />
                                 
-                                <TextInput label="Uwagi (np. godzina dostawy)" mode="outlined" value={item.notes} onChangeText={t => updateOfferItem(item.id, 'notes', t)}
-                                           style={[styles.input, { flex: 2 }]} outlineColor={theme.colors.outline} activeOutlineColor={theme.colors.primary} />
+                                <FormField label="Uwagi (np. godzina dostawy)" value={item.notes}
+                                           onChangeText={(t) => {
+                                               updateOfferItem(item.id, 'notes', t)
+                                               clearFieldError("notes")
+                                           }}
+                                           style={styles.input}
+                                           error={errors.notes} />
                             </View>
                         </Surface>
                     ))}
@@ -281,28 +407,55 @@ function AddReservationScreen({ navigation }: Props) {
                             value={selectedGuestId} items={guests}
                             getValue={g => g.guestId}
                             getLabel={g => `${g.firstName} ${g.lastName} (${g.identityCardNumber || 'Brak dowodu'})`}
-                            onChange={val => setSelectedGuestId(val as number | null)}
+                            onChange={(val) => {
+                                setSelectedGuestId(val as number | null)
+                                clearFieldError("guestId")
+                            }}
+                            error={errors.guestId}
                             required
                         />
                     ) : (
+                        
+                        //TODO 2 DODAC LOGIKE AUTOMATYCZNEGO USTAWIANIA GODZINY REZERWACJI NA BACKENDZIE
                         <View style={styles.gap}>
-                            <TextInput label="Imię *" mode="outlined" value={newGuest.firstName} onChangeText={t => setNewGuest({...newGuest, firstName: t})}
-                                       style={styles.input} outlineColor={theme.colors.outline} activeOutlineColor={theme.colors.primary} />
+                            <FormField label="Imię" required value={newGuest.firstName} 
+                                       onChangeText={(t) => {
+                                           setNewGuest({...newGuest, firstName: t})
+                                           clearFieldError("firstName")
+                                       }}
+                                       style={styles.input} error={errors.firstName} />
                             
-                            <TextInput label="Nazwisko *" mode="outlined" value={newGuest.lastName} onChangeText={t => setNewGuest({...newGuest, lastName: t})}
-                                       style={styles.input} outlineColor={theme.colors.outline} activeOutlineColor={theme.colors.primary} />
+                            <FormField label="Nazwisko" required value={newGuest.lastName} 
+                                       onChangeText={(t) => {
+                                           setNewGuest({...newGuest, lastName: t})
+                                           clearFieldError("lastName")
+                                       }}
+                                       style={styles.input} error={errors.lastName} />
                             
-                            <TextInput label="Numer dowodu (np. ABC123456) *" mode="outlined" value={newGuest.identityCardNumber}
-                                       onChangeText={t => setNewGuest({...newGuest, identityCardNumber: t.toUpperCase()})} autoCapitalize="characters" style={styles.input}
-                                       outlineColor={theme.colors.outline} activeOutlineColor={theme.colors.primary} />
+                            <FormField label="Numer dowodu (np. ABC123456)" required value={newGuest.identityCardNumber}
+                                       onChangeText={(t) => {
+                                           setNewGuest({...newGuest, identityCardNumber: t.toUpperCase()})
+                                           clearFieldError("identityCardNumber")
+                                       }}
+                                       autoCapitalize="characters"
+                                       style={styles.input}
+                                       error={errors.identityCardNumber} />
                             
-                            <TextInput label="Numer telefonu *" mode="outlined" keyboardType="phone-pad" value={newGuest.phoneNumber}
-                                       onChangeText={t => setNewGuest({...newGuest, phoneNumber: t})} style={styles.input} outlineColor={theme.colors.outline}
-                                       activeOutlineColor={theme.colors.primary} />
+                            <FormField label="Numer telefonu" required keyboardType="phone-pad" value={newGuest.phoneNumber}
+                                       onChangeText={(t) => {
+                                           setNewGuest({...newGuest, phoneNumber: t})
+                                           clearFieldError("phoneNumber")
+                                       }}
+                                       style={styles.input}
+                                       error={errors.phoneNumber} />
                             
-                            <TextInput label="Email komunikacyjny" mode="outlined" keyboardType="email-address" autoCapitalize="none" value={newGuest.email}
-                                       onChangeText={t => setNewGuest({...newGuest, email: t})} style={styles.input} outlineColor={theme.colors.outline} 
-                                       activeOutlineColor={theme.colors.primary} />
+                            <FormField label="Email komunikacyjny" keyboardType="email-address" autoCapitalize="none" value={newGuest.email}
+                                       onChangeText={(t) => {
+                                           setNewGuest({...newGuest, email: t})
+                                           clearFieldError("email")
+                                       }}
+                                       style={styles.input}
+                                       error={errors.email} />
                         </View>
                     )}
 
@@ -314,12 +467,22 @@ function AddReservationScreen({ navigation }: Props) {
                         items={statuses}
                         getValue={s => s}
                         getLabel={s=> s}
-                        onChange={val => setStatus(val as ReservationStatus)}
+                        onChange={(val) => {
+                            setStatus(val as ReservationStatus);
+                            clearFieldError("reservationStatus")
+                        }}
+                        error={errors.reservationStatus}
                         required
                     />
 
-                    <TextInput label="Informacje dodatkowe" mode="outlined" multiline numberOfLines={3} value={reservationNotes} onChangeText={setReservationNotes}
-                               style={[styles.input, { marginTop: 12 }]} outlineColor={theme.colors.outline} activeOutlineColor={theme.colors.primary} />
+                    <FormField
+                        label="Informacje dodatkowe"
+                        multiline
+                        numberOfLines={3}
+                        value={reservationNotes}
+                        onChangeText={setReservationNotes}
+                        style={[styles.input, { marginTop: 12 }]}
+                    />
 
                     <Surface style={[styles.summarySurface, { backgroundColor: 'rgba(0, 0, 0, 0.2)', borderColor: theme.colors.outlineVariant }]} elevation={0}>
                         <Text variant="titleSmall" style={[styles.summaryTitle, { color: theme.colors.onSurfaceVariant }]}>Podsumowanie kosztów</Text>
@@ -378,6 +541,9 @@ const styles = StyleSheet.create({
     },
     flex1: {
         flex: 1
+    },
+    flex2: {
+        flex: 2
     },
     divider: {
         marginVertical: 24,

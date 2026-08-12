@@ -11,13 +11,13 @@ public class CreateReservationValidator : AbstractValidator<CreateReservationCom
     {
 
         RuleFor(x => x.CheckInDate)
-            .GreaterThan(x => DateTime.Now)
+            .GreaterThanOrEqualTo( DateTime.Now.Date)
             .WithMessage("Data zameldowania nie może być w przeszłości.")
             .LessThan(x => x.CheckOutDate)
             .WithMessage("Data zameldowania musi być wcześniej niż data wymeldowania.");
 
         RuleFor(x => x.CheckOutDate)
-            .GreaterThan(x => DateTime.Now)
+            .GreaterThan(DateTime.Now.Date)
             .WithMessage("Data wymeldowania nie może być w przeszłości.")
             .GreaterThan(x => x.CheckInDate)
             .WithMessage("Data wymeldowania musi być później niż data zameldowania.");
