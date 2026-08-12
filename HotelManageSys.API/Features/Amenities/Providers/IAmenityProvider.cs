@@ -10,5 +10,6 @@ namespace HotelManageSys.API.Features.Amenities.Providers
 
         Task<List<Amenity>> GetAmenitiesByIdsAsync(IEnumerable<int> amenityIds, bool asNoTracking = true, CancellationToken cancellationToken = default);
         Task<bool> AmenityExistsByName(string name, CancellationToken cancellationToken = default);
+        Task<bool> AmenityExistsByName(string name, int amenityId, CancellationToken cancellationToken = default);
     }
 }

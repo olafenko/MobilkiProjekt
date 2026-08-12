@@ -44,14 +44,29 @@ namespace HotelManageSys.API.Features.Guests.Providers
             return await _dbContext.Guests.AnyAsync(g => g.Email == email && g.IsActive,cancellationToken);
         }
 
+        public async Task<bool> GuestExistsByEmail(string email, int guestId, CancellationToken cancellationToken = default)
+        {
+            return await _dbContext.Guests.AnyAsync(g => g.Email == email && g.GuestId != guestId && g.IsActive,cancellationToken);
+        }
+
         public async Task<bool> GuestExistsByPhoneNumber(string phoneNumber, CancellationToken cancellationToken = default)
         {
             return await _dbContext.Guests.AnyAsync(g => g.PhoneNumber == phoneNumber && g.IsActive,cancellationToken);
         }
 
+        public async Task<bool> GuestExistsByPhoneNumber(string phoneNumber, int guestId, CancellationToken cancellationToken = default)
+        {
+            return await _dbContext.Guests.AnyAsync(g => g.PhoneNumber == phoneNumber && g.GuestId != guestId && g.IsActive,cancellationToken);
+        }
+
         public async Task<bool> GuestExistsByIdentityCardNumber(string identityCardNumber, CancellationToken cancellationToken = default)
         {
             return await _dbContext.Guests.AnyAsync(g => g.IdentityCardNumber == identityCardNumber && g.IsActive,cancellationToken);
+        }
+
+        public async Task<bool> GuestExistsByIdentityCardNumber(string identityCardNumber, int guestId, CancellationToken cancellationToken = default)
+        {
+            return await _dbContext.Guests.AnyAsync(g => g.IdentityCardNumber == identityCardNumber && g.GuestId != guestId && g.IsActive,cancellationToken);
         }
 
         public async Task<bool> GuestExistsById(int? guestId, CancellationToken cancellationToken = default)

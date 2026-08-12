@@ -9,6 +9,7 @@ namespace HotelManageSys.API.Features.RoomTypes.Providers
 
         Task<RoomType?> GetRoomTypeById(int roomId, bool asNoTracking = true, CancellationToken cancellationToken = default);
         Task<bool> RoomTypeExistsByName(string name, CancellationToken cancellationToken = default);
+        Task<bool> RoomTypeExistsByName(string name, int roomTypeId, CancellationToken cancellationToken = default);
 
     }
 }

@@ -48,6 +48,11 @@ namespace HotelManageSys.API.Features.AdditionalOffers.Providers
         {
             return await _dbContext.AdditionalOffers.AnyAsync(ao => ao.Name == name && ao.IsActive, cancellationToken);
         }
+
+        public async Task<bool> AdditionalOfferExistsByName(string name, int additionalOfferId, CancellationToken cancellationToken = default)
+        {
+            return await _dbContext.AdditionalOffers.AnyAsync(ao => ao.Name == name && ao.AdditionalOfferId != additionalOfferId && ao.IsActive, cancellationToken);
+        }
     }
 }
 

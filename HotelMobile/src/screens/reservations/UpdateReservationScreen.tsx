@@ -10,14 +10,18 @@ import {
     Button,
     Card,
     Divider,
+    HelperText,
     Surface,
     Text,
-    TextInput,
     useTheme
 } from 'react-native-paper';
-import DateTimePicker from '@react-native-community/datetimepicker';
+import DatePicker from "react-native-date-picker";
 import { PickerField } from "../../components/PickerField.tsx";
 import { LargePickerField } from "../../components/LargePickerField.tsx";
+import { FormField } from "../../components/FormField.tsx";
+import { ErrorBanner } from "../../components/ErrorBanner.tsx";
+import { useFormErrors } from "../../hooks/useFormErrors.ts";
+import { ApiError } from "../../types/errors.ts";
 
 type Props = NativeStackScreenProps<RootStackParamList, 'UpdateReservation'>;
 
@@ -28,10 +32,11 @@ function UpdateReservationScreen({ navigation, route }: Props) {
 
     const [checkIn, setCheckIn] = useState(new Date(reservation.checkInDate));
     const [checkOut, setCheckOut] = useState(new Date(reservation.checkOutDate));
-    const [showPicker, setShowPicker] = useState<'in' | 'out' | null>(null);
+    const [openCheckIn, setOpenCheckIn] = useState(false);
+    const [openCheckOut, setOpenCheckOut] = useState(false);
 
-    const [status, setStatus] = useState<ReservationStatus>(reservation.reservationStatus);
-    const [selectedRoomId, setSelectedRoomId] = useState<number>(reservation.roomId);
+    const [status, setStatus] = useState<ReservationStatus | null>(reservation.reservationStatus);
+    const [selectedRoomId, setSelectedRoomId] = useState<number | null>(reservation.roomId);
     const [reservationNotes, setReservationNotes] = useState(reservation.notes || '');
 
     const [rooms, setRooms] = useState<Room[]>([]);
@@ -39,6 +44,14 @@ function UpdateReservationScreen({ navigation, route }: Props) {
 
     const [loading, setLoading] = useState(true);
     const [submitting, setSubmitting] = useState(false);
+
+    const {
+        errors,
+        generalError,
+        clearFieldError,
+        clearAllErrors,
+        handleApiError
+    } = useFormErrors();
 
     useEffect(() => {
         const loadData = async () => {
@@ -67,17 +80,33 @@ function UpdateReservationScreen({ navigation, route }: Props) {
         return { nights, roomPricePerNight, roomCostTotal };
     }, [checkIn, checkOut, selectedRoomId, rooms]);
 
-    const onDateChange = (event: any, date?: Date) => {
-        setShowPicker(null);
-        if (date) {
-            if (showPicker === 'in') {
-                setCheckIn(date);
-                if (date >= checkOut) setCheckOut(new Date(date.getTime() + 86400000));
-            } else setCheckOut(date);
-        }
-    };
-
     const handleSubmit = async () => {
+        clearAllErrors();
+
+        if (!selectedRoomId) {
+            handleApiError({
+                type: 'ValidationError',
+                title: 'Błędy walidacji',
+                status: 400,
+                errors: {
+                    roomId: ['Wybierz pokój'],
+                },
+            });
+            return;
+        }
+
+        if (!status) {
+            handleApiError({
+                type: 'ValidationError',
+                title: 'Błędy walidacji',
+                status: 400,
+                errors: {
+                    reservationStatus: ['Wybierz status rezerwacji'],
+                },
+            });
+            return;
+        }
+
         try {
             setSubmitting(true);
             await updateReservation(reservation.reservationId, {
@@ -93,7 +122,7 @@ function UpdateReservationScreen({ navigation, route }: Props) {
                 { text: "OK", onPress: () => navigation.goBack() },
             ]);
         } catch (err) {
-            Alert.alert("Błąd", (err as Error).message);
+            handleApiError(err as ApiError);
         } finally {
             setSubmitting(false);
         }
@@ -111,55 +140,111 @@ function UpdateReservationScreen({ navigation, route }: Props) {
         <ScrollView style={{ backgroundColor: theme.colors.background }} contentContainerStyle={styles.scrollContent}>
             <Card style={styles.card} mode="contained">
                 <Card.Content>
+                    {generalError && (
+                        <ErrorBanner
+                            message={generalError}
+                            onDismiss={clearAllErrors}
+                        />
+                    )}
+
                     <Text variant="headlineSmall" style={styles.mainTitle}>Edycja rezerwacji</Text>
 
                     <Divider style={styles.divider} />
 
                     <Text variant="titleMedium" style={styles.sectionTitle}>Termin pobytu</Text>
                     <View style={styles.row}>
-                        <Button mode="outlined" onPress={() => setShowPicker('in')} style={styles.flex1} textColor={theme.colors.onSurface}>
+                        <Button mode="outlined" onPress={() => setOpenCheckIn(true)} style={styles.flex1} textColor={theme.colors.onSurface}>
                             Od: {checkIn.toLocaleDateString()}
                         </Button>
                         <View style={{ width: 10 }} />
-                        <Button mode="outlined" onPress={() => setShowPicker('out')} style={styles.flex1} textColor={theme.colors.onSurface}>
+                        <Button mode="outlined" onPress={() => setOpenCheckOut(true)} style={styles.flex1} textColor={theme.colors.onSurface}>
                             Do: {checkOut.toLocaleDateString()}
                         </Button>
                     </View>
+                    <HelperText type="error" visible={!!errors.checkOutDate}>
+                        {errors.checkOutDate}
+                    </HelperText>
 
-                    {showPicker && (
-                        <DateTimePicker value={showPicker === 'in' ? checkIn : checkOut} mode="date" onChange={onDateChange} minimumDate={showPicker === 'out' ? checkIn : new Date()}/>
-                    )}
+                    <DatePicker
+                        modal
+                        title="Wybierz datę zameldowania"
+                        mode="date"
+                        open={openCheckIn}
+                        date={checkIn}
+                        onConfirm={(date) => {
+                            setOpenCheckIn(false);
+
+                            if (date >= checkOut) setCheckOut(new Date(date.getTime() + (1000 * 60 * 60 * 24)));
+                            setCheckIn(date);
+                            clearFieldError("checkInDate");
+                            clearFieldError("checkOutDate");
+                        }}
+                        onCancel={() => {
+                            setOpenCheckIn(false);
+                        }}
+                        minimumDate={checkIn}
+                        theme="dark"
+                        dividerColor={theme.colors.outline}
+                        buttonColor={theme.colors.primary}
+                    />
+
+                    <DatePicker
+                        modal
+                        title="Wybierz datę wymeldowania"
+                        mode="date"
+                        open={openCheckOut}
+                        date={checkOut}
+                        onConfirm={(date) => {
+                            setOpenCheckOut(false);
+                            setCheckOut(date);
+                            clearFieldError("checkOutDate");
+                        }}
+                        onCancel={() => {
+                            setOpenCheckOut(false);
+                        }}
+                        minimumDate={checkIn}
+                        maximumDate={new Date(checkIn.getTime() + (1000 * 60 * 60 * 24 * 30))}
+                        theme="dark"
+                        dividerColor={theme.colors.outline}
+                        buttonColor={theme.colors.primary}
+                    />
 
                     <LargePickerField
-                        label="Pokój *"
+                        label="Pokój"
                         value={selectedRoomId}
                         items={rooms}
                         getValue={r => r.roomId}
                         getLabel={r => `Pokój ${r.number} (${r.roomTypeName})`}
-                        onChange={val => setSelectedRoomId(val as number)}
+                        onChange={(val) => {
+                            setSelectedRoomId(val as number | null);
+                            clearFieldError("roomId");
+                        }}
+                        error={errors.roomId}
+                        required
                     />
 
                     <PickerField
-                        label="Status rezerwacji *"
+                        label="Status rezerwacji"
                         selectedValue={status}
                         items={statuses}
                         getValue={s => s}
                         getLabel={s => s}
-                        onChange={val => setStatus(val as ReservationStatus)}
+                        onChange={(val) => {
+                            setStatus(val as ReservationStatus);
+                            clearFieldError("reservationStatus");
+                        }}
+                        error={errors.reservationStatus}
                         required
                     />
 
-                    <TextInput
+                    <FormField
                         label="Informacje dodatkowe"
-                        mode="outlined"
                         value={reservationNotes}
                         onChangeText={setReservationNotes}
                         multiline
                         numberOfLines={3}
                         editable={!submitting}
                         style={styles.input}
-                        outlineColor={theme.colors.outline}
-                        activeOutlineColor={theme.colors.primary}
                     />
 
                     <Surface style={[styles.summarySurface, { backgroundColor: 'rgba(0, 0, 0, 0.2)', borderColor: theme.colors.outlineVariant }]} elevation={0}>

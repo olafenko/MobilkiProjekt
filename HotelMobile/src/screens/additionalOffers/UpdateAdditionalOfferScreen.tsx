@@ -4,6 +4,10 @@ import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../navigation/types.ts";
 import { useAdditionalOffers } from "../../context/AdditionalOffersContext.tsx";
 import { TextInput, Button, Card, Text, useTheme } from 'react-native-paper';
+import { useFormErrors } from "../../hooks/useFormErrors.ts";
+import { ApiError } from "../../types/errors.ts";
+import { ErrorBanner } from "../../components/ErrorBanner.tsx";
+import { FormField } from "../../components/FormField.tsx";
 
 type Props = NativeStackScreenProps<RootStackParamList, "UpdateAdditionalOffer">;
 
@@ -15,17 +19,49 @@ function UpdateAdditionalOfferScreen({ navigation, route }: Props) {
     const [price, setPrice] = useState(additionalOffer.price.toString());
     const [submitting, setSubmitting] = useState(false);
 
+    const {
+        errors,
+        generalError,
+        clearFieldError,
+        clearAllErrors,
+        handleApiError
+    } = useFormErrors();
+
     const handleSubmit = async () => {
-        if (!name.trim()) return Alert.alert("Błąd", "Podaj nazwę oferty");
+        clearAllErrors();
+
         const parsedPrice = parseFloat(price);
-        if (!price.trim() || parsedPrice < 0) return Alert.alert("Błąd", "Podaj poprawną cenę");
+
+        if (!name.trim()) {
+            handleApiError({
+                type: 'ValidationError',
+                title: 'Błędy walidacji',
+                status: 400,
+                errors: {
+                    name: ['Nazwa oferty jest wymagana'],
+                },
+            });
+            return;
+        }
+
+        if (!price.trim() || Number.isNaN(parsedPrice) || parsedPrice < 0) {
+            handleApiError({
+                type: 'ValidationError',
+                title: 'Błędy walidacji',
+                status: 400,
+                errors: {
+                    price: ['Podaj poprawną cenę'],
+                },
+            });
+            return;
+        }
 
         try {
             setSubmitting(true);
             await updateAdditionalOffer(additionalOffer.additionalOfferId, { additionalOfferId: additionalOffer.additionalOfferId, name: name.trim(), price: parsedPrice });
             Alert.alert("Sukces", "Oferta została zaktualizowana", [{ text: "OK", onPress: () => navigation.goBack() }]);
         } catch (err) {
-            Alert.alert("Błąd", (err as Error).message);
+            handleApiError(err as ApiError);
         } finally {
             setSubmitting(false);
         }
@@ -35,12 +71,40 @@ function UpdateAdditionalOfferScreen({ navigation, route }: Props) {
         <ScrollView style={{ backgroundColor: theme.colors.background }} contentContainerStyle={styles.scrollContent}>
             <Card style={styles.card} mode="contained">
                 <Card.Content style={styles.form}>
-                    <Text variant="headlineSmall" style={styles.title}>Edycja oferty</Text>
-                    <TextInput label="Nazwa usługi *" mode="outlined" value={name} onChangeText={setName} editable={!submitting} style={styles.input}
-                               outlineColor={theme.colors.outline} activeOutlineColor={theme.colors.primary} />
+                    {generalError && (
+                        <ErrorBanner
+                            message={generalError}
+                            onDismiss={clearAllErrors}
+                        />
+                    )}
 
-                    <TextInput label="Cena (PLN) *" mode="outlined" value={price} onChangeText={setPrice} editable={!submitting} keyboardType="decimal-pad"
-                               style={styles.input} outlineColor={theme.colors.outline} activeOutlineColor={theme.colors.primary} left={<TextInput.Affix text="zł" />} />
+                    <Text variant="headlineSmall" style={styles.title}>Edycja oferty</Text>
+
+                    <FormField
+                        label="Nazwa usługi"
+                        required
+                        value={name}
+                        onChangeText={(text) => {
+                            setName(text);
+                            clearFieldError('name');
+                        }}
+                        editable={!submitting}
+                        error={errors.name}
+                    />
+
+                    <FormField
+                        label="Cena (PLN)"
+                        required
+                        value={price}
+                        onChangeText={(text) => {
+                            setPrice(text);
+                            clearFieldError('price');
+                        }}
+                        editable={!submitting}
+                        keyboardType="decimal-pad"
+                        error={errors.price}
+                        left={<TextInput.Affix text="zł" />}
+                    />
 
                     <View style={styles.buttonWrapper}>
                         <Button mode="outlined" onPress={() => navigation.goBack()} style={styles.button} disabled={submitting} 
@@ -60,7 +124,6 @@ const styles = StyleSheet.create({
     form: { gap: 16 },
     title: { fontWeight: 'bold', textAlign: 'center' },
     subtitle: { textAlign: 'center', opacity: 0.5, marginTop: -8, marginBottom: 8 },
-    input: { backgroundColor: 'transparent' },
     buttonWrapper: { flexDirection: 'row', gap: 12, marginTop: 16 },
     button: { flex: 1, borderRadius: 12, paddingVertical: 4 },
 });

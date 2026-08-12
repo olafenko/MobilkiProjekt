@@ -7,7 +7,12 @@ import { PaymentMethod, PaymentStatus, Reservation } from "../../types/models.ts
 import { PickerField } from "../../components/PickerField.tsx";
 import apiService from "../../api/apiService.ts";
 import { LargePickerField } from "../../components/LargePickerField.tsx";
-import { TextInput, Button, Card, Text, useTheme, ActivityIndicator } from 'react-native-paper';
+import { TextInput, Button, Card, Text, useTheme, ActivityIndicator, HelperText } from 'react-native-paper';
+import { useFormErrors } from "../../hooks/useFormErrors.ts";
+import { ApiError } from "../../types/errors.ts";
+import { ErrorBanner } from "../../components/ErrorBanner.tsx";
+import { FormField } from "../../components/FormField.tsx";
+import MaterialDesignIcons from "@react-native-vector-icons/material-design-icons";
 
 type Props = NativeStackScreenProps<RootStackParamList, "AddPayment">;
 
@@ -26,6 +31,14 @@ function AddPaymentScreen({ navigation }: Props) {
     const [loading, setLoading] = useState(true);
     const [submitting, setSubmitting] = useState(false);
 
+    const {
+        errors,
+        generalError,
+        clearFieldError,
+        clearAllErrors,
+        handleApiError
+    } = useFormErrors();
+
     useEffect(() => {
         const loadData = async () => {
             try {
@@ -42,13 +55,57 @@ function AddPaymentScreen({ navigation }: Props) {
     }, []);
 
     const handleSubmit = async () => {
-        if (!title.trim()) return Alert.alert("Błąd", "Podaj tytuł płatności");
+        clearAllErrors();
 
         const parsedPrice = parseFloat(price);
-        if (!price.trim() || parsedPrice <= 0) return Alert.alert("Błąd", "Podaj poprawną kwotę (większą od zera)");
 
-        if (!paymentMethod) return Alert.alert("Błąd", "Wybierz metodę płatności");
-        if (!reservationId) return Alert.alert("Błąd", "Przypisz płatność do rezerwacji");
+        if (!title.trim()) {
+            handleApiError({
+                type: 'ValidationError',
+                title: 'Błędy walidacji',
+                status: 400,
+                errors: {
+                    title: ['Tytuł płatności jest wymagany'],
+                },
+            });
+            return;
+        }
+
+        if (!price.trim() || Number.isNaN(parsedPrice) || parsedPrice <= 0) {
+            handleApiError({
+                type: 'ValidationError',
+                title: 'Błędy walidacji',
+                status: 400,
+                errors: {
+                    price: ['Podaj poprawną kwotę większą od zera'],
+                },
+            });
+            return;
+        }
+
+        if (!paymentMethod) {
+            handleApiError({
+                type: 'ValidationError',
+                title: 'Błędy walidacji',
+                status: 400,
+                errors: {
+                    paymentMethod: ['Wybierz metodę płatności'],
+                },
+            });
+            return;
+        }
+
+        if (!reservationId) {
+            handleApiError({
+                type: 'ValidationError',
+                title: 'Błędy walidacji',
+                status: 400,
+                errors: {
+                    reservationId: ['Przypisz płatność do rezerwacji'],
+                },
+            });
+            return;
+        }
 
         try {
             setSubmitting(true);
@@ -57,7 +114,7 @@ function AddPaymentScreen({ navigation }: Props) {
                 { text: "OK", onPress: () => navigation.goBack() }
             ]);
         } catch (err) {
-            Alert.alert("Błąd", (err as Error).message);
+            handleApiError(err as ApiError);
         } finally {
             setSubmitting(false);
         }
@@ -76,33 +133,76 @@ function AddPaymentScreen({ navigation }: Props) {
         <ScrollView style={{ backgroundColor: theme.colors.background }} contentContainerStyle={styles.scrollContent}>
             <Card style={styles.card} mode="contained">
                 <Card.Content style={styles.form}>
+                    {generalError && (
+                        <ErrorBanner
+                            message={generalError}
+                            onDismiss={clearAllErrors}
+                        />
+                    )}
+
                     <Text variant="headlineSmall" style={styles.title}>Nowa płatność</Text>
 
-                    <TextInput label="Tytuł płatności *" mode="outlined" value={title} onChangeText={setTitle} editable={!submitting}
-                               placeholder="np. Opłata za rezerwację #123" style={styles.input} outlineColor={theme.colors.outline} activeOutlineColor={theme.colors.primary} />
+                    <FormField
+                        label="Tytuł płatności"
+                        required
+                        value={title}
+                        onChangeText={(text) => {
+                            setTitle(text);
+                            clearFieldError('title');
+                        }}
+                        editable={!submitting}
+                        placeholder="np. Opłata za rezerwację #123"
+                        error={errors.title}
+                    />
 
-                    <TextInput label="Kwota (PLN) *" mode="outlined" value={price} onChangeText={setPrice} editable={!submitting} keyboardType="decimal-pad" placeholder="0.00"
-                               style={styles.input} outlineColor={theme.colors.outline} activeOutlineColor={theme.colors.primary} left={<TextInput.Affix text="zł" />} />
+                    <FormField
+                        label="Kwota (PLN)"
+                        required
+                        value={price}
+                        onChangeText={(text) => {
+                            setPrice(text);
+                            clearFieldError('price');
+                        }}
+                        editable={!submitting}
+                        keyboardType="decimal-pad"
+                        placeholder="0.00"
+                        error={errors.price}
+                        left={<TextInput.Affix text="zł" />}
+                    />
 
                     <LargePickerField 
-                        label="Rezerwacja *"
+                        label="Rezerwacja"
                         value={reservationId}
                         items={reservations}
                         getValue={res => res.reservationId}
                         getLabel={res => `Rezerwacja #${res.reservationId}`}
-                        onChange={val => setReservationId(val as number)}
-                        placeholder="Wybierz rezerwację..." required disabled={submitting}
+                        onChange={val => {
+                            setReservationId(val as number);
+                            clearFieldError('reservationId');
+                        }}
+                        placeholder="Wybierz rezerwację..."
+                        required
+                        disabled={submitting}
+                        error={errors.reservationId}
                     />
 
-                    <PickerField 
+                    <View>
+                        <HelperText type="error" visible={!!errors.paymentMethod} style={styles.errorText}>
+                            <MaterialDesignIcons name="alert-circle-outline" color="#E53935" /> {errors.paymentMethod}
+                        </HelperText>
+                        <PickerField 
                         label="Metoda płatności *"
                         selectedValue={paymentMethod}
                         items={methods}
                         getValue={m => m}
                         getLabel={m => m}
-                        onChange={val => setPaymentMethod(val as PaymentMethod)}
+                        onChange={val => {
+                            setPaymentMethod(val as PaymentMethod);
+                            clearFieldError('paymentMethod');
+                        }}
                         required
-                    />
+                        />
+                    </View>
 
                     <View style={styles.buttonWrapper}>
                         <Button mode="outlined" onPress={() => navigation.goBack()} style={styles.button} disabled={submitting} textColor={theme.colors.onSurfaceVariant}>Anuluj</Button>
@@ -122,7 +222,7 @@ const styles = StyleSheet.create({
     card: { borderRadius: 24, paddingVertical: 8 },
     form: { gap: 16 },
     title: { fontWeight: 'bold', textAlign: 'center', marginBottom: 8 },
-    input: { backgroundColor: 'transparent' },
+    errorText: { color: '#E53935', fontSize: 12, fontWeight: '500' },
     buttonWrapper: { flexDirection: 'row', gap: 12, marginTop: 16 },
     button: { flex: 1, borderRadius: 12, paddingVertical: 4 },
 });

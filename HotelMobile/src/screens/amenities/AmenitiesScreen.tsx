@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from "react";
-import { Alert, FlatList, StyleSheet, View, RefreshControl } from "react-native";
-import { NativeStackScreenProps } from "@react-navigation/native-stack";
+import React, {useEffect} from "react";
+import {Alert, FlatList, StyleSheet, View} from "react-native";
+import {NativeStackScreenProps} from "@react-navigation/native-stack";
 import {HomePageStackParamList, RootStackParamList} from "../../navigation/types.ts";
-import { Amenity } from "../../types/models.ts";
-import { useAmenities } from "../../context/AmenitiesContext.tsx";
-import { Text, Card, Button, ActivityIndicator, FAB, useTheme, Avatar, IconButton, Surface } from "react-native-paper";
+import {Amenity} from "../../types/models.ts";
+import {useAmenities} from "../../context/AmenitiesContext.tsx";
+import {ActivityIndicator, Avatar, Card, FAB, IconButton, Surface, Text, useTheme} from "react-native-paper";
 import {CompositeScreenProps} from "@react-navigation/native";
 
 type Props = CompositeScreenProps<NativeStackScreenProps<HomePageStackParamList, 'Amenities'>,NativeStackScreenProps<RootStackParamList>>;

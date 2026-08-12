@@ -3,7 +3,11 @@ import { View, StyleSheet, ScrollView, Alert } from 'react-native';
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../navigation/types.ts";
 import { useGuests } from "../../context/GuestsContext.tsx";
-import { TextInput, Button, Card, Text, useTheme } from 'react-native-paper';
+import { Button, Card, Text, useTheme } from 'react-native-paper';
+import { useFormErrors } from "../../hooks/useFormErrors.ts";
+import { ApiError } from "../../types/errors.ts";
+import { ErrorBanner } from "../../components/ErrorBanner.tsx";
+import { FormField } from "../../components/FormField.tsx";
 
 type Props = NativeStackScreenProps<RootStackParamList, "AddGuest">;
 
@@ -18,9 +22,40 @@ function AddGuestScreen({ navigation }: Props) {
     const [identityCardNumber, setIdentityCardNumber] = useState("");
     const [submitting, setSubmitting] = useState(false);
 
+    const {
+        errors,
+        generalError,
+        clearFieldError,
+        clearAllErrors,
+        handleApiError
+    } = useFormErrors();
+
     const handleSubmit = async () => {
-        
-        if (!firstName.trim() || !lastName.trim()) return Alert.alert("Błąd", "Podaj imię i nazwisko");
+        clearAllErrors();
+
+        if (!firstName.trim()) {
+            handleApiError({
+                type: 'ValidationError',
+                title: 'Błędy walidacji',
+                status: 400,
+                errors: {
+                    firstName: ['Imię jest wymagane'],
+                },
+            });
+            return;
+        }
+
+        if (!lastName.trim()) {
+            handleApiError({
+                type: 'ValidationError',
+                title: 'Błędy walidacji',
+                status: 400,
+                errors: {
+                    lastName: ['Nazwisko jest wymagane'],
+                },
+            });
+            return;
+        }
 
         try {
             setSubmitting(true);
@@ -36,7 +71,7 @@ function AddGuestScreen({ navigation }: Props) {
                 { text: "OK", onPress: () => navigation.goBack() }
             ]);
         } catch (err) {
-            Alert.alert("Błąd", (err as Error).message);
+            handleApiError(err as ApiError);
         } finally {
             setSubmitting(false);
         }
@@ -46,22 +81,75 @@ function AddGuestScreen({ navigation }: Props) {
         <ScrollView style={{ backgroundColor: theme.colors.background }} contentContainerStyle={styles.scrollContent}>
             <Card style={styles.card} mode="contained">
                 <Card.Content style={styles.form}>
+                    {generalError && (
+                        <ErrorBanner
+                            message={generalError}
+                            onDismiss={clearAllErrors}
+                        />
+                    )}
+
                     <Text variant="headlineSmall" style={styles.title}>Nowy gość</Text>
 
-                    <TextInput label="Imię *" mode="outlined" value={firstName} onChangeText={setFirstName} editable={!submitting}
-                               style={styles.input} outlineColor={theme.colors.outline} activeOutlineColor={theme.colors.primary} />
+                    <FormField
+                        label="Imię"
+                        required
+                        value={firstName}
+                        onChangeText={(text) => {
+                            setFirstName(text);
+                            clearFieldError('firstName');
+                        }}
+                        editable={!submitting}
+                        error={errors.firstName}
+                    />
 
-                    <TextInput label="Nazwisko *" mode="outlined" value={lastName} onChangeText={setLastName} editable={!submitting}
-                               style={styles.input} outlineColor={theme.colors.outline} activeOutlineColor={theme.colors.primary} />
+                    <FormField
+                        label="Nazwisko"
+                        required
+                        value={lastName}
+                        onChangeText={(text) => {
+                            setLastName(text);
+                            clearFieldError('lastName');
+                        }}
+                        editable={!submitting}
+                        error={errors.lastName}
+                    />
 
-                    <TextInput label="Numer telefonu *" mode="outlined" value={phoneNumber} onChangeText={setPhoneNumber} editable={!submitting}
-                               keyboardType="phone-pad" style={styles.input} outlineColor={theme.colors.outline} activeOutlineColor={theme.colors.primary} />
+                    <FormField
+                        label="Numer telefonu"
+                        required
+                        value={phoneNumber}
+                        onChangeText={(text) => {
+                            setPhoneNumber(text);
+                            clearFieldError('phoneNumber');
+                        }}
+                        editable={!submitting}
+                        keyboardType="phone-pad"
+                        error={errors.phoneNumber}
+                    />
 
-                    <TextInput label="Email" mode="outlined" value={email} onChangeText={setEmail} editable={!submitting} keyboardType="email-address"
-                               style={styles.input} outlineColor={theme.colors.outline} activeOutlineColor={theme.colors.primary} />
+                    <FormField
+                        label="Email"
+                        value={email}
+                        onChangeText={(text) => {
+                            setEmail(text);
+                            clearFieldError('email');
+                        }}
+                        editable={!submitting}
+                        keyboardType="email-address"
+                        error={errors.email}
+                    />
                     
-                    <TextInput label="Numer dowodu osobistego *" mode="outlined" value={identityCardNumber} onChangeText={setIdentityCardNumber}
-                               editable={!submitting} style={styles.input} outlineColor={theme.colors.outline} activeOutlineColor={theme.colors.primary} />
+                    <FormField
+                        label="Numer dowodu osobistego"
+                        required
+                        value={identityCardNumber}
+                        onChangeText={(text) => {
+                            setIdentityCardNumber(text);
+                            clearFieldError('identityCardNumber');
+                        }}
+                        editable={!submitting}
+                        error={errors.identityCardNumber}
+                    />
 
                     <View style={styles.buttonWrapper}>
                         <Button mode="outlined" onPress={() => navigation.goBack()} style={styles.button} disabled={submitting}
@@ -80,7 +168,6 @@ const styles = StyleSheet.create({
     card: { borderRadius: 24, paddingVertical: 8 },
     form: { gap: 16 },
     title: { fontWeight: 'bold', textAlign: 'center', marginBottom: 8 },
-    input: { backgroundColor: 'transparent' },
     buttonWrapper: { flexDirection: 'row', gap: 12, marginTop: 16 },
     button: { flex: 1, borderRadius: 12, paddingVertical: 4 },
 });

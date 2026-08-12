@@ -4,6 +4,10 @@ import {Alert, ScrollView, StyleSheet, View} from "react-native";
 import {useRoomTypes} from "../../context/RoomTypesContext.tsx";
 import {useState} from "react";
 import {ActivityIndicator, Button, Card, TextInput, useTheme} from "react-native-paper";
+import {useFormErrors} from "../../hooks/useFormErrors.ts";
+import {ApiError} from "../../types/errors.ts";
+import {ErrorBanner} from "../../components/ErrorBanner.tsx";
+import {FormField} from "../../components/FormField.tsx";
 
 type Props = NativeStackScreenProps<RootStackParamList, "AddRoomType">;
 
@@ -18,13 +22,35 @@ function AddRoomTypeScreen({navigation} : Props) {
     const [loading, setLoading] = useState(false);
     const [submitting, setSubmitting] = useState(false);
 
+    const {
+        errors,
+        generalError,
+        clearFieldError,
+        clearAllErrors,
+        handleApiError
+    } = useFormErrors();
+
     const handleSubmit = async () => {
         if (!name.trim()){
-            Alert.alert("Błąd", "Podaj nazwę");
+            handleApiError({
+                type: 'ValidationError',
+                title: 'Błędy walidacji',
+                status: 400,
+                errors: {
+                    name: ['Nazwa jest wymagana'],
+                },
+            });
             return;
         }
         if (!basePrice) {
-            Alert.alert("Błąd", "Podaj cene bazową");
+            handleApiError({
+                type: 'ValidationError',
+                title: 'Błędy walidacji',
+                status: 400,
+                errors: {
+                    name: ['Cena bazowa jest wymagana'],
+                },
+            });
             return;
         }
 
@@ -40,7 +66,7 @@ function AddRoomTypeScreen({navigation} : Props) {
                 { text: "OK", onPress: () => navigation.goBack() },
             ])
         } catch (err) {
-            Alert.alert("Błąd", (err as Error).message);
+            handleApiError(err as ApiError);
         } finally {
             setSubmitting(false);
         }
@@ -58,43 +84,52 @@ function AddRoomTypeScreen({navigation} : Props) {
         <ScrollView style={{ backgroundColor: theme.colors.background }} contentContainerStyle={styles.scrollContent}>
             <Card style={styles.card} mode="contained">
                 <Card.Content style={styles.gap}>
+                    
+                    {generalError && (
+                        <ErrorBanner
+                            message={generalError}
+                            onDismiss={clearAllErrors}
+                        />
+                    )}
 
-                    <TextInput
-                        label="Nazwa *"
-                        mode="outlined"
+                    <FormField
+                        label="Nazwa"
+                        required
                         value={name}
-                        onChangeText={setName}
+                        onChangeText={(text) => {
+                            setName(text);
+                            clearFieldError('name');
+                        }}
                         editable={!submitting}
-                        style={styles.input}
-                        outlineColor={theme.colors.outline}
-                        activeOutlineColor={theme.colors.primary}
+                        error={errors.name}
                     />
 
-                    <TextInput
-                        label="Cena bazowa *"
-                        mode="outlined"
+                    <FormField
+                        label="Cena bazowa"
+                        required
                         value={basePrice}
-                        onChangeText={setBasePrice}
-                        keyboardType="numeric"
+                        onChangeText={(text) => {
+                            setBasePrice(text);
+                            clearFieldError('basePrice');
+                        }}
+                        keyboardType='numeric'
                         editable={!submitting}
-                        style={styles.input}
-                        outlineColor={theme.colors.outline}
-                        activeOutlineColor={theme.colors.primary}
+                        error={errors.basePrice}
                     />
 
-                    <TextInput
+                    <FormField
                         label="Opis"
-                        mode="outlined"
                         value={description}
-                        onChangeText={setDescription}
+                        onChangeText={(text) => {
+                            setDescription(text);
+                            clearFieldError('description');
+                        }}
                         multiline
                         numberOfLines={3}
                         editable={!submitting}
-                        style={styles.input}
-                        outlineColor={theme.colors.outline}
-                        activeOutlineColor={theme.colors.primary}
+                        error={errors.description}
                     />
-
+                    
                     <View style={styles.buttons}>
                         <Button
                             mode="outlined"

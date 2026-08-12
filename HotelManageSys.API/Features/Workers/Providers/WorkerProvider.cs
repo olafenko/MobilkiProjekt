@@ -36,6 +36,16 @@ namespace HotelManageSys.API.Features.Workers.Providers
             
             return await query.FirstOrDefaultAsync(w => w.IsActive && w.WorkerId == workerId, cancellationToken);
         }
+
+        public async Task<bool> WorkerExistsByLogin(string login, CancellationToken cancellationToken = default)
+        {
+            return await _dbContext.Workers.AnyAsync(w => w.Login == login && w.IsActive, cancellationToken);
+        }
+
+        public async Task<bool> WorkerExistsByLogin(string login, int workerId, CancellationToken cancellationToken = default)
+        {
+            return await _dbContext.Workers.AnyAsync(w => w.Login == login && w.WorkerId != workerId && w.IsActive, cancellationToken);
+        }
     }
 }
 

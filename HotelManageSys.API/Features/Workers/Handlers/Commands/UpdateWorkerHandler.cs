@@ -1,3 +1,4 @@
+using HotelManageSys.API.Exceptions;
 using HotelManageSys.API.Features.Workers.Messages.Commands;
 using HotelManageSys.API.Features.Workers.Providers;
 using HotelManageSys.API.Features.Workers.Services;
@@ -22,6 +23,11 @@ namespace HotelManageSys.API.Features.Workers.Handlers.Commands
         public async Task<Unit> Handle(UpdateWorkerCommand request, CancellationToken cancellationToken)
         {
             var worker = await _workerProvider.GetWorkerByIdAsync(request.WorkerId, false, cancellationToken);
+
+            if (worker == null) throw new NotFoundException("Worker", request.WorkerId);
+
+            if (await _workerProvider.WorkerExistsByLogin(request.Login, request.WorkerId, cancellationToken))
+                throw new UniqueConstraintException("Login",$"Pracownik o loginie {request.Login} już istnieje");
 
             _logger.LogInformation("Aktualizowanie pracownika ID: {WorkerId}", request.WorkerId);
 

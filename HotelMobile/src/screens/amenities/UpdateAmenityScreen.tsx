@@ -4,6 +4,10 @@ import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../navigation/types.ts";
 import { useAmenities } from "../../context/AmenitiesContext.tsx";
 import { TextInput, Button, Card, Text, useTheme } from 'react-native-paper';
+import {FormField} from "../../components/FormField.tsx";
+import {ErrorBanner} from "../../components/ErrorBanner.tsx";
+import {useFormErrors} from "../../hooks/useFormErrors.ts";
+import {ApiError} from "../../types/errors.ts";
 
 type Props = NativeStackScreenProps<RootStackParamList, "UpdateAmenity">;
 
@@ -16,15 +20,32 @@ function UpdateAmenityScreen({ navigation, route }: Props) {
     const [description, setDescription] = useState(amenity.description || "");
     const [submitting, setSubmitting] = useState(false);
 
+    const {
+        errors,
+        generalError,
+        clearFieldError,
+        clearAllErrors,
+        handleApiError
+    } = useFormErrors();
+    
+
     const handleSubmit = async () => {
-        if (!name.trim()) return Alert.alert("Błąd", "Podaj nazwę udogodnienia");
+        if (!name.trim()) {
+            handleApiError({
+                type: 'ValidationError',
+                title: 'Błędy walidacji',
+                status: 400,
+                errors: {name: ['Nazwa udogodnienia jest wymagana']},
+            })
+            return;
+        }
 
         try {
             setSubmitting(true);
             await updateAmenity(amenity.amenityId, { amenityId: amenity.amenityId, name: name.trim(), description: description.trim() });
             Alert.alert("Sukces", "Udogodnienie zostało zaktualizowane", [{ text: "OK", onPress: () => navigation.goBack() }]);
         } catch (err) {
-            Alert.alert("Błąd", (err as Error).message);
+            handleApiError(err as ApiError);
         } finally {
             setSubmitting(false);
         }
@@ -34,12 +55,42 @@ function UpdateAmenityScreen({ navigation, route }: Props) {
         <ScrollView style={{ backgroundColor: theme.colors.background }} contentContainerStyle={styles.scrollContent}>
             <Card style={styles.card} mode="contained">
                 <Card.Content style={styles.form}>
+                    
+                    {generalError && (
+                        <ErrorBanner
+                            message={generalError}
+                            onDismiss={clearAllErrors}
+                        />
+                    )}
+                    
                     <Text variant="headlineSmall" style={styles.title}>Edytuj udogodnienie</Text>
-                    <TextInput label="Nazwa *" mode="outlined" value={name} onChangeText={setName} editable={!submitting} style={styles.input}
-                               outlineColor={theme.colors.outline} activeOutlineColor={theme.colors.primary} />
+                    <FormField
+                        label="Nazwa"
+                        required
+                        value={name}
+                        onChangeText={(text) => {
+                            setName(text);
+                            clearFieldError('name');
+                        }}
+                        placeholder="np. Klimatyzacja"
+                        error={errors.name}
+                        editable={!submitting}
+                    />
 
-                    <TextInput label="Opis" mode="outlined" value={description} onChangeText={setDescription} editable={!submitting} multiline numberOfLines={3}
-                               style={[styles.input, styles.multiline]} outlineColor={theme.colors.outline} activeOutlineColor={theme.colors.primary} />
+                    <FormField
+                        label="Opis"
+                        value={description}
+                        onChangeText={(text) => {
+                            setDescription(text);
+                            clearFieldError('description');
+                        }}
+                        placeholder="Opcjonalny opis..."
+                        error={errors.description}
+                        editable={!submitting}
+                        style={[styles.multiline]}
+                        multiline
+                        numberOfLines={3}
+                    />
 
                     <View style={styles.buttonWrapper}>
                         <Button mode="outlined" onPress={() => navigation.goBack()} style={styles.button} disabled={submitting}

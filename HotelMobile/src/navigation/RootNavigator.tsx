@@ -14,7 +14,7 @@ import AddWorkerScreen from "../screens/workers/AddWorkerScreen.tsx";
 import UpdateWorkerScreen from "../screens/workers/UpdateWorkerScreen.tsx";
 import AddAdditionalOfferScreen from "../screens/additionalOffers/AddAdditionalOfferScreen.tsx";
 import UpdateAdditionalOfferScreen from "../screens/additionalOffers/UpdateAdditionalOfferScreen.tsx";
-import CreateReservationScreen from "../screens/reservations/CreateReservationScreen.tsx";
+import AddReservationScreen from "../screens/reservations/AddReservationScreen.tsx";
 import UpdateReservationScreen from "../screens/reservations/UpdateReservationScreen.tsx";
 import AddPaymentScreen from "../screens/payments/AddPaymentScreen.tsx";
 import {BottomNavigator} from "./BottomNavigator.tsx";
@@ -106,7 +106,7 @@ function RootNavigator(): React.JSX.Element {
                 />
                 <Stack.Screen
                     name="AddReservation"
-                    component={CreateReservationScreen}
+                    component={AddReservationScreen}
                     options={{title: "Dodaj rezerwacje"}}
                 />
                 <Stack.Screen

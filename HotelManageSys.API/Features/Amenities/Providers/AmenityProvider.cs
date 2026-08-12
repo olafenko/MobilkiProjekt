@@ -76,5 +76,10 @@ namespace HotelManageSys.API.Features.Amenities.Providers
         {
             return await _dbContext.Amenities.AnyAsync(a => a.Name == name && a.IsActive, cancellationToken);
         }
+
+        public async Task<bool> AmenityExistsByName(string name, int amenityId, CancellationToken cancellationToken = default)
+        {
+            return await _dbContext.Amenities.AnyAsync(a => a.Name == name && a.AmenityId != amenityId && a.IsActive, cancellationToken);
+        }
     }
 }
