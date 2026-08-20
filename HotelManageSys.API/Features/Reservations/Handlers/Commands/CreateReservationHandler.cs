@@ -25,6 +25,9 @@ namespace HotelManageSys.API.Features.Reservations.Handlers.Commands
         private readonly ILogger<CreateReservationHandler> _logger;
         private readonly ApplicationDbContext _context;
 
+        private static readonly TimeSpan DefaultCheckInTime = new TimeSpan(15,0,0);
+        private static readonly TimeSpan DefaultCheckOutTime = new TimeSpan(10,0,0);
+
         public CreateReservationHandler(IReservationProvider reservationProvider, IWorkerProvider workerProvider, IAdditionalOfferProvider additionalOfferProvider, IGuestProvider guestProvider, IGuestService guestService, IRoomProvider roomProvider, ILogger<CreateReservationHandler> logger, ApplicationDbContext context)
         {
             _reservationProvider = reservationProvider;
@@ -88,10 +91,13 @@ namespace HotelManageSys.API.Features.Reservations.Handlers.Commands
                 
                 var nights = (int)Math.Ceiling((request.CheckOutDate - request.CheckInDate).TotalDays);
                 var totalPrice = room.RoomType.BasePrice * nights;
-
+                
                 var reservation = request.Adapt<Reservation>();
                 reservation.GuestId = request.GuestId.Value;
 
+                reservation.CheckInDate = request.CheckInDate.Date + DefaultCheckInTime;
+                reservation.CheckOutDate = request.CheckOutDate.Date + DefaultCheckOutTime;
+                
                 foreach (var additionalOfferDTO in request.AdditionalOffers)
                 {
                     var additionalOffer = additionalOffers[additionalOfferDTO.AdditionalOfferId];
@@ -105,7 +111,7 @@ namespace HotelManageSys.API.Features.Reservations.Handlers.Commands
                     reservation.ReservationAdditionalOffers.Add(reservationAdditionalOffer);
 
                 }
-
+                
                 reservation.TotalPrice = totalPrice;
                 
                 _context.Reservations.Add(reservation);
